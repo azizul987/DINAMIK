@@ -18,10 +18,16 @@ config/icon="res://icon.svg"
 [autoload]
 
 GlobalLogic="*res://global_logic.gd"
+sp="*uid://cxmb1j6o5lray"
+gd="*uid://2juixsd1cldy"
 
 [display]
 
 window/stretch/mode="canvas_items"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/awesome_splash/plugin.cfg", "res://addons/godot-action/plugin.cfg")
 
 [input]
 

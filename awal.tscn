@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://2kyj7kxuwy81"]
+
+[ext_resource type="Script" uid="uid://ca5gh6nv811en" path="res://addons/awesome_splash/core/SplashContainer.gd" id="1_jtkw1"]
+[ext_resource type="PackedScene" uid="uid://bvp1p5sxea7hc" path="res://src/demo_collection/twist/splash_screen.tscn" id="2_g4yjm"]
+
+[node name="AweSplashScreen" type="Node2D" unique_id=986945418]
+script = ExtResource("1_jtkw1")
+custom_node/type = 0
+custom_node/default_time = 1.0
+skip/type = 0
+transition_time = 1.0
+fade_color = Color(1, 1, 1, 1)
+metadata/_custom_type_script = "uid://ca5gh6nv811en"
+
+[node name="SplashTwist" parent="." unique_id=1020273107 instance=ExtResource("2_g4yjm")]
