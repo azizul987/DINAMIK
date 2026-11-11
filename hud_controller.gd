@@ -25,7 +25,7 @@ extends Control
 @onready var mat_frost_count: Label = %MatFrostCount
 
 @onready var target_reticle: TextureRect = %TargetReticle
-@onready var player: CharacterBody3D = $"../Players"
+@onready var player: CharacterBody3D = %Players
 
 func _process(_delta: float) -> void:
 	if player and "locked_target" in player and player.locked_target and is_instance_valid(player.locked_target):

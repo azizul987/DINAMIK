@@ -167,3 +167,13 @@ func consume_potion(potion_name: String) -> bool:
 	potion_consumed.emit(potion_name)
 	inventory_updated.emit()
 	return true
+
+var _hit_stop_id: int = 0
+
+func hit_stop(duration: float = 0.05, slow: float = 0.05) -> void:
+	_hit_stop_id += 1
+	var current_id := _hit_stop_id
+	Engine.time_scale = slow
+	await get_tree().create_timer(duration, true, false, true).timeout
+	if current_id == _hit_stop_id:
+		Engine.time_scale = 1.0

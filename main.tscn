@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bgo85e8kye2ny" path="res://camera_pivot.gd" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://bcveboefkhqd8" path="res://hud_controller.gd" id="3_hud"]
 [ext_resource type="Texture2D" uid="uid://dbfmrnvqnscpc" path="res://icon.svg" id="4_icon"]
-[ext_resource type="Script" path="res://dummy_enemy.gd" id="5_dummy"]
+[ext_resource type="Script" uid="uid://cs2ie3ic3a16i" path="res://dummy_enemy.gd" id="5_dummy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -102,6 +102,7 @@ use_collision = true
 size = Vector3(800, 10.075, 800)
 
 [node name="Players" type="CharacterBody3D" parent="." unique_id=1728051542]
+unique_name_in_owner = true
 script = ExtResource("1_ig7tw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Players" unique_id=1610283709]
@@ -150,9 +151,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39254224, 1.4145684)
 use_collision = true
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1317791019]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5556282, 2.4144456)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0382943, 4.6949263)
 use_collision = true
-size = Vector3(1, 1.3261719, 1)
+size = Vector3(1, 4.291504, 1)
 
 [node name="DummySlime" type="CharacterBody3D" parent="." unique_id=711]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74075574, -4.5)
@@ -164,7 +165,9 @@ shape = SubResource("SphereShape3D_slime")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DummySlime" unique_id=713]
 mesh = SubResource("SphereMesh_slime")
 
-[node name="Control" type="Control" parent="." unique_id=1414476379]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1414476000]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1414476379]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -174,7 +177,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("3_hud")
 
-[node name="TargetReticle" type="TextureRect" parent="Control" unique_id=901]
+[node name="TargetReticle" type="TextureRect" parent="CanvasLayer/Control" unique_id=901]
 unique_name_in_owner = true
 visible = false
 self_modulate = Color(1, 0.8, 0.2, 0.9)
@@ -187,90 +190,75 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Toxic" type="Label" parent="Control" unique_id=1004612044]
+[node name="Toxic" type="Label" parent="CanvasLayer/Control" unique_id=1004612044]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -556.0
-offset_top = -309.0
-offset_right = -538.0
-offset_bottom = -264.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 100.0
+offset_bottom = 65.0
 theme_override_colors/font_color = Color(3.85046e-07, 0.7551492, 0.49844563, 1)
 theme_override_font_sizes/font_size = 32
 text = "0"
 
-[node name="Hp" type="Label" parent="Control" unique_id=1084712337]
+[node name="Hp" type="Label" parent="CanvasLayer/Control" unique_id=1084712337]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 524.0
-offset_top = -312.0
-offset_right = 542.0
-offset_bottom = -267.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.52238977, 0, 0.1358791, 1)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 65.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.85, 0.15, 0.25, 1)
 theme_override_font_sizes/font_size = 32
 text = "0"
+horizontal_alignment = 2
 
-[node name="QuickSlotsBar" type="HBoxContainer" parent="Control" unique_id=592520786]
+[node name="QuickSlotsBar" type="HBoxContainer" parent="CanvasLayer/Control" unique_id=592520786]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -142.0
-offset_top = -68.0
-offset_right = 142.0
-offset_bottom = -14.0
+offset_left = -145.0
+offset_top = -74.0
+offset_right = 145.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="SlotHeal" type="PanelContainer" parent="Control/QuickSlotsBar" unique_id=401]
-custom_minimum_size = Vector2(48, 52)
+[node name="SlotHeal" type="PanelContainer" parent="CanvasLayer/Control/QuickSlotsBar" unique_id=401]
+custom_minimum_size = Vector2(50, 56)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
-[node name="VBox" type="VBoxContainer" parent="Control/QuickSlotsBar/SlotHeal" unique_id=402]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal" unique_id=402]
 layout_mode = 2
 theme_override_constants/separation = 1
 
-[node name="Top" type="HBoxContainer" parent="Control/QuickSlotsBar/SlotHeal/VBox" unique_id=403]
+[node name="Top" type="HBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox" unique_id=403]
 layout_mode = 2
 
-[node name="Key" type="Label" parent="Control/QuickSlotsBar/SlotHeal/VBox/Top" unique_id=404]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
-theme_override_font_sizes/font_size = 11
-text = "1"
-
-[node name="Spacer" type="Control" parent="Control/QuickSlotsBar/SlotHeal/VBox/Top" unique_id=405]
+[node name="Spacer" type="Control" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox/Top" unique_id=405]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CountHeal" type="Label" parent="Control/QuickSlotsBar/SlotHeal/VBox/Top" unique_id=406]
+[node name="CountHeal" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox/Top" unique_id=406]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "0"
 
-[node name="IconHeal" type="TextureRect" parent="Control/QuickSlotsBar/SlotHeal/VBox" unique_id=407]
+[node name="IconHeal" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox" unique_id=407]
 unique_name_in_owner = true
 self_modulate = Color(0.2, 0.9, 0.5, 1)
-custom_minimum_size = Vector2(26, 26)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -278,38 +266,39 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SlotStrength" type="PanelContainer" parent="Control/QuickSlotsBar" unique_id=411]
-custom_minimum_size = Vector2(48, 52)
+[node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox" unique_id=404]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_font_sizes/font_size = 11
+text = "1"
+horizontal_alignment = 1
+
+[node name="SlotStrength" type="PanelContainer" parent="CanvasLayer/Control/QuickSlotsBar" unique_id=411]
+custom_minimum_size = Vector2(50, 56)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
-[node name="VBox" type="VBoxContainer" parent="Control/QuickSlotsBar/SlotStrength" unique_id=412]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength" unique_id=412]
 layout_mode = 2
 theme_override_constants/separation = 1
 
-[node name="Top" type="HBoxContainer" parent="Control/QuickSlotsBar/SlotStrength/VBox" unique_id=413]
+[node name="Top" type="HBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox" unique_id=413]
 layout_mode = 2
 
-[node name="Key" type="Label" parent="Control/QuickSlotsBar/SlotStrength/VBox/Top" unique_id=414]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
-theme_override_font_sizes/font_size = 11
-text = "2"
-
-[node name="Spacer" type="Control" parent="Control/QuickSlotsBar/SlotStrength/VBox/Top" unique_id=415]
+[node name="Spacer" type="Control" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox/Top" unique_id=415]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CountStrength" type="Label" parent="Control/QuickSlotsBar/SlotStrength/VBox/Top" unique_id=416]
+[node name="CountStrength" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox/Top" unique_id=416]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "0"
 
-[node name="IconStrength" type="TextureRect" parent="Control/QuickSlotsBar/SlotStrength/VBox" unique_id=417]
+[node name="IconStrength" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox" unique_id=417]
 unique_name_in_owner = true
 self_modulate = Color(1, 0.6, 0.2, 1)
-custom_minimum_size = Vector2(26, 26)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -317,38 +306,39 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SlotSlow" type="PanelContainer" parent="Control/QuickSlotsBar" unique_id=421]
-custom_minimum_size = Vector2(48, 52)
+[node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox" unique_id=414]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_font_sizes/font_size = 11
+text = "2"
+horizontal_alignment = 1
+
+[node name="SlotSlow" type="PanelContainer" parent="CanvasLayer/Control/QuickSlotsBar" unique_id=421]
+custom_minimum_size = Vector2(50, 56)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
-[node name="VBox" type="VBoxContainer" parent="Control/QuickSlotsBar/SlotSlow" unique_id=422]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow" unique_id=422]
 layout_mode = 2
 theme_override_constants/separation = 1
 
-[node name="Top" type="HBoxContainer" parent="Control/QuickSlotsBar/SlotSlow/VBox" unique_id=423]
+[node name="Top" type="HBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox" unique_id=423]
 layout_mode = 2
 
-[node name="Key" type="Label" parent="Control/QuickSlotsBar/SlotSlow/VBox/Top" unique_id=424]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
-theme_override_font_sizes/font_size = 11
-text = "3"
-
-[node name="Spacer" type="Control" parent="Control/QuickSlotsBar/SlotSlow/VBox/Top" unique_id=425]
+[node name="Spacer" type="Control" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox/Top" unique_id=425]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CountSlow" type="Label" parent="Control/QuickSlotsBar/SlotSlow/VBox/Top" unique_id=426]
+[node name="CountSlow" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox/Top" unique_id=426]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "0"
 
-[node name="IconSlow" type="TextureRect" parent="Control/QuickSlotsBar/SlotSlow/VBox" unique_id=427]
+[node name="IconSlow" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox" unique_id=427]
 unique_name_in_owner = true
 self_modulate = Color(0.3, 0.75, 1, 1)
-custom_minimum_size = Vector2(26, 26)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -356,38 +346,39 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SlotBerserk" type="PanelContainer" parent="Control/QuickSlotsBar" unique_id=431]
-custom_minimum_size = Vector2(48, 52)
+[node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox" unique_id=424]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_font_sizes/font_size = 11
+text = "3"
+horizontal_alignment = 1
+
+[node name="SlotBerserk" type="PanelContainer" parent="CanvasLayer/Control/QuickSlotsBar" unique_id=431]
+custom_minimum_size = Vector2(50, 56)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot")
 
-[node name="VBox" type="VBoxContainer" parent="Control/QuickSlotsBar/SlotBerserk" unique_id=432]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk" unique_id=432]
 layout_mode = 2
 theme_override_constants/separation = 1
 
-[node name="Top" type="HBoxContainer" parent="Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=433]
+[node name="Top" type="HBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=433]
 layout_mode = 2
 
-[node name="Key" type="Label" parent="Control/QuickSlotsBar/SlotBerserk/VBox/Top" unique_id=434]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
-theme_override_font_sizes/font_size = 11
-text = "4"
-
-[node name="Spacer" type="Control" parent="Control/QuickSlotsBar/SlotBerserk/VBox/Top" unique_id=435]
+[node name="Spacer" type="Control" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox/Top" unique_id=435]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CountBerserk" type="Label" parent="Control/QuickSlotsBar/SlotBerserk/VBox/Top" unique_id=436]
+[node name="CountBerserk" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox/Top" unique_id=436]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
 text = "0"
 
-[node name="IconBerserk" type="TextureRect" parent="Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=437]
+[node name="IconBerserk" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=437]
 unique_name_in_owner = true
 self_modulate = Color(1, 0.25, 0.35, 1)
-custom_minimum_size = Vector2(26, 26)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -395,13 +386,20 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="BtnCraftToggle" type="Button" parent="Control/QuickSlotsBar" unique_id=441]
+[node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=434]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_font_sizes/font_size = 11
+text = "4"
+horizontal_alignment = 1
+
+[node name="BtnCraftToggle" type="Button" parent="CanvasLayer/Control/QuickSlotsBar" unique_id=441]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(48, 52)
+custom_minimum_size = Vector2(50, 56)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
 
-[node name="VBox" type="VBoxContainer" parent="Control/QuickSlotsBar/BtnCraftToggle" unique_id=442]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/QuickSlotsBar/BtnCraftToggle" unique_id=442]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -411,15 +409,14 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_constants/separation = 1
 
-[node name="Key" type="Label" parent="Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=443]
+[node name="TopSpacer" type="Control" parent="CanvasLayer/Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=445]
+custom_minimum_size = Vector2(0, 11)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.8, 0.3, 1)
-theme_override_font_sizes/font_size = 11
-text = "C"
+mouse_filter = 2
 
-[node name="IconCraft" type="TextureRect" parent="Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=444]
+[node name="IconCraft" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=444]
 self_modulate = Color(0.9, 0.8, 0.3, 1)
-custom_minimum_size = Vector2(26, 26)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -428,7 +425,14 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CraftingPanel" type="PanelContainer" parent="Control" unique_id=515765654]
+[node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=443]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 11
+text = "C"
+horizontal_alignment = 1
+
+[node name="CraftingPanel" type="PanelContainer" parent="CanvasLayer/Control" unique_id=515765654]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -445,37 +449,37 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_crafting")
 
-[node name="Margin" type="MarginContainer" parent="Control/CraftingPanel" unique_id=1058788858]
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/Control/CraftingPanel" unique_id=1058788858]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="VBox" type="VBoxContainer" parent="Control/CraftingPanel/Margin" unique_id=1924657773]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin" unique_id=1924657773]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Control/CraftingPanel/Margin/VBox" unique_id=1130125351]
+[node name="Title" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox" unique_id=1130125351]
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 text = "MEJA ALKIMIA"
 horizontal_alignment = 1
 
-[node name="MaterialsBar" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox" unique_id=236356269]
+[node name="MaterialsBar" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox" unique_id=236356269]
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="ChipSlime" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar" unique_id=311001001]
+[node name="ChipSlime" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar" unique_id=311001001]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime" unique_id=311001002]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime" unique_id=311001002]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime/HBox" unique_id=311001003]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime/HBox" unique_id=311001003]
 self_modulate = Color(0.2, 0.9, 0.5, 1)
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
@@ -484,21 +488,21 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MatSlimeCount" type="Label" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime/HBox" unique_id=311001004]
+[node name="MatSlimeCount" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime/HBox" unique_id=311001004]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "0"
 
-[node name="ChipFire" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar" unique_id=311001005]
+[node name="ChipFire" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar" unique_id=311001005]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire" unique_id=311001006]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire" unique_id=311001006]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire/HBox" unique_id=311001007]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire/HBox" unique_id=311001007]
 self_modulate = Color(1, 0.6, 0.2, 1)
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
@@ -507,21 +511,21 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MatFireCount" type="Label" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire/HBox" unique_id=311001008]
+[node name="MatFireCount" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire/HBox" unique_id=311001008]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "0"
 
-[node name="ChipFrost" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar" unique_id=311001009]
+[node name="ChipFrost" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar" unique_id=311001009]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost" unique_id=311001010]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost" unique_id=311001010]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost/HBox" unique_id=311001011]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost/HBox" unique_id=311001011]
 self_modulate = Color(0.3, 0.75, 1, 1)
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
@@ -530,28 +534,28 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MatFrostCount" type="Label" parent="Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost/HBox" unique_id=311001012]
+[node name="MatFrostCount" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost/HBox" unique_id=311001012]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "0"
 
-[node name="HSeparator" type="HSeparator" parent="Control/CraftingPanel/Margin/VBox" unique_id=1041631887]
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox" unique_id=1041631887]
 layout_mode = 2
 
-[node name="RecipeList" type="VBoxContainer" parent="Control/CraftingPanel/Margin/VBox" unique_id=1588507515]
+[node name="RecipeList" type="VBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox" unique_id=1588507515]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="RowHeal" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=1361408767]
+[node name="RowHeal" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=1361408767]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal" unique_id=1559084392]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal" unique_id=1559084392]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=811001001]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=811001001]
 self_modulate = Color(0.2, 0.9, 0.5, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -560,38 +564,38 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Info" type="VBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=626939614]
+[node name="Info" type="VBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=626939614]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Name" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox/Info" unique_id=280103302]
+[node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox/Info" unique_id=280103302]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.9, 0.5, 1)
 theme_override_font_sizes/font_size = 14
 text = "Healing Potion"
 
-[node name="Cost" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox/Info" unique_id=1999635762]
+[node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox/Info" unique_id=1999635762]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Slime Gel"
 
-[node name="BtnHeal" type="Button" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=1235304248]
+[node name="BtnHeal" type="Button" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=1235304248]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(75, 32)
 layout_mode = 2
 size_flags_vertical = 4
 text = "Racik"
 
-[node name="RowStrength" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=722712317]
+[node name="RowStrength" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=722712317]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength" unique_id=1787346383]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength" unique_id=1787346383]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=811001002]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=811001002]
 self_modulate = Color(1, 0.6, 0.2, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -600,38 +604,38 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Info" type="VBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=1231907935]
+[node name="Info" type="VBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=1231907935]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Name" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox/Info" unique_id=1863986502]
+[node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox/Info" unique_id=1863986502]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
 theme_override_font_sizes/font_size = 14
 text = "Strength Potion"
 
-[node name="Cost" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox/Info" unique_id=1485570316]
+[node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox/Info" unique_id=1485570316]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Fire Essence"
 
-[node name="BtnStrength" type="Button" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=1806135789]
+[node name="BtnStrength" type="Button" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=1806135789]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(75, 32)
 layout_mode = 2
 size_flags_vertical = 4
 text = "Racik"
 
-[node name="RowSlow" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=2098263592]
+[node name="RowSlow" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=2098263592]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow" unique_id=935305177]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow" unique_id=935305177]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=811001003]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=811001003]
 self_modulate = Color(0.3, 0.75, 1, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -640,38 +644,38 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Info" type="VBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=792660077]
+[node name="Info" type="VBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=792660077]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Name" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox/Info" unique_id=1649568066]
+[node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox/Info" unique_id=1649568066]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "Slow Potion"
 
-[node name="Cost" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox/Info" unique_id=111490904]
+[node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox/Info" unique_id=111490904]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Frost Wing"
 
-[node name="BtnSlow" type="Button" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=1724340894]
+[node name="BtnSlow" type="Button" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=1724340894]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(75, 32)
 layout_mode = 2
 size_flags_vertical = 4
 text = "Racik"
 
-[node name="RowBerserk" type="PanelContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=920731256]
+[node name="RowBerserk" type="PanelContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList" unique_id=920731256]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_row")
 
-[node name="HBox" type="HBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk" unique_id=932680373]
+[node name="HBox" type="HBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk" unique_id=932680373]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=811001004]
+[node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=811001004]
 self_modulate = Color(1, 0.25, 0.35, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -680,23 +684,23 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Info" type="VBoxContainer" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=1742681291]
+[node name="Info" type="VBoxContainer" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=1742681291]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Name" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox/Info" unique_id=1803893203]
+[node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox/Info" unique_id=1803893203]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.25, 0.35, 1)
 theme_override_font_sizes/font_size = 14
 text = "Berserk Potion"
 
-[node name="Cost" type="Label" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox/Info" unique_id=981128649]
+[node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox/Info" unique_id=981128649]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Slime + 1 Api"
 
-[node name="BtnBerserk" type="Button" parent="Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=1601723709]
+[node name="BtnBerserk" type="Button" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=1601723709]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(75, 32)
 layout_mode = 2

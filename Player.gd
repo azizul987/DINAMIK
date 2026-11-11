@@ -1,20 +1,64 @@
 extends CharacterBody3D
 
+@export_group("Movement")
 @export var walk_speed: float = 4.5
 @export var run_speed: float = 7.0
 @export var jump_force: float = 7.5
 @export var gravity: float = 20.0
 @export var air_control: float = 0.3
 @export var coyote_time: float = 0.12
+
+@export_group("Combat - Attack")
 @export var base_damage: float = 15.0
 @export var attack_cooldown: float = 0.35
+@export var base_knockback_force: float = 9.0
+@export var knockback_lift: float = 0.45
+@export var strength_damage_multiplier: float = 2.0
+@export var berserk_damage_multiplier: float = 3.0
+@export var strength_knockback_multiplier: float = 1.25
+@export var berserk_knockback_multiplier: float = 1.5
+@export var attack_slash_angle_deg: float = 65.0
+@export var attack_slash_duration: float = 0.12
+@export var attack_recovery_duration: float = 0.15
+@export var attack_lunge_speed: float = 4.2
+@export var attack_lunge_duration: float = 0.08
+
+@export_group("Combat - Defense & Recoil")
+@export var invulnerability_duration: float = 0.6
+@export var received_knockback_duration: float = 0.25
+@export var received_knockback_damping: float = 9.0
+@export var hit_trauma_shake: float = 0.55
+
+@export_group("Combat - Dash")
+@export var dash_speed: float = 16.0
+@export var dash_duration: float = 0.18
+@export var dash_cooldown: float = 0.5
+@export var dash_ghost_interval: float = 0.045
+
+@export_group("Target Lock-On")
+@export var lock_on_max_distance: float = 18.0
+@export var lock_on_turn_speed: float = 15.0
 
 var speed_multiplier: float = 1.0
 var coyote_timer: float = 0.0
 var is_attacking: bool = false
 var can_attack: bool = true
 var locked_target: Node3D = null
-const LOCK_ON_MAX_DISTANCE: float = 18.0
+
+var is_invulnerable: bool = false
+var knockback_timer: float = 0.0
+var _hit_targets_this_swing: Array[Node] = []
+var lunge_timer: float = 0.0
+var lunge_direction: Vector3 = Vector3.ZERO
+
+var is_dashing: bool = false
+var dash_timer: float = 0.0
+var dash_cooldown_timer: float = 0.0
+var dash_direction: Vector3 = Vector3.ZERO
+var dash_ghost_timer: float = 0.0
+
+var slash_arc: MeshInstance3D = null
+var slash_arc_mat: StandardMaterial3D = null
 
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var mesh_instance: Node3D = $MeshInstance
@@ -22,8 +66,47 @@ const LOCK_ON_MAX_DISTANCE: float = 18.0
 @onready var hitbox: Area3D = %Hitbox
 
 func _ready() -> void:
+	add_to_group("player")
 	GlobalLogic.toxicity_stage_changed.connect(_on_toxicity_stage_changed)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
+	_setup_slash_arc()
+
+func _setup_slash_arc() -> void:
+	slash_arc = MeshInstance3D.new()
+	slash_arc.name = "SlashArc"
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.35
+	torus.outer_radius = 0.65
+	torus.rings = 24
+	torus.ring_segments = 6
+	slash_arc.mesh = torus
+
+	slash_arc_mat = StandardMaterial3D.new()
+	slash_arc_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	slash_arc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	slash_arc_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.0)
+	slash_arc.material_override = slash_arc_mat
+
+	slash_arc.position = Vector3(0.0, 0.0, 0.3)
+	slash_arc.scale = Vector3(1.0, 0.05, 1.0)
+	slash_arc.visible = false
+	weapon_pivot.add_child(slash_arc)
+
+func _trigger_slash_arc() -> void:
+	if not slash_arc or not slash_arc_mat:
+		return
+	slash_arc.visible = true
+	var arc_color := Color(1.0, 0.25, 0.2, 0.85) if GlobalLogic.is_berserk_active else (Color(1.0, 0.8, 0.2, 0.85) if GlobalLogic.is_strength_active else Color(1.0, 1.0, 1.0, 0.85))
+	slash_arc_mat.albedo_color = arc_color
+	slash_arc.scale = Vector3(0.8, 0.04, 0.8)
+
+	var tw := create_tween()
+	tw.tween_property(slash_arc, "scale", Vector3(1.3, 0.04, 1.3), attack_slash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(slash_arc_mat, "albedo_color:a", 0.0, attack_slash_duration).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func():
+		if is_instance_valid(slash_arc):
+			slash_arc.visible = false
+	)
 
 func _on_toxicity_stage_changed(stage: GlobalLogic.ToxicityStage) -> void:
 	match stage:
@@ -63,7 +146,28 @@ func _physics_process(delta: float) -> void:
 	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var direction := _get_camera_relative_direction(input_dir)
 
-	if is_on_floor():
+	dash_cooldown_timer = maxf(0.0, dash_cooldown_timer - delta)
+
+	if is_dashing:
+		dash_timer -= delta
+		velocity.x = dash_direction.x * dash_speed
+		velocity.z = dash_direction.z * dash_speed
+		dash_ghost_timer -= delta
+		if dash_ghost_timer <= 0.0:
+			dash_ghost_timer = dash_ghost_interval
+			_spawn_ghost_trail()
+		if dash_timer <= 0.0:
+			is_dashing = false
+			is_invulnerable = false
+	elif lunge_timer > 0.0:
+		lunge_timer -= delta
+		velocity.x = lunge_direction.x * attack_lunge_speed
+		velocity.z = lunge_direction.z * attack_lunge_speed
+	elif knockback_timer > 0.0:
+		knockback_timer -= delta
+		velocity.x = move_toward(velocity.x, direction.x * target_speed, received_knockback_damping * delta)
+		velocity.z = move_toward(velocity.z, direction.z * target_speed, received_knockback_damping * delta)
+	elif is_on_floor():
 		if direction:
 			velocity.x = direction.x * target_speed
 			velocity.z = direction.z * target_speed
@@ -82,7 +186,7 @@ func _physics_process(delta: float) -> void:
 		to_enemy.y = 0.0
 		if to_enemy.length_squared() > 0.01:
 			var target_yaw := atan2(to_enemy.x, to_enemy.z)
-			mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_yaw, 15.0 * delta)
+			mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_yaw, lock_on_turn_speed * delta)
 	elif direction.length() > 0.1:
 		var target_angle := atan2(direction.x, direction.z)
 		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_angle, 12.0 * delta)
@@ -103,6 +207,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_Q or event.keycode == KEY_TAB:
 			toggle_lock_on()
+		elif event.keycode == KEY_SHIFT:
+			dash()
 
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_MIDDLE:
@@ -110,6 +216,78 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.button_index == MOUSE_BUTTON_LEFT:
 			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and can_attack and not GlobalLogic.is_dead:
 				attack()
+
+func dash() -> void:
+	if is_dashing or dash_cooldown_timer > 0.0 or GlobalLogic.is_dead:
+		return
+
+	is_dashing = true
+	dash_timer = dash_duration
+	dash_cooldown_timer = dash_cooldown
+	is_invulnerable = true
+	dash_ghost_timer = 0.0
+
+	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var move_dir := _get_camera_relative_direction(input_dir)
+
+	if locked_target and is_instance_valid(locked_target):
+		var to_enemy: Vector3 = locked_target.global_position - global_position
+		to_enemy.y = 0.0
+		var dist := to_enemy.length()
+		if input_dir.length_squared() > 0.1:
+			dash_direction = move_dir
+		elif dist > 1.2:
+			dash_direction = to_enemy.normalized()
+		else:
+			dash_direction = -to_enemy.normalized()
+
+		if dash_direction.length_squared() > 0.01:
+			mesh_instance.rotation.y = atan2(dash_direction.x, dash_direction.z)
+	elif move_dir.length_squared() > 0.01:
+		dash_direction = move_dir
+		mesh_instance.rotation.y = atan2(dash_direction.x, dash_direction.z)
+	else:
+		dash_direction = Vector3(sin(mesh_instance.rotation.y), 0.0, cos(mesh_instance.rotation.y)).normalized()
+
+	var tw := create_tween()
+	mesh_instance.scale = Vector3(0.82, 0.82, 1.35)
+	tw.tween_property(mesh_instance, "scale", Vector3.ONE, dash_duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	if camera_pivot and camera_pivot.has_method("fov_punch"):
+		camera_pivot.fov_punch(-2.5, dash_duration + 0.08)
+
+	_spawn_ghost_trail()
+
+func _spawn_ghost_trail() -> void:
+	if not is_inside_tree():
+		return
+
+	var ghost := MeshInstance3D.new()
+	var cap := CapsuleMesh.new()
+	cap.radius = 0.38
+	cap.height = 1.75
+	ghost.mesh = cap
+
+	var ghost_mat := StandardMaterial3D.new()
+	ghost_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ghost_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	ghost_mat.albedo_color = Color(0.35, 0.85, 1.0, 0.45)
+	ghost.material_override = ghost_mat
+
+	var parent_node := get_parent()
+	if not parent_node:
+		parent_node = get_tree().current_scene
+	if not parent_node:
+		return
+
+	parent_node.add_child(ghost)
+	ghost.global_position = mesh_instance.global_position + Vector3(0.0, 0.9, 0.0)
+	ghost.global_rotation = mesh_instance.global_rotation
+	ghost.scale = mesh_instance.scale
+
+	var tw := ghost.create_tween()
+	tw.tween_property(ghost_mat, "albedo_color:a", 0.0, 0.22).set_ease(Tween.EASE_IN)
+	tw.tween_callback(ghost.queue_free)
 
 func toggle_lock_on() -> void:
 	if locked_target != null:
@@ -120,7 +298,7 @@ func toggle_lock_on() -> void:
 func _find_best_target() -> Node3D:
 	var enemies := get_tree().get_nodes_in_group("enemies")
 	var best_target: Node3D = null
-	var best_dist: float = LOCK_ON_MAX_DISTANCE
+	var best_dist: float = lock_on_max_distance
 
 	var cam_basis: Basis = camera_pivot.global_transform.basis
 	var cam_forward: Vector3 = -cam_basis.z
@@ -136,7 +314,7 @@ func _find_best_target() -> Node3D:
 
 		var to_enemy: Vector3 = enemy_node.global_position - global_position
 		var dist: float = to_enemy.length()
-		if dist > LOCK_ON_MAX_DISTANCE:
+		if dist > lock_on_max_distance:
 			continue
 
 		to_enemy.y = 0.0
@@ -152,6 +330,7 @@ func _find_best_target() -> Node3D:
 func attack() -> void:
 	can_attack = false
 	is_attacking = true
+	_hit_targets_this_swing.clear()
 
 	# Snap orientation directly to locked target or camera forward!
 	if locked_target and is_instance_valid(locked_target):
@@ -168,38 +347,92 @@ func attack() -> void:
 
 	var damage := base_damage
 	if GlobalLogic.is_berserk_active:
-		damage *= 3.0
+		damage *= berserk_damage_multiplier
 	elif GlobalLogic.is_strength_active:
-		damage *= 2.0
+		damage *= strength_damage_multiplier
+
+	# Attack lunge & slash arc
+	lunge_direction = Vector3(sin(mesh_instance.rotation.y), 0.0, cos(mesh_instance.rotation.y)).normalized()
+	lunge_timer = attack_lunge_duration
+	_trigger_slash_arc()
 
 	var tween := create_tween()
-	tween.tween_property(weapon_pivot, "rotation:y", deg_to_rad(65.0), 0.12).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(weapon_pivot, "rotation:y", 0.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(weapon_pivot, "rotation:y", deg_to_rad(attack_slash_angle_deg), attack_slash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(weapon_pivot, "rotation:y", 0.0, attack_recovery_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 
 	hitbox.monitoring = true
 	var bodies := hitbox.get_overlapping_bodies()
 	for b in bodies:
 		if b != self and b.has_method("take_damage"):
-			var knockback: Vector3 = (b.global_position - global_position).normalized()
-			knockback.y = 0.2
-			b.take_damage(damage, knockback)
+			_apply_hit_to_target(b)
 
-	await get_tree().create_timer(0.15).timeout
+	await get_tree().create_timer(attack_slash_duration).timeout
 	hitbox.monitoring = false
 	is_attacking = false
 
-	await get_tree().create_timer(attack_cooldown - 0.15).timeout
+	await get_tree().create_timer(maxf(0.01, attack_cooldown - attack_slash_duration)).timeout
 	can_attack = true
+
+func _apply_hit_to_target(target: Node) -> void:
+	if not target or target == self or not target.has_method("take_damage"):
+		return
+	if _hit_targets_this_swing.has(target):
+		return
+	_hit_targets_this_swing.append(target)
+
+	var damage := base_damage
+	var kb_force: float = base_knockback_force
+	if GlobalLogic.is_berserk_active:
+		damage *= berserk_damage_multiplier
+		kb_force *= berserk_knockback_multiplier
+	elif GlobalLogic.is_strength_active:
+		damage *= strength_damage_multiplier
+		kb_force *= strength_knockback_multiplier
+
+	var to_body: Vector3 = target.global_position - global_position
+	to_body.y = 0.0
+	var knockback_dir: Vector3 = to_body.normalized() if to_body.length_squared() > 0.01 else -global_transform.basis.z
+	knockback_dir.y = knockback_lift
+	knockback_dir = knockback_dir.normalized()
+
+	target.take_damage(damage, knockback_dir * kb_force)
+
+	# Combat Juice Feedback
+	GlobalLogic.hit_stop(0.05, 0.05)
+	if camera_pivot:
+		var is_buffed: bool = GlobalLogic.is_berserk_active or GlobalLogic.is_strength_active
+		var trauma_val: float = 0.65 if is_buffed else 0.42
+		var punch_val: float = 2.4 if is_buffed else 1.5
+		if camera_pivot.has_method("add_trauma"):
+			camera_pivot.add_trauma(trauma_val)
+		if camera_pivot.has_method("fov_punch"):
+			camera_pivot.fov_punch(punch_val)
 
 func _on_hitbox_body_entered(body: Node) -> void:
 	if not is_attacking or body == self:
 		return
-	if body.has_method("take_damage"):
-		var damage := base_damage
-		if GlobalLogic.is_berserk_active:
-			damage *= 3.0
-		elif GlobalLogic.is_strength_active:
-			damage *= 2.0
-		var knockback: Vector3 = (body.global_position - global_position).normalized()
-		knockback.y = 0.2
-		body.take_damage(damage, knockback)
+	_apply_hit_to_target(body)
+
+func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
+	if is_invulnerable or GlobalLogic.is_dead:
+		return
+
+	is_invulnerable = true
+	GlobalLogic.modify_hp(-amount)
+
+	if knockback.length_squared() > 0.01:
+		velocity = knockback
+		knockback_timer = received_knockback_duration
+
+	var tween := create_tween()
+	mesh_instance.scale = Vector3(0.8, 1.25, 0.8)
+	tween.tween_property(mesh_instance, "scale", Vector3.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	if camera_pivot:
+		if camera_pivot.has_method("add_trauma"):
+			camera_pivot.add_trauma(hit_trauma_shake)
+		if camera_pivot.has_method("fov_punch"):
+			camera_pivot.fov_punch(2.0)
+
+	await get_tree().create_timer(invulnerability_duration).timeout
+	is_invulnerable = false

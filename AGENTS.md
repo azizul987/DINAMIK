@@ -17,3 +17,7 @@
 
 ## 3. Aturan .gitignore
 - File `FUNCTIONS_REGISTRY.md` harus selalu terdaftar di `.gitignore` agar tidak mengotori commit riwayat git.
+
+## 4. Manajemen Proses Background & Lifecycle Task
+- **Wajib Auto-Terminate pada Pengujian:** Setiap kali menjalankan pengujian headless Godot atau skrip runner, agen WAJIB menggunakan flag pembatas (misal `--quit-after N`) atau memastikan skrip memanggil `get_tree().quit()` / `quit()` agar proses tidak menggantung tanpa batas.
+- **Pembersihan Proses di Akhir Giliran:** Sebelum menyelesaikan respon percakapan, agen WAJIB memeriksa task aktif via `manage_task` dan mematikan (*kill*) seluruh proses background yang tidak diperlukan, KECUALI pengguna secara eksplisit meminta proses tersebut tetap berjalan di latar belakang (misal dev server, watcher, atau daemon).
