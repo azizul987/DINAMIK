@@ -13,6 +13,15 @@ func _ready() -> void:
 	if parent_body is CollisionObject3D:
 		spring_arm.add_excluded_object(parent_body.get_rid())
 
+func _process(delta: float) -> void:
+	var parent_node := get_parent()
+	if parent_node and "locked_target" in parent_node and parent_node.locked_target and is_instance_valid(parent_node.locked_target):
+		var to_target: Vector3 = parent_node.locked_target.global_position - global_position
+		to_target.y = 0.0
+		if to_target.length_squared() > 0.01:
+			var target_yaw := atan2(-to_target.x, -to_target.z)
+			global_rotation.y = lerp_angle(global_rotation.y, target_yaw, 10.0 * delta)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
