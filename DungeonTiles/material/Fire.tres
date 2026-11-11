@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b0gymtrf5pf6l"]
+
+[ext_resource type="Shader" uid="uid://uqcr4gm6sw2m" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/FireShader.tres" id="1_2uwbh"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_2uwbh")
+shader_parameter/ScrollSpeed = 1.0
+shader_parameter/it_does_something = 2.6
+shader_parameter/EmissionStrength = 1.5

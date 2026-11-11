@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dbfmrnvqnscpc" path="res://icon.svg" id="4_icon"]
 [ext_resource type="Script" uid="uid://cs2ie3ic3a16i" path="res://dummy_enemy.gd" id="5_dummy"]
 [ext_resource type="PackedScene" path="res://spike_trap.tscn" id="6_spike_trap"]
+[ext_resource type="PackedScene" uid="uid://3fjrei2e1v2b" path="res://DungeonTiles/scenes/Level/Test.tscn" id="7_272bh"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -104,6 +105,7 @@ size = Vector3(800, 10.075, 800)
 
 [node name="Players" type="CharacterBody3D" parent="." unique_id=1728051542]
 unique_name_in_owner = true
+wall_min_slide_angle = 1.2391838
 script = ExtResource("1_ig7tw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Players" unique_id=1610283709]
@@ -710,3 +712,6 @@ custom_minimum_size = Vector2(75, 32)
 layout_mode = 2
 size_flags_vertical = 4
 text = "Racik"
+
+[node name="Node3D" parent="." unique_id=1257887040 instance=ExtResource("7_272bh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7486942, 0)

@@ -1,0 +1,247 @@
+[gd_scene format=3 uid="uid://3fjrei2e1v2b"]
+
+[ext_resource type="PackedScene" uid="uid://q7po4mjnrsu1" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_candle.tscn" id="1_ac28i"]
+[ext_resource type="MeshLibrary" uid="uid://ctt52t6ypk3ef" path="res://DungeonTiles/scenes/MeshLibrary/rooms.tres" id="1_vvuyf"]
+[ext_resource type="MeshLibrary" uid="uid://1c2k4d2qgfv4" path="res://DungeonTiles/scenes/MeshLibrary/Walls.tres" id="2_d2luu"]
+[ext_resource type="MeshLibrary" uid="uid://cja1xmiipdihy" path="res://DungeonTiles/scenes/MeshLibrary/decors.tres" id="3_b5cms"]
+[ext_resource type="PackedScene" uid="uid://r0o3ggd3njgg" path="res://DungeonTiles/scenes/Props/set_5/prop_set_5_torch_wall_1.tscn" id="3_fk2dp"]
+[ext_resource type="MeshLibrary" uid="uid://dh3twsgivnq63" path="res://DungeonTiles/scenes/MeshLibrary/Pillars.tres" id="3_lv1e3"]
+[ext_resource type="MeshLibrary" uid="uid://vcg31mrtc2pk" path="res://DungeonTiles/scenes/MeshLibrary/Platforms.tres" id="4_0lig1"]
+[ext_resource type="PackedScene" uid="uid://bhiy2s68nbpmo" path="res://DungeonTiles/scenes/Props/set_5/prop_set_5_torch_wall_2.tscn" id="4_wjbr7"]
+[ext_resource type="PackedScene" uid="uid://co5g1aq33h6i3" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_barrel.tscn" id="10_lxo6f"]
+[ext_resource type="PackedScene" uid="uid://b6wqhomqcbctf" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_box.tscn" id="11_ehxbl"]
+[ext_resource type="PackedScene" uid="uid://d1msiynse4qh3" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_chest.tscn" id="12_otdek"]
+[ext_resource type="PackedScene" uid="uid://ckf14xewfe5kr" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_jar.tscn" id="13_sb10u"]
+[ext_resource type="PackedScene" uid="uid://cjvv5vvi45r3a" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_book_1.tscn" id="14_rmut0"]
+[ext_resource type="PackedScene" uid="uid://dan7pnvdxbfdk" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_book_2.tscn" id="15_v15tn"]
+[ext_resource type="PackedScene" uid="uid://hq2hiq0p4s2i" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_candle_holder_1.tscn" id="16_e0iqh"]
+[ext_resource type="PackedScene" uid="uid://dgjeswn7gdvpc" path="res://DungeonTiles/scenes/Props/set_3/prop_set_3_bench.tscn" id="17_gmg5a"]
+[ext_resource type="PackedScene" uid="uid://ben0jpo68dona" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_large_bone.tscn" id="18_p35j5"]
+[ext_resource type="PackedScene" uid="uid://csienx0lltfyi" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_shelf.tscn" id="19_s2axl"]
+[ext_resource type="PackedScene" uid="uid://b4hildib8tibc" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_shelf_001.tscn" id="20_1f31e"]
+[ext_resource type="PackedScene" uid="uid://ci5g3edqtm3jy" path="res://DungeonTiles/scenes/Props/set_5/prop_set_5_head_clamp.tscn" id="28_5sei3"]
+
+[node name="Node3D" type="Node3D" unique_id=131380000]
+
+[node name="Lights" type="Node3D" parent="." unique_id=2098143068]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Lights" unique_id=755878703]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 13.2512, 0)
+light_energy = 0.0
+shadow_enabled = true
+shadow_reverse_cull_face = true
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Lights" unique_id=382492005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.75381, 2.3816, 8.38637)
+light_energy = 1.869
+shadow_enabled = true
+omni_range = 16.573
+
+[node name="Candle" type="Node3D" parent="Lights" unique_id=978762656]
+visible = false
+
+[node name="PropSet_2_Candle" parent="Lights/Candle" unique_id=1163702846 instance=ExtResource("1_ac28i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8078, 1.40496, -2.04042)
+
+[node name="PropSet_2_Candle4" parent="Lights/Candle" unique_id=1634961699 instance=ExtResource("1_ac28i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.08652, 1.42802, 40.0993)
+
+[node name="PropSet_2_Candle5" parent="Lights/Candle" unique_id=993615826 instance=ExtResource("1_ac28i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.18503, 1.42803, 29.6592)
+
+[node name="Torches" type="Node3D" parent="Lights" unique_id=561524000]
+visible = false
+
+[node name="PropSet_5_TorchWall_29" parent="Lights/Torches" unique_id=59378967 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 0.888871, 1, -0.287891)
+
+[node name="PropSet_5_TorchWall_2" parent="Lights/Torches" unique_id=531615561 instance=ExtResource("4_wjbr7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09961036, 0.98247766, 5.0710325)
+
+[node name="PropSet_5_TorchWall_4" parent="Lights/Torches" unique_id=200419814 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -10.9108, 1, 15.0591)
+
+[node name="PropSet_5_TorchWall_5" parent="Lights/Torches" unique_id=1040564598 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, 1, -10.9108, 1, 15.0591)
+
+[node name="PropSet_5_TorchWall_7" parent="Lights/Torches" unique_id=1053258014 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1.49012e-07, 0, 1, 0, 1, 0, -1, 0, -1.49012e-07, -30.6058, 5, 29.0591)
+
+[node name="PropSet_5_TorchWall_12" parent="Lights/Torches" unique_id=379627513 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1.49012e-07, 0, 1, 0, 1, 0, -1, 0, -1.49012e-07, -38.6421, 5, 25.0591)
+
+[node name="PropSet_5_TorchWall_13" parent="Lights/Torches" unique_id=1287857426 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1.49012e-07, 0, 1, 0, 1, 0, -1, 0, -1.49012e-07, -38.6421, 5, 29.0591)
+
+[node name="PropSet_5_TorchWall_16" parent="Lights/Torches" unique_id=115464876 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1, 0, -1.92723e-07, 0, 1, 0, 1.92723e-07, 0, -1, -60.6421, 1, 38.9783)
+
+[node name="PropSet_5_TorchWall_17" parent="Lights/Torches" unique_id=1859916838 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1.78814e-07, 0, 1, 0, 1, 0, -1, 0, -1.78814e-07, -66.7977, 1, 32.0591)
+
+[node name="PropSet_5_TorchWall_8" parent="Lights/Torches" unique_id=1595433623 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(5.96046e-08, 0, -1, 0, 1, 0, 1, 0, 5.96046e-08, -43.3362, 5, 29.0591)
+
+[node name="PropSet_5_TorchWall_9" parent="Lights/Torches" unique_id=1544936486 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(5.96046e-08, 0, -1, 0, 1, 0, 1, 0, 5.96046e-08, -43.3362, 5, 25.0591)
+
+[node name="PropSet_5_TorchWall_21" parent="Lights/Torches" unique_id=1206337313 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(5.96046e-08, 0, -1, 0, 1, 0, 1, 0, 5.96046e-08, -51.3362, 5, 25.0591)
+
+[node name="PropSet_5_TorchWall_10" parent="Lights/Torches" unique_id=2005973999 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(5.96046e-08, 0, -1, 0, 1, 0, 1, 0, 5.96046e-08, -35.3349, 5, 29.0591)
+
+[node name="PropSet_5_TorchWall_11" parent="Lights/Torches" unique_id=1009999521 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(5.96046e-08, 0, -1, 0, 1, 0, 1, 0, 5.96046e-08, -35.3349, 5, 25.0591)
+
+[node name="PropSet_5_TorchWall_22" parent="Lights/Torches" unique_id=797467519 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, -1, -10.9138, 1, 34.9548)
+
+[node name="PropSet_5_TorchWall_20" parent="Lights/Torches" unique_id=1765505077 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, 1, -10.9108, 1, 35.0591)
+
+[node name="PropSet_5_TorchWall_23" parent="Lights/Torches" unique_id=708438440 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, -1, -3.05905, 1, 34.9548)
+
+[node name="PropSet_5_TorchWall_24" parent="Lights/Torches" unique_id=659786865 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, 1, -3.05604, 1, 35.0591)
+
+[node name="PropSet_5_TorchWall_25" parent="Lights/Torches" unique_id=1518753714 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, -1, 8.94095, 1, 34.9548)
+
+[node name="PropSet_5_TorchWall_26" parent="Lights/Torches" unique_id=1450661053 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, 1, 8.94396, 1, 35.0591)
+
+[node name="PropSet_5_TorchWall_27" parent="Lights/Torches" unique_id=669518045 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(-1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, -1, 16.9409, 1, 34.9548)
+
+[node name="PropSet_5_TorchWall_28" parent="Lights/Torches" unique_id=1296805155 instance=ExtResource("3_fk2dp")]
+transform = Transform3D(1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, 1, 16.944, 1, 35.0591)
+
+[node name="GridMaps" type="Node3D" parent="." unique_id=510626213]
+
+[node name="Rooms" type="GridMap" parent="GridMaps" unique_id=1262979731]
+mesh_library = ExtResource("1_vvuyf")
+data = {
+"cells": PackedInt32Array(0, 65535, 655365, 0, 1, 1048582, 0, 3, 1048582, 65534, 65535, 655366, 65532, 65535, 655366, 65530, 65535, 655367, 65534, 1, 655364, 65532, 1, 655364, 65530, 1, 1441798, 65530, 3, 1441798, 65534, 5, 6, 65532, 5, 6, 65530, 5, 5, 65532, 3, 4, 65534, 3, 4, 0, 5, 1048582, 0, 7, 1048581, 65532, 7, 1441845, 65530, 7, 1441845, 65528, 15, 655365, 65528, 17, 5, 65530, 17, 1441845, 65532, 17, 1441845, 65534, 17, 1441857, 0, 17, 1441826, 0, 19, 1441799, 0, 15, 1441797, 2, 19, 6, 6, 19, 6, 8, 19, 6, 10, 19, 1048581, 2, 15, 655366, 6, 15, 655366, 8, 15, 655366, 10, 15, 1048583, 10, 17, 1048582, 8, 17, 1048580, 6, 17, 1048580, 2, 17, 1048580, 65528, 7, 1441845, 65526, 7, 8, 4, 15, 655366, 4, 17, 1048580, 4, 19, 6)
+}
+metadata/_editor_floor_ = Vector3(0, 2, 0)
+
+[node name="Walls" type="GridMap" parent="GridMaps" unique_id=732766081]
+mesh_library = ExtResource("2_d2luu")
+data = {
+"cells": PackedInt32Array(65531, 5, 1441794, 65531, 3, 1441792, 65531, 1, 1441792, 65531, 65535, 1441792, 65532, 1, 655364, 65534, 1, 655366, 0, 1, 655360, 65530, 1, 655364, 65535, 17, 1048578, 65533, 17, 1048578, 65531, 17, 1048578, 0, 16, 0, 0, 18, 0, 3, 15, 1441800, 3, 19, 1441792, 4, 18, 655360, 4, 16, 655360, 8, 16, 0, 10, 16, 655364, 10, 18, 655364, 8, 18, 0, 6, 18, 4, 6, 16, 4, 7, 19, 1048576, 7, 15, 1048576)
+}
+
+[node name="Decors" type="GridMap" parent="GridMaps" unique_id=1200394452]
+mesh_library = ExtResource("3_b5cms")
+data = {
+"cells": PackedInt32Array(65533, 4, 655367, 65535, 4, 655367, 6, 16, 655378, 5, 19, 655385, 9, 19, 655385, 9, 15, 25, 5, 15, 25, 1, 15, 25, 1, 19, 655385, 65532, 18, 655360, 65534, 18, 655360, 65532, 16, 0, 65534, 16, 0, 0, 16, 0, 0, 18, 655360, 65534, 1, 655386, 65532, 65535, 655369, 65535, 7, 655373, 65532, 7, 655371, 65526, 7, 655369, 65528, 15, 655368, 65530, 17, 655376, 2, 17, 655373, 8, 17, 655370)
+}
+metadata/_editor_floor_ = Vector3(0, -2, 0)
+
+[node name="Pillars" type="GridMap" parent="GridMaps" unique_id=292628204]
+mesh_library = ExtResource("3_lv1e3")
+data = {
+"cells": PackedInt32Array(65527, 8, 1048576, 1, 8, 1048576, 65534, 8, 1048576, 65531, 8, 1048576, 65534, 6, 1048576, 65531, 6, 1048576, 1, 65534, 1048576, 65529, 65534, 1048576, 65529, 6, 1048576, 65529, 8, 1048576, 65531, 1, 655360, 65531, 65534, 655360, 1, 1, 655360, 65535, 6, 1048576, 65528, 15, 1048585, 65532, 17, 1048585, 65535, 17, 1048583, 2, 17, 1048585, 6, 17, 1048585, 9, 17, 1048583)
+}
+metadata/_editor_floor_ = Vector3(0, 6, 0)
+
+[node name="Platforms" type="GridMap" parent="GridMaps" unique_id=1262111252]
+visible = false
+mesh_library = ExtResource("4_0lig1")
+data = {
+"cells": PackedInt32Array(65508, 13, 9)
+}
+
+[node name="Props" type="Node3D" parent="." unique_id=741816078]
+
+[node name="PropSet_1_Barrel" parent="Props" unique_id=354913937 instance=ExtResource("10_lxo6f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.19561, 6)
+
+[node name="PropSet_1_Barrel2" parent="Props" unique_id=558500461 instance=ExtResource("10_lxo6f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.7854, 2.19561, 2.30294)
+
+[node name="PropSet_1_Barrel3" parent="Props" unique_id=802551376 instance=ExtResource("10_lxo6f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0340729, 2.19561, 40.122)
+
+[node name="PropSet_1_Barrel4" parent="Props" unique_id=692237862 instance=ExtResource("10_lxo6f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11302, 2.19561, 38.9862)
+
+[node name="PropSet_1_Barrel5" parent="Props" unique_id=836230369 instance=ExtResource("10_lxo6f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1451, 2.19561, 39.7638)
+
+[node name="PropSet_1_Box" parent="Props" unique_id=1683291395 instance=ExtResource("11_ehxbl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02796, 2.01667, 15.7913)
+
+[node name="PropSet_1_Box2" parent="Props" unique_id=231761533 instance=ExtResource("11_ehxbl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.54594, 2.01667, -2.0215)
+
+[node name="PropSet_1_Box3" parent="Props" unique_id=366896841 instance=ExtResource("11_ehxbl")]
+transform = Transform3D(-0.0198606, 0, 0.999803, 0, 1, 0, -0.999803, 0, -0.0198606, -0.250915, 2.01667, -2.00773)
+
+[node name="PropSet_1_Jar" parent="Props" unique_id=225489760 instance=ExtResource("13_sb10u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.42222, 1.48624, 12.3328)
+
+[node name="PropSet_2_Book_1" parent="Props" unique_id=1567052994 instance=ExtResource("14_rmut0")]
+transform = Transform3D(0.958148, -0.286274, 0, 0.286274, 0.958148, 0, 0, 0, 1, -11.0935, 2.14585, -0.26638)
+
+[node name="PropSet_2_Book_5" parent="Props" unique_id=630252636 instance=ExtResource("14_rmut0")]
+transform = Transform3D(0.958148, -0.286274, 0, 0.286274, 0.958148, 0, 0, 0, 1, -11.6522, 2.14585, -1.10406)
+
+[node name="PropSet_2_Book_6" parent="Props" unique_id=1532389701 instance=ExtResource("14_rmut0")]
+transform = Transform3D(0.958148, -0.286274, 0, 0.286274, 0.958148, 0, 0, 0, 1, -11.023, 2.14585, -1.75345)
+
+[node name="PropSet_2_Book_2" parent="Props" unique_id=1898237080 instance=ExtResource("15_v15tn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3563, 2.14585, -0.26638)
+
+[node name="PropSet_2_Book_3" parent="Props" unique_id=729037981 instance=ExtResource("14_rmut0")]
+transform = Transform3D(-3.68998e-08, 0.844169, 0.536077, -1, -4.37114e-08, 0, 2.34327e-08, -0.536077, 0.844169, -10.7416, 2.01447, -0.801434)
+
+[node name="PropSet_2_Book_4" parent="Props" unique_id=1565994353 instance=ExtResource("15_v15tn")]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -10.7416, 2.27723, -0.801434)
+
+[node name="PropSet_2_Book_7" parent="Props" unique_id=1428249682 instance=ExtResource("15_v15tn")]
+transform = Transform3D(-1.49581e-08, 0.3422, -0.939627, -1, -4.37114e-08, 0, -4.10724e-08, 0.939627, 0.3422, -10.7406, 2.59827, -0.850457)
+
+[node name="PropSet_2_CandleHolder_1" parent="Props" unique_id=1362388371 instance=ExtResource("16_e0iqh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8587, 1.1, 1.21365)
+
+[node name="PropSet_3_Bench" parent="Props" unique_id=678292782 instance=ExtResource("17_gmg5a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.45291, 1.62219, 40.4115)
+
+[node name="PropSet_3_Bench2" parent="Props" unique_id=599680819 instance=ExtResource("17_gmg5a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.45291, 1.62219, 29.6708)
+
+[node name="PropSet_3_Bench3" parent="Props" unique_id=82238562 instance=ExtResource("17_gmg5a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2322, 1.62219, 29.8664)
+
+[node name="PropSet_2_Book_8" parent="Props" unique_id=1131819912 instance=ExtResource("15_v15tn")]
+transform = Transform3D(0.150726, -0.988576, 0, 0.988576, 0.150726, 0, 0, 0, 1, 12.6773, 2.55041, 29.9065)
+
+[node name="PropSet_1_Chest3" parent="Props" unique_id=306235464 instance=ExtResource("12_otdek")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 16.2591, 1.1, 38.8731)
+
+[node name="PropSet_1_Jar2" parent="Props" unique_id=482529074 instance=ExtResource("13_sb10u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7724, 1.66537, 29.5705)
+
+[node name="PropSet_1_Jar3" parent="Props" unique_id=452786966 instance=ExtResource("13_sb10u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.9787, 1.66537, 30.2291)
+
+[node name="PropSet_1_Jar4" parent="Props" unique_id=1363008254 instance=ExtResource("13_sb10u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.3914, 1.66537, 29.8076)
+
+[node name="PropSet_1_Jar5" parent="Props" unique_id=23689498 instance=ExtResource("13_sb10u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.06564, 1.66537, 39.207)
+
+[node name="PropSet_1_LargeBone" parent="Props" unique_id=463507116 instance=ExtResource("18_p35j5")]
+transform = Transform3D(0.185473, -0.213032, 0.959279, 0.754206, 0.656638, 0, -0.6299, 0.723494, 0.282459, 16.7761, 2.62416, 30.8007)
+
+[node name="PropSet_2_Shelf" parent="Props" unique_id=1671632970 instance=ExtResource("19_s2axl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69845, 3.01282, 12.3304)
+
+[node name="PropSet_2_Shelf001" parent="Props" unique_id=157808734 instance=ExtResource("20_1f31e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.59447, 1.1, -2.44913)
+
+[node name="PropSet_5_HeadClamp" parent="Props" unique_id=1283438068 instance=ExtResource("28_5sei3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.49228, 1.1, -0.221108)

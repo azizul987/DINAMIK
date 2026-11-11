@@ -1,0 +1,176 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://bsyl64lxve68v"
+path="res://.godot/imported/ModularDungeonTiles_Props.gltf-35797df4786bbc33aef9dc3ddc713627.scn"
+
+[deps]
+
+source_file="res://DungeonTiles/GLTF/ModularDungeonTiles_Props.gltf"
+dest_files=["res://.godot/imported/ModularDungeonTiles_Props.gltf-35797df4786bbc33aef9dc3ddc713627.scn"]
+
+[params]
+
+nodes/root_type="Node3D"
+nodes/root_name="Scene Root"
+nodes/root_script=null
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"materials": {
+"Fire": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": "res://Assets/ModularDungeonAsset/DungeonTiles/material/Fire.tres"
+},
+"PropSet_1_Mat": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": "res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_1_Mat.tres"
+},
+"PropSet_2_Mat": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": "res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_2_Mat.tres"
+},
+"PropSet_3_Mat": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": "res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_3_Mat.tres"
+},
+"PropSet_4_Mat": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": "res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_4_Mat.tres"
+},
+"PropSet_5_Mat": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": "res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_5_Mat.tres"
+}
+},
+"nodes": {
+"PATH:PropSet_1_Barrel": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_1_Box": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_1_Chest": {
+"generate/physics": true
+},
+"PATH:PropSet_1_Chest/PropSet_1_Chest_Lid": {
+"generate/physics": true
+},
+"PATH:PropSet_1_Jar": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_1_LargeBone": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_2_Book_1": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_2_Book_2": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_2_Candle": {
+"generate/physics": true
+},
+"PATH:PropSet_2_CandleHolder_1": {
+"generate/physics": true
+},
+"PATH:PropSet_2_CandleHolder_2": {
+"generate/physics": true
+},
+"PATH:PropSet_2_Shelf": {
+"generate/physics": true
+},
+"PATH:PropSet_2_Shelf001": {
+"generate/physics": true
+},
+"PATH:PropSet_2_Torch": {
+"generate/physics": true
+},
+"PATH:PropSet_3_Bench": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_3_Chair": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_3_Stool": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_3_Table": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_4_Bowl": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_4_Cup": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_4_Goblet": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_4_Plate": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_4_Spoon": {
+"generate/physics": true,
+"physics/body_type": 1
+},
+"PATH:PropSet_5_Entrance_SteelBar_1": {
+"generate/physics": true
+},
+"PATH:PropSet_5_Entrance_SteelBar_2": {
+"generate/physics": true
+},
+"PATH:PropSet_5_HeadClamp": {
+"generate/physics": true
+},
+"PATH:PropSet_5_WallChain_1": {
+"generate/physics": true
+},
+"PATH:PropSet_5_Window_SteelBar1": {
+"generate/physics": true
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=0

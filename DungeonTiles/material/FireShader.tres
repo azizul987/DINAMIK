@@ -1,0 +1,77 @@
+[gd_resource type="VisualShader" format=3 uid="uid://uqcr4gm6sw2m"]
+
+[ext_resource type="Texture2D" uid="uid://b6byxiiwiar3j" path="res://DungeonTiles/textures/Fire/BASE COLOR_Fire.png" id="1_wykkr"]
+[ext_resource type="Texture2D" uid="uid://ctxtpko00gd3d" path="res://DungeonTiles/textures/Fire/Alpha_Fire.png" id="2_ntfup"]
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_camsp"]
+parameter_name = "it_does_something"
+hint = 2
+min = 1.0
+max = 20.0
+default_value_enabled = true
+default_value = 5.0
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_iphqk"]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_kg2k1"]
+op_type = 0
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_u65wd"]
+default_input_values = [0, 0.0, 1, 2.0]
+operator = 3
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_1dln1"]
+parameter_name = "ScrollSpeed"
+hint = 2
+min = 0.1
+max = 3.0
+default_value_enabled = true
+default_value = 1.0
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_1lwqw"]
+operator = 2
+
+[sub_resource type="VisualShaderNodeFloatParameter" id="VisualShaderNodeFloatParameter_yatuh"]
+parameter_name = "EmissionStrength"
+hint = 2
+max = 4.0
+default_value_enabled = true
+default_value = 3.0
+
+[sub_resource type="VisualShaderNodeUVFunc" id="VisualShaderNodeUVFunc_b0sij"]
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_vvfl0"]
+texture = ExtResource("1_wykkr")
+texture_type = 1
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_yju1b"]
+texture = ExtResource("2_ntfup")
+
+[sub_resource type="VisualShaderNodeColorOp" id="VisualShaderNodeColorOp_0y8gx"]
+operator = 8
+
+[resource]
+nodes/fragment/2/node = SubResource("VisualShaderNodeUVFunc_b0sij")
+nodes/fragment/2/position = Vector2(-820, 60)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture_vvfl0")
+nodes/fragment/3/position = Vector2(-540, 180)
+nodes/fragment/4/node = SubResource("VisualShaderNodeTexture_yju1b")
+nodes/fragment/4/position = Vector2(-540, -60)
+nodes/fragment/9/node = SubResource("VisualShaderNodeColorOp_0y8gx")
+nodes/fragment/9/position = Vector2(-340, 360)
+nodes/fragment/10/node = SubResource("VisualShaderNodeFloatParameter_camsp")
+nodes/fragment/10/position = Vector2(-760, 480)
+nodes/fragment/11/node = SubResource("VisualShaderNodeInput_iphqk")
+nodes/fragment/11/position = Vector2(-1560, 120)
+nodes/fragment/13/node = SubResource("VisualShaderNodeVectorCompose_kg2k1")
+nodes/fragment/13/position = Vector2(-1020, 100)
+nodes/fragment/14/node = SubResource("VisualShaderNodeFloatOp_u65wd")
+nodes/fragment/14/position = Vector2(-1220, 140)
+nodes/fragment/15/node = SubResource("VisualShaderNodeFloatParameter_1dln1")
+nodes/fragment/15/position = Vector2(-1520, 200)
+nodes/fragment/16/node = SubResource("VisualShaderNodeVectorOp_1lwqw")
+nodes/fragment/16/position = Vector2(-160, 340)
+nodes/fragment/17/node = SubResource("VisualShaderNodeFloatParameter_yatuh")
+nodes/fragment/17/position = Vector2(-440, 520)
+nodes/fragment/connections = PackedInt32Array(3, 0, 0, 0, 2, 0, 3, 0, 4, 0, 0, 1, 10, 0, 9, 1, 3, 0, 9, 0, 13, 0, 2, 2, 2, 0, 4, 0, 11, 0, 14, 0, 14, 0, 13, 0, 15, 0, 14, 1, 16, 0, 0, 5, 17, 0, 16, 1, 9, 0, 16, 0, 16, 0, 0, 18)

@@ -28,12 +28,12 @@ extends Control
 @onready var player: CharacterBody3D = %Players
 
 @onready var quick_slots_bar: HBoxContainer = $QuickSlotsBar
-@onready var slot_heal: Control = count_heal.get_parent().get_parent()
-@onready var slot_strength: Control = count_strength.get_parent().get_parent()
-@onready var slot_slow: Control = count_slow.get_parent().get_parent()
-@onready var slot_berserk: Control = count_berserk.get_parent().get_parent()
+@onready var slot_heal: PanelContainer = $QuickSlotsBar/SlotHeal
+@onready var slot_strength: PanelContainer = $QuickSlotsBar/SlotStrength
+@onready var slot_slow: PanelContainer = $QuickSlotsBar/SlotSlow
+@onready var slot_berserk: PanelContainer = $QuickSlotsBar/SlotBerserk
 
-var slot_ironskin: Control = null
+var slot_ironskin: PanelContainer = null
 var count_ironskin: Label = null
 var icon_ironskin: TextureRect = null
 var btn_ironskin: Button = null
@@ -103,6 +103,7 @@ func _setup_ironskin_ui() -> void:
 	if quick_slots_bar and slot_berserk:
 		slot_ironskin = slot_berserk.duplicate()
 		slot_ironskin.name = "SlotIronskin"
+		slot_ironskin.visible = false
 		quick_slots_bar.add_child(slot_ironskin)
 		quick_slots_bar.move_child(slot_ironskin, quick_slots_bar.get_child_count() - 2)
 

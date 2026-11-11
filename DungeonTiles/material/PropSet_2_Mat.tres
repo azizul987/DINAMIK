@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" load_steps=4 format=3 uid="uid://dkke3cme1q653"]
+
+[ext_resource type="Texture2D" uid="uid://djg573ivm0ej6" path="res://Assets/ModularDungeonAsset/DungeonTiles/textures/PropSet_2/Base Color_PropSet_2.png" id="1_vaguv"]
+[ext_resource type="Texture2D" uid="uid://b7guvh8ih1y25" path="res://Assets/ModularDungeonAsset/DungeonTiles/textures/PropSet_2/MR_PropSet_2.exr" id="2_r8g8c"]
+[ext_resource type="Texture2D" uid="uid://cqlg4kg77ul2b" path="res://Assets/ModularDungeonAsset/DungeonTiles/textures/PropSet_2/NORMAL_PropSet_2.png" id="3_hu62h"]
+
+[resource]
+albedo_texture = ExtResource("1_vaguv")
+metallic = 1.0
+metallic_texture = ExtResource("2_r8g8c")
+roughness_texture = ExtResource("2_r8g8c")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_texture = ExtResource("3_hu62h")

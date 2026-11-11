@@ -1,0 +1,74 @@
+[gd_scene load_steps=15 format=3 uid="uid://c38seubpaa00b"]
+
+[ext_resource type="Material" uid="uid://c208cmvk8ed4y" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/DungeonBrickTrim_Mat.tres" id="1_hshct"]
+[ext_resource type="Material" uid="uid://qp1ep4vbobo6" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/DungeonBrickWall_Mat.tres" id="2_07nc5"]
+[ext_resource type="Material" uid="uid://bpbw32mvxrwsu" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/DungeonBrickFloor_mat.tres" id="3_lcram"]
+[ext_resource type="PackedScene" uid="uid://dmfiqglgm3bl6" path="res://Assets/ModularDungeonAsset/DungeonTiles/GLTF/ModularDungeonTiles.gltf" id="4_22g5m"]
+[ext_resource type="Material" uid="uid://c87df5igj8fvv" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_1_Mat.tres" id="4_s5etb"]
+[ext_resource type="Material" uid="uid://dkke3cme1q653" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_2_Mat.tres" id="5_41mhh"]
+[ext_resource type="Material" uid="uid://bkvlieu4r3e22" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_3_Mat.tres" id="6_tmer7"]
+[ext_resource type="Material" uid="uid://di5arbf86nadj" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_4_Mat.tres" id="7_2ajgc"]
+[ext_resource type="Material" uid="uid://dbtk0ncyclvyf" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_5_Mat.tres" id="8_hrg8q"]
+[ext_resource type="Shader" uid="uid://uqcr4gm6sw2m" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/FireShader.tres" id="9_bc3us"]
+[ext_resource type="PackedScene" uid="uid://bsyl64lxve68v" path="res://Assets/ModularDungeonAsset/DungeonTiles/GLTF/ModularDungeonTiles_Props.gltf" id="10_0gnj7"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_smq5k"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_v2dck"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sq3xo"]
+render_priority = 0
+shader = ExtResource("9_bc3us")
+shader_parameter/ScrollSpeed = 1.0
+shader_parameter/it_does_something = 3.3
+shader_parameter/EmissionStrength = 1.4
+
+[node name="Node3D" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("1_hshct")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.21342, 0, 0)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("2_07nc5")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.58714, 0, 0)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("3_lcram")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.90606, 0, -0.614573)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("4_s5etb")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0191, 0, -0.48369)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("5_41mhh")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.4328, 0, -0.622754)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("6_tmer7")
+
+[node name="MeshInstance3D7" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.546, 4.76837e-07, -0.64142)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("7_2ajgc")
+
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8306, 4.76837e-07, -0.444576)
+mesh = SubResource("PlaneMesh_smq5k")
+surface_material_override/0 = ExtResource("8_hrg8q")
+
+[node name="MeshInstance3D9" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8969, 4.76837e-07, -3.65311)
+mesh = SubResource("PlaneMesh_v2dck")
+surface_material_override/0 = SubResource("ShaderMaterial_sq3xo")
+
+[node name="ModularDungeonTiles_Props" parent="." instance=ExtResource("10_0gnj7")]
+
+[node name="ModularDungeonTiles" parent="." instance=ExtResource("4_22g5m")]
