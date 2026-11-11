@@ -432,7 +432,7 @@ func _spawn_damage_number(amount: float) -> void:
 	tw.parallel().tween_property(label, "modulate:a", 0.0, 0.45).set_ease(Tween.EASE_IN)
 	tw.tween_callback(label.queue_free)
 
-func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
+func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bool = false) -> void:
 	if is_dead:
 		return
 
@@ -489,9 +489,7 @@ func die() -> void:
 	if hp_sprite:
 		hp_sprite.visible = false
 
-	var global = get_node_or_null("/root/GlobalLogic")
-	if global:
-		global.add_material("slime_gel", 1)
+	_spawn_item_drop()
 
 	var tween := create_tween()
 	tween.tween_property(mesh, "scale", Vector3.ZERO, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
@@ -501,6 +499,19 @@ func die() -> void:
 
 	await get_tree().create_timer(respawn_time).timeout
 	respawn()
+
+func _spawn_item_drop() -> void:
+	var item_script = load("res://item_drop.gd")
+	if not item_script:
+		return
+	var drop = item_script.new()
+	var parent_scene = get_parent()
+	if not parent_scene:
+		parent_scene = get_tree().current_scene
+	if parent_scene:
+		parent_scene.add_child(drop)
+		drop.global_position = global_position + Vector3(0.0, 0.4, 0.0)
+		drop.set_drop_color(slime_base_color)
 
 func respawn() -> void:
 	global_position = spawn_position

@@ -28,16 +28,25 @@ extends CharacterBody3D
 @export var received_knockback_duration: float = 0.25
 @export var received_knockback_damping: float = 9.0
 @export var hit_trauma_shake: float = 0.55
+@export var hit_flash_duration: float = 0.08
+@export var hit_blink_interval: float = 0.06
 
 @export_group("Combat - Dash")
 @export var dash_speed: float = 16.0
 @export var dash_duration: float = 0.18
 @export var dash_cooldown: float = 0.5
 @export var dash_ghost_interval: float = 0.045
+@export var dash_ghost_color: Color = Color(0.65, 0.08, 0.12, 0.55)
 
 @export_group("Target Lock-On")
 @export var lock_on_max_distance: float = 18.0
 @export var lock_on_turn_speed: float = 15.0
+
+@export_group("Targeting - Auto Aim Assist")
+@export var auto_target_enabled: bool = true
+@export var auto_target_radius: float = 4.2
+@export var auto_target_cone_deg: float = 130.0
+@export var auto_target_point_blank_radius: float = 1.8
 
 var speed_multiplier: float = 1.0
 var coyote_timer: float = 0.0
@@ -59,17 +68,21 @@ var dash_ghost_timer: float = 0.0
 
 var slash_arc: MeshInstance3D = null
 var slash_arc_mat: StandardMaterial3D = null
+var flash_material: StandardMaterial3D = null
+var _hit_blink_tween: Tween = null
 
 @onready var camera_pivot: Node3D = $CameraPivot
-@onready var mesh_instance: Node3D = $MeshInstance
+@onready var mesh_instance: MeshInstance3D = $MeshInstance
 @onready var weapon_pivot: Node3D = $MeshInstance/WeaponPivot
 @onready var hitbox: Area3D = %Hitbox
 
 func _ready() -> void:
 	add_to_group("player")
 	GlobalLogic.toxicity_stage_changed.connect(_on_toxicity_stage_changed)
+	GlobalLogic.player_died.connect(_on_player_died)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
 	_setup_slash_arc()
+	_setup_flash_material()
 
 func _setup_slash_arc() -> void:
 	slash_arc = MeshInstance3D.new()
@@ -159,6 +172,8 @@ func _physics_process(delta: float) -> void:
 		if dash_timer <= 0.0:
 			is_dashing = false
 			is_invulnerable = false
+			mesh_instance.rotation.x = 0.0
+			mesh_instance.scale = Vector3.ONE
 	elif lunge_timer > 0.0:
 		lunge_timer -= delta
 		velocity.x = lunge_direction.x * attack_lunge_speed
@@ -230,8 +245,9 @@ func dash() -> void:
 	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var move_dir := _get_camera_relative_direction(input_dir)
 
-	if locked_target and is_instance_valid(locked_target):
-		var to_enemy: Vector3 = locked_target.global_position - global_position
+	var target_candidate: Node3D = locked_target if (locked_target and is_instance_valid(locked_target)) else _find_soft_target()
+	if target_candidate and is_instance_valid(target_candidate):
+		var to_enemy: Vector3 = target_candidate.global_position - global_position
 		to_enemy.y = 0.0
 		var dist := to_enemy.length()
 		if input_dir.length_squared() > 0.1:
@@ -250,11 +266,15 @@ func dash() -> void:
 		dash_direction = Vector3(sin(mesh_instance.rotation.y), 0.0, cos(mesh_instance.rotation.y)).normalized()
 
 	var tw := create_tween()
-	mesh_instance.scale = Vector3(0.82, 0.82, 1.35)
+	mesh_instance.scale = Vector3(1.25, 0.50, 1.50)
+	mesh_instance.rotation.x = deg_to_rad(24.0)
+
+	tw.set_parallel(true)
 	tw.tween_property(mesh_instance, "scale", Vector3.ONE, dash_duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(mesh_instance, "rotation:x", 0.0, dash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 	if camera_pivot and camera_pivot.has_method("fov_punch"):
-		camera_pivot.fov_punch(-2.5, dash_duration + 0.08)
+		camera_pivot.fov_punch(-4.5, dash_duration + 0.10)
 
 	_spawn_ghost_trail()
 
@@ -264,14 +284,14 @@ func _spawn_ghost_trail() -> void:
 
 	var ghost := MeshInstance3D.new()
 	var cap := CapsuleMesh.new()
-	cap.radius = 0.38
-	cap.height = 1.75
+	cap.radius = 0.42
+	cap.height = 2.0
 	ghost.mesh = cap
 
 	var ghost_mat := StandardMaterial3D.new()
 	ghost_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	ghost_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	ghost_mat.albedo_color = Color(0.35, 0.85, 1.0, 0.45)
+	ghost_mat.albedo_color = dash_ghost_color
 	ghost.material_override = ghost_mat
 
 	var parent_node := get_parent()
@@ -281,7 +301,7 @@ func _spawn_ghost_trail() -> void:
 		return
 
 	parent_node.add_child(ghost)
-	ghost.global_position = mesh_instance.global_position + Vector3(0.0, 0.9, 0.0)
+	ghost.global_position = mesh_instance.global_position
 	ghost.global_rotation = mesh_instance.global_rotation
 	ghost.scale = mesh_instance.scale
 
@@ -327,19 +347,65 @@ func _find_best_target() -> Node3D:
 
 	return best_target
 
+func _find_soft_target() -> Node3D:
+	if not auto_target_enabled:
+		return null
+
+	var enemies := get_tree().get_nodes_in_group("enemies")
+	var best_target: Node3D = null
+	var best_score: float = -9999.0
+
+	var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
+	var forward: Vector3 = -cam_basis.z
+	forward.y = 0.0
+	forward = forward.normalized()
+
+	for enemy in enemies:
+		var enemy_node := enemy as Node3D
+		if not enemy_node or not is_instance_valid(enemy_node):
+			continue
+		if enemy_node.get("is_dead") == true or not enemy_node.visible:
+			continue
+
+		var to_enemy: Vector3 = enemy_node.global_position - global_position
+		to_enemy.y = 0.0
+		var dist: float = to_enemy.length()
+		if dist > auto_target_radius or dist < 0.01:
+			continue
+
+		var dir: Vector3 = to_enemy.normalized()
+		var dot: float = forward.dot(dir)
+
+		# 1. Point-blank check (dist <= auto_target_point_blank_radius): 360 degrees
+		if dist <= auto_target_point_blank_radius:
+			var score: float = 100.0 - dist * 10.0
+			if score > best_score:
+				best_score = score
+				best_target = enemy_node
+		# 2. Cone check (within auto_target_cone_deg)
+		elif dot >= cos(deg_to_rad(auto_target_cone_deg * 0.5)):
+			var score: float = (dot * 2.0) - (dist / auto_target_radius)
+			if score > best_score:
+				best_score = score
+				best_target = enemy_node
+
+	return best_target
+
 func attack() -> void:
 	can_attack = false
 	is_attacking = true
 	_hit_targets_this_swing.clear()
 
-	# Snap orientation directly to locked target or camera forward!
-	if locked_target and is_instance_valid(locked_target):
-		var to_enemy: Vector3 = locked_target.global_position - global_position
+	# Snap orientation directly to locked target, soft auto-target, or camera forward!
+	var target_to_face: Node3D = locked_target if (locked_target and is_instance_valid(locked_target)) else _find_soft_target()
+
+	if target_to_face and is_instance_valid(target_to_face):
+		var to_enemy: Vector3 = target_to_face.global_position - global_position
 		to_enemy.y = 0.0
 		if to_enemy.length_squared() > 0.01:
 			mesh_instance.rotation.y = atan2(to_enemy.x, to_enemy.z)
 	else:
-		var cam_basis: Basis = camera_pivot.global_transform.basis
+		var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
 		var forward: Vector3 = -cam_basis.z
 		forward.y = 0.0
 		if forward.length_squared() > 0.01:
@@ -413,8 +479,69 @@ func _on_hitbox_body_entered(body: Node) -> void:
 		return
 	_apply_hit_to_target(body)
 
-func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
+func _setup_flash_material() -> void:
+	flash_material = StandardMaterial3D.new()
+	flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	flash_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+
+func _on_player_died() -> void:
+	if _hit_blink_tween:
+		_hit_blink_tween.kill()
+	if is_instance_valid(mesh_instance):
+		mesh_instance.material_override = null
+		mesh_instance.visible = true
+
+func _trigger_hit_feedback() -> void:
+	if not mesh_instance or not flash_material:
+		return
+
+	if _hit_blink_tween:
+		_hit_blink_tween.kill()
+
+	# 1. Pure White Hit Flash on Impact
+	mesh_instance.material_override = flash_material
+	mesh_instance.visible = true
+
+	_hit_blink_tween = create_tween()
+	# Hold solid white flash for hit_flash_duration (0.08s)
+	_hit_blink_tween.tween_interval(hit_flash_duration)
+	# Remove white flash material
+	_hit_blink_tween.tween_callback(func():
+		if is_instance_valid(mesh_instance):
+			mesh_instance.material_override = null
+	)
+
+	# 2. i-Frame Blinking during remainder of invulnerability_duration
+	var remaining_time: float = maxf(0.0, invulnerability_duration - hit_flash_duration)
+	var cycles: int = int(remaining_time / (hit_blink_interval * 2.0))
+	for i in range(cycles):
+		_hit_blink_tween.tween_callback(func():
+			if is_instance_valid(mesh_instance):
+				mesh_instance.visible = false
+		)
+		_hit_blink_tween.tween_interval(hit_blink_interval)
+		_hit_blink_tween.tween_callback(func():
+			if is_instance_valid(mesh_instance):
+				mesh_instance.visible = true
+		)
+		_hit_blink_tween.tween_interval(hit_blink_interval)
+
+	# 3. Final cleanup and invulnerability reset
+	_hit_blink_tween.tween_callback(func():
+		if is_instance_valid(mesh_instance):
+			mesh_instance.visible = true
+			mesh_instance.material_override = null
+		is_invulnerable = false
+	)
+
+func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: bool = false) -> void:
 	if is_invulnerable or GlobalLogic.is_dead:
+		return
+
+	# Sharp hazard deflection when Ironskin potion is active
+	if is_sharp and GlobalLogic.is_ironskin_active:
+		_trigger_ironskin_deflection()
 		return
 
 	is_invulnerable = true
@@ -434,5 +561,54 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
 		if camera_pivot.has_method("fov_punch"):
 			camera_pivot.fov_punch(2.0)
 
-	await get_tree().create_timer(invulnerability_duration).timeout
-	is_invulnerable = false
+	_trigger_hit_feedback()
+
+func _trigger_ironskin_deflection() -> void:
+	# 1. Metallic Clang SFX
+	var sfx := AudioStreamPlayer.new()
+	sfx.bus = "Master"
+	var sample_hz := 22050.0
+	var dur := 0.25
+	var total_samples := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total_samples * 2)
+
+	# Metallic clang harmonics (1100 Hz, 1650 Hz, 2750 Hz)
+	for i in range(total_samples):
+		var t := float(i) / sample_hz
+		var env := exp(-t * 20.0)
+		var val := int((sin(t * 1100.0 * TAU) * 0.5 + sin(t * 1650.0 * TAU) * 0.3 + sin(t * 2750.0 * TAU) * 0.2) * env * 0.55 * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	sfx.stream = wav
+	get_tree().root.add_child(sfx)
+	sfx.play()
+	sfx.finished.connect(sfx.queue_free)
+
+	# 2. Floating Toast "DEFLECTED!"
+	var label := Label3D.new()
+	label.text = "DEFLECTED!"
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.modulate = Color(0.92, 0.94, 0.98, 1.0)
+	label.outline_modulate = Color(0.2, 0.25, 0.35, 0.95)
+	label.outline_size = 8
+	label.font_size = 28
+	label.no_depth_test = true
+	label.pixel_size = 0.0055
+
+	get_tree().root.add_child(label)
+	label.global_position = global_position + Vector3(0.0, 1.2, 0.0)
+
+	var tw := label.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(label, "global_position:y", label.global_position.y + 0.85, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(label, "modulate:a", 0.0, 0.55).set_ease(Tween.EASE_IN)
+	tw.chain().tween_callback(label.queue_free)
+
+	# 3. Micro trauma shake
+	if camera_pivot and camera_pivot.has_method("add_trauma"):
+		camera_pivot.add_trauma(0.18)

@@ -30,14 +30,102 @@ var potions := {
 	"healing": 0,
 	"strength": 0,
 	"slow": 0,
-	"berserk": 0
+	"berserk": 0,
+	"ironskin": 0
 }
 
 var is_strength_active: bool = false
 var is_slow_active: bool = false
 var is_berserk_active: bool = false
+var is_ironskin_active: bool = false
+var ironskin_timer: float = 0.0
+
+var lpf_effect: AudioEffectLowPassFilter = null
+var tinnitus_player: AudioStreamPlayer = null
+var heartbeat_player: AudioStreamPlayer = null
+var heartbeat_timer: float = 0.0
+
+func _ready() -> void:
+	_setup_toxicity_audio()
+
+func _setup_toxicity_audio() -> void:
+	# 1. Setup LowPassFilter on Master Bus
+	lpf_effect = AudioEffectLowPassFilter.new()
+	lpf_effect.cutoff_hz = 20500.0
+	lpf_effect.resonance = 0.5
+	AudioServer.add_bus_effect(0, lpf_effect)
+
+	# 2. Setup Tinnitus Sine Ringing Tone (3800 Hz)
+	tinnitus_player = AudioStreamPlayer.new()
+	tinnitus_player.bus = "Master"
+	var sample_hz := 22050.0
+	var duration := 1.0
+	var num_samples := int(sample_hz * duration)
+	var buffer := PackedByteArray()
+	buffer.resize(num_samples * 2)
+	var freq := 3800.0
+	for i in range(num_samples):
+		var t := float(i) / sample_hz
+		var sample_val := int(sin(t * freq * TAU) * 0.22 * 32767.0)
+		buffer.encode_s16(i * 2, sample_val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wav.loop_begin = 0
+	wav.loop_end = num_samples
+	wav.data = buffer
+	tinnitus_player.stream = wav
+	tinnitus_player.volume_db = -80.0
+	add_child(tinnitus_player)
+	tinnitus_player.play()
+
+	# 3. Setup Heartbeat Thump Sound (55 Hz damped pulse)
+	heartbeat_player = AudioStreamPlayer.new()
+	heartbeat_player.bus = "Master"
+	var hb_hz := 22050.0
+	var hb_samples := int(hb_hz * 0.18)
+	var hb_buffer := PackedByteArray()
+	hb_buffer.resize(hb_samples * 2)
+	for i in range(hb_samples):
+		var t := float(i) / hb_hz
+		var env := exp(-t * 24.0)
+		var val := int(sin(t * 55.0 * TAU) * env * 0.75 * 32767.0)
+		hb_buffer.encode_s16(i * 2, val)
+
+	var hb_wav := AudioStreamWAV.new()
+	hb_wav.format = AudioStreamWAV.FORMAT_16_BITS
+	hb_wav.mix_rate = int(hb_hz)
+	hb_wav.data = hb_buffer
+	heartbeat_player.stream = hb_wav
+	add_child(heartbeat_player)
 
 func _process(delta: float) -> void:
+	var ratio := get_toxicity_ratio()
+
+	# Toxicity Audio Processing (>75%)
+	if lpf_effect:
+		if ratio > 0.75:
+			var factor := clampf((ratio - 0.75) / 0.25, 0.0, 1.0)
+			var target_cutoff := lerpf(2200.0, 650.0, factor)
+			lpf_effect.cutoff_hz = lerpf(lpf_effect.cutoff_hz, target_cutoff, 10.0 * delta)
+
+			if tinnitus_player:
+				var target_tinnitus_db := lerpf(-38.0, -14.0, factor)
+				tinnitus_player.volume_db = lerpf(tinnitus_player.volume_db, target_tinnitus_db, 6.0 * delta)
+
+			if heartbeat_player and not is_dead:
+				heartbeat_timer -= delta
+				if heartbeat_timer <= 0.0:
+					var beat_interval := lerpf(0.95, 0.38, factor)
+					heartbeat_timer = beat_interval
+					heartbeat_player.play()
+		else:
+			lpf_effect.cutoff_hz = lerpf(lpf_effect.cutoff_hz, 20500.0, 8.0 * delta)
+			if tinnitus_player:
+				tinnitus_player.volume_db = lerpf(tinnitus_player.volume_db, -80.0, 8.0 * delta)
+
 	if is_dead:
 		return
 
@@ -52,6 +140,11 @@ func _process(delta: float) -> void:
 
 	if is_berserk_active:
 		modify_hp(-2.5 * delta)
+
+	if is_ironskin_active:
+		ironskin_timer -= delta
+		if ironskin_timer <= 0.0:
+			is_ironskin_active = false
 
 func get_toxicity_ratio() -> float:
 	return current_toxicity / max_toxicity if max_toxicity > 0 else 0.0
@@ -104,6 +197,8 @@ func reset_safe_zone() -> void:
 	is_berserk_active = false
 	is_strength_active = false
 	is_slow_active = false
+	is_ironskin_active = false
+	ironskin_timer = 0.0
 	current_hp = max_hp
 	current_toxicity = 0.0
 	player_hp_changed.emit(current_hp, max_hp)
@@ -121,6 +216,7 @@ func can_craft(potion_name: String) -> bool:
 		"strength": return materials["fire_essence"] >= 1
 		"slow": return materials["frost_wing"] >= 1
 		"berserk": return materials["slime_gel"] >= 1 and materials["fire_essence"] >= 1
+		"ironskin": return materials["slime_gel"] >= 2
 	return false
 
 func craft_potion(potion_name: String) -> bool:
@@ -141,6 +237,9 @@ func craft_potion(potion_name: String) -> bool:
 			materials["slime_gel"] -= 1
 			materials["fire_essence"] -= 1
 			potions["berserk"] += 1
+		"ironskin":
+			materials["slime_gel"] -= 2
+			potions["ironskin"] += 1
 
 	inventory_updated.emit()
 	return true
@@ -163,6 +262,10 @@ func consume_potion(potion_name: String) -> bool:
 		"berserk":
 			is_berserk_active = true
 			add_toxicity(35.0)
+		"ironskin":
+			is_ironskin_active = true
+			ironskin_timer = 15.0
+			add_toxicity(20.0)
 
 	potion_consumed.emit(potion_name)
 	inventory_updated.emit()

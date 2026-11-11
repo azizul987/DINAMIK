@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://bcveboefkhqd8" path="res://hud_controller.gd" id="3_hud"]
 [ext_resource type="Texture2D" uid="uid://dbfmrnvqnscpc" path="res://icon.svg" id="4_icon"]
 [ext_resource type="Script" uid="uid://cs2ie3ic3a16i" path="res://dummy_enemy.gd" id="5_dummy"]
+[ext_resource type="PackedScene" path="res://spike_trap.tscn" id="6_spike_trap"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -156,7 +157,7 @@ use_collision = true
 size = Vector3(1, 4.291504, 1)
 
 [node name="DummySlime" type="CharacterBody3D" parent="." unique_id=711]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74075574, -4.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74075574, -9.617898)
 script = ExtResource("5_dummy")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DummySlime" unique_id=712]
@@ -164,6 +165,9 @@ shape = SubResource("SphereShape3D_slime")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DummySlime" unique_id=713]
 mesh = SubResource("SphereMesh_slime")
+
+[node name="SpikeTrap" parent="." unique_id=1970698199 instance=ExtResource("6_spike_trap")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.829979, 0.35161388, -2.2)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1414476000]
 
