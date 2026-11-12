@@ -32,27 +32,20 @@ extends Control
 @onready var slot_strength: PanelContainer = $QuickSlotsBar/SlotStrength
 @onready var slot_slow: PanelContainer = $QuickSlotsBar/SlotSlow
 @onready var slot_berserk: PanelContainer = $QuickSlotsBar/SlotBerserk
+@onready var toxic_overlay: ColorRect = %ToxicOverlay if has_node("%ToxicOverlay") else null
 
 var slot_ironskin: PanelContainer = null
 var count_ironskin: Label = null
 var icon_ironskin: TextureRect = null
 var btn_ironskin: Button = null
 
-var toxic_overlay: ColorRect = null
 var toxic_mat: ShaderMaterial = null
 
 func _setup_toxic_overlay() -> void:
-	toxic_overlay = ColorRect.new()
-	toxic_overlay.name = "ToxicOverlay"
-	toxic_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	toxic_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var shader := load("res://shaders/toxic_veins.gdshader") as Shader
-	if shader:
-		toxic_mat = ShaderMaterial.new()
-		toxic_mat.shader = shader
-		toxic_overlay.material = toxic_mat
-	add_child(toxic_overlay)
-	move_child(toxic_overlay, 0)
+	if not toxic_overlay and has_node("ToxicOverlay"):
+		toxic_overlay = $ToxicOverlay as ColorRect
+	if toxic_overlay and toxic_overlay.material:
+		toxic_mat = toxic_overlay.material as ShaderMaterial
 
 func _process(_delta: float) -> void:
 	if player and "locked_target" in player and player.locked_target and is_instance_valid(player.locked_target):

@@ -1,5 +1,8 @@
 extends CharacterBody3D
 
+const DASH_GHOST_SCENE: PackedScene = preload("res://dash_ghost.tscn")
+const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
+
 @export_group("Movement")
 @export var walk_speed: float = 4.5
 @export var run_speed: float = 7.0
@@ -66,7 +69,6 @@ var dash_cooldown_timer: float = 0.0
 var dash_direction: Vector3 = Vector3.ZERO
 var dash_ghost_timer: float = 0.0
 
-var slash_arc: MeshInstance3D = null
 var slash_arc_mat: StandardMaterial3D = null
 var flash_material: StandardMaterial3D = null
 var _hit_blink_tween: Tween = null
@@ -75,6 +77,8 @@ var _hit_blink_tween: Tween = null
 @onready var mesh_instance: MeshInstance3D = $MeshInstance
 @onready var weapon_pivot: Node3D = $MeshInstance/WeaponPivot
 @onready var hitbox: Area3D = %Hitbox
+@onready var slash_arc: MeshInstance3D = %SlashArc if has_node("%SlashArc") else null
+@onready var deflect_audio: AudioStreamPlayer = $DeflectAudio if has_node("DeflectAudio") else null
 
 func _ready() -> void:
 	add_to_group("player")
@@ -83,27 +87,43 @@ func _ready() -> void:
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
 	_setup_slash_arc()
 	_setup_flash_material()
+	_setup_deflect_audio()
+
+func _setup_deflect_audio() -> void:
+	if not deflect_audio and has_node("DeflectAudio"):
+		deflect_audio = $DeflectAudio as AudioStreamPlayer
+	if deflect_audio and not deflect_audio.stream:
+		var sample_hz := 22050.0
+		var dur := 0.25
+		var total_samples := int(sample_hz * dur)
+		var buffer := PackedByteArray()
+		buffer.resize(total_samples * 2)
+
+		for i in range(total_samples):
+			var t := float(i) / sample_hz
+			var env := exp(-t * 20.0)
+			var val := int((sin(t * 1100.0 * TAU) * 0.5 + sin(t * 1650.0 * TAU) * 0.3 + sin(t * 2750.0 * TAU) * 0.2) * env * 0.55 * 32767.0)
+			buffer.encode_s16(i * 2, val)
+
+		var wav := AudioStreamWAV.new()
+		wav.format = AudioStreamWAV.FORMAT_16_BITS
+		wav.mix_rate = int(sample_hz)
+		wav.data = buffer
+		deflect_audio.stream = wav
 
 func _setup_slash_arc() -> void:
-	slash_arc = MeshInstance3D.new()
-	slash_arc.name = "SlashArc"
-	var torus := TorusMesh.new()
-	torus.inner_radius = 0.35
-	torus.outer_radius = 0.65
-	torus.rings = 24
-	torus.ring_segments = 6
-	slash_arc.mesh = torus
-
-	slash_arc_mat = StandardMaterial3D.new()
-	slash_arc_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	slash_arc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	slash_arc_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.0)
-	slash_arc.material_override = slash_arc_mat
-
-	slash_arc.position = Vector3(0.0, 0.0, 0.3)
-	slash_arc.scale = Vector3(1.0, 0.05, 1.0)
-	slash_arc.visible = false
-	weapon_pivot.add_child(slash_arc)
+	if not slash_arc and weapon_pivot:
+		slash_arc = weapon_pivot.get_node_or_null("SlashArc") as MeshInstance3D
+	if slash_arc:
+		if slash_arc.material_override:
+			slash_arc_mat = slash_arc.material_override as StandardMaterial3D
+		elif slash_arc.mesh and slash_arc.mesh.material:
+			slash_arc_mat = slash_arc.mesh.material as StandardMaterial3D
+		else:
+			slash_arc_mat = StandardMaterial3D.new()
+			slash_arc_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			slash_arc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			slash_arc.material_override = slash_arc_mat
 
 func _trigger_slash_arc() -> void:
 	if not slash_arc or not slash_arc_mat:
@@ -279,20 +299,8 @@ func dash() -> void:
 	_spawn_ghost_trail()
 
 func _spawn_ghost_trail() -> void:
-	if not is_inside_tree():
+	if not is_inside_tree() or not DASH_GHOST_SCENE:
 		return
-
-	var ghost := MeshInstance3D.new()
-	var cap := CapsuleMesh.new()
-	cap.radius = 0.42
-	cap.height = 2.0
-	ghost.mesh = cap
-
-	var ghost_mat := StandardMaterial3D.new()
-	ghost_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	ghost_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	ghost_mat.albedo_color = dash_ghost_color
-	ghost.material_override = ghost_mat
 
 	var parent_node := get_parent()
 	if not parent_node:
@@ -300,14 +308,15 @@ func _spawn_ghost_trail() -> void:
 	if not parent_node:
 		return
 
+	var ghost := DASH_GHOST_SCENE.instantiate() as DashGhost
+	if not ghost:
+		return
+
 	parent_node.add_child(ghost)
 	ghost.global_position = mesh_instance.global_position
 	ghost.global_rotation = mesh_instance.global_rotation
 	ghost.scale = mesh_instance.scale
-
-	var tw := ghost.create_tween()
-	tw.tween_property(ghost_mat, "albedo_color:a", 0.0, 0.22).set_ease(Tween.EASE_IN)
-	tw.tween_callback(ghost.queue_free)
+	ghost.start_fade(dash_ghost_color)
 
 func toggle_lock_on() -> void:
 	if locked_target != null:
@@ -565,49 +574,16 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 
 func _trigger_ironskin_deflection() -> void:
 	# 1. Metallic Clang SFX
-	var sfx := AudioStreamPlayer.new()
-	sfx.bus = "Master"
-	var sample_hz := 22050.0
-	var dur := 0.25
-	var total_samples := int(sample_hz * dur)
-	var buffer := PackedByteArray()
-	buffer.resize(total_samples * 2)
-
-	# Metallic clang harmonics (1100 Hz, 1650 Hz, 2750 Hz)
-	for i in range(total_samples):
-		var t := float(i) / sample_hz
-		var env := exp(-t * 20.0)
-		var val := int((sin(t * 1100.0 * TAU) * 0.5 + sin(t * 1650.0 * TAU) * 0.3 + sin(t * 2750.0 * TAU) * 0.2) * env * 0.55 * 32767.0)
-		buffer.encode_s16(i * 2, val)
-
-	var wav := AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = int(sample_hz)
-	wav.data = buffer
-	sfx.stream = wav
-	get_tree().root.add_child(sfx)
-	sfx.play()
-	sfx.finished.connect(sfx.queue_free)
+	if deflect_audio:
+		deflect_audio.play()
 
 	# 2. Floating Toast "DEFLECTED!"
-	var label := Label3D.new()
-	label.text = "DEFLECTED!"
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.modulate = Color(0.92, 0.94, 0.98, 1.0)
-	label.outline_modulate = Color(0.2, 0.25, 0.35, 0.95)
-	label.outline_size = 8
-	label.font_size = 28
-	label.no_depth_test = true
-	label.pixel_size = 0.0055
-
-	get_tree().root.add_child(label)
-	label.global_position = global_position + Vector3(0.0, 1.2, 0.0)
-
-	var tw := label.create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(label, "global_position:y", label.global_position.y + 0.85, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(label, "modulate:a", 0.0, 0.55).set_ease(Tween.EASE_IN)
-	tw.chain().tween_callback(label.queue_free)
+	if FLOATING_TEXT_SCENE:
+		var label := FLOATING_TEXT_SCENE.instantiate() as FloatingText
+		if label:
+			get_tree().root.add_child(label)
+			label.global_position = global_position + Vector3(0.0, 1.2, 0.0)
+			label.pop("DEFLECTED!", Color(0.92, 0.94, 0.98, 1.0), 28, 0.85, 0.55)
 
 	# 3. Micro trauma shake
 	if camera_pivot and camera_pivot.has_method("add_trauma"):

@@ -21,3 +21,9 @@
 ## 4. Manajemen Proses Background & Lifecycle Task
 - **Wajib Auto-Terminate pada Pengujian:** Setiap kali menjalankan pengujian headless Godot atau skrip runner, agen WAJIB menggunakan flag pembatas (misal `--quit-after N`) atau memastikan skrip memanggil `get_tree().quit()` / `quit()` agar proses tidak menggantung tanpa batas.
 - **Pembersihan Proses di Akhir Giliran:** Sebelum menyelesaikan respon percakapan, agen WAJIB memeriksa task aktif via `manage_task` dan mematikan (*kill*) seluruh proses background yang tidak diperlukan, KECUALI pengguna secara eksplisit meminta proses tersebut tetap berjalan di latar belakang (misal dev server, watcher, atau daemon).
+
+## 5. Arsitektur Berbasis Scene & Prefab (Best Practice Godot)
+- **Utamakan Scene/Prefab (`.tscn`) daripada Hardcode Script:** Seluruh entitas visual, UI, collider, partikel, audio player, dan komponen game WAJIB didefinisikan sebagai file Scene Prefab (`.tscn`) atau sub-node scene di editor Godot, BUKAN di-instansiasi manual lewat kode GDScript (`.new()`).
+- **Dilarang Hardcode Komponen:** Hindari membuat hierarki UI atau node 3D secara prosedural di dalam script (seperti `SubViewport.new()`, `ProgressBar.new()`, `MeshInstance3D.new()`, `Area3D.new()`) jika komponen tersebut merupakan bagian tetap dari entitas.
+- **Referensi Bersih:** Skrip GDScript bertugas menghubungkan referensi node via `@onready`, memproses logika state, dan menggerakkan animasi/properti saat runtime.
+- **Modular Spawning:** Objek yang dimunculkan berulang (seperti monster, item drop, projectile) WAJIB dibuat sebagai PackedScene prefab tersendiri dan dimunculkan menggunakan `PREFAB.instantiate()`.

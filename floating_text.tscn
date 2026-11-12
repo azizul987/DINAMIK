@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://c7m8q3v5w6y1a"]
+
+[ext_resource type="Script" path="res://floating_text.gd" id="1_float"]
+
+[node name="FloatingText" type="Label3D"]
+billboard = 1
+no_depth_test = true
+outline_modulate = Color(0.08, 0.08, 0.08, 1)
+outline_size = 8
+font_size = 32
+pixel_size = 0.0055
+script = ExtResource("1_float")

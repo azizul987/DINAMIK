@@ -29,6 +29,10 @@ window/stretch/mode="canvas_items"
 
 enabled=PackedStringArray("res://addons/awesome_splash/plugin.cfg", "res://addons/godot-action/plugin.cfg")
 
+[gui]
+
+theme/custom="res://resources/ui/alchemy_theme.tres"
+
 [input]
 
 ui_left={

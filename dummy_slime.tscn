@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://dg40l3lyf8uts"]
+
+[ext_resource type="Script" path="res://dummy_enemy.gd" id="1_dummy"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_slime"]
+radius = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slime"]
+albedo_color = Color(0.15, 0.85, 0.45, 0.9)
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.1, 0.6, 0.3, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_slime"]
+material = SubResource("StandardMaterial3D_slime")
+radius = 0.45
+height = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_splat"]
+shading_mode = 0
+albedo_color = Color(0.25, 0.95, 0.45, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_splat"]
+material = SubResource("StandardMaterial3D_splat")
+radius = 0.04
+height = 0.08
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
+bg_color = Color(0.08, 0.08, 0.08, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.3, 0.3, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_lag"]
+bg_color = Color(0.95, 0.72, 0.15, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.2, 0.85, 0.35, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_hp"]
+viewport_path = NodePath("HpViewport")
+
+[node name="DummySlime" type="CharacterBody3D"]
+script = ExtResource("1_dummy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_slime")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_slime")
+
+[node name="SplatParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
+emitting = false
+amount = 10
+lifetime = 0.35
+one_shot = true
+explosiveness = 0.92
+mesh = SubResource("SphereMesh_splat")
+direction = Vector3(0, 1, 0)
+spread = 80.0
+gravity = Vector3(0, -12, 0)
+initial_velocity_min = 2.5
+initial_velocity_max = 4.5
+
+[node name="HpViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(120, 14)
+
+[node name="HpLagBar" type="ProgressBar" parent="HpViewport"]
+custom_minimum_size = Vector2(120, 14)
+offset_right = 120.0
+offset_bottom = 14.0
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_lag")
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="HpBar" type="ProgressBar" parent="HpViewport"]
+custom_minimum_size = Vector2(120, 14)
+offset_right = 120.0
+offset_bottom = 14.0
+theme_override_styles/background = SubResource("StyleBoxEmpty_hp")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+max_value = 30.0
+value = 30.0
+show_percentage = false
+
+[node name="HpSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+billboard = 1
+no_depth_test = true
+texture = SubResource("ViewportTexture_hp")
+pixel_size = 0.0055

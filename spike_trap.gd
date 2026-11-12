@@ -17,6 +17,7 @@ var state_timer: float = 0.0
 @onready var spikes_pivot: Node3D = $SpikesPivot
 @onready var trigger_area: Area3D = $TriggerArea
 @onready var base_plate: CSGBox3D = $BasePlate
+@onready var trap_audio: AudioStreamPlayer3D = $TrapAudio if has_node("TrapAudio") else null
 
 var base_mat: StandardMaterial3D = null
 var default_base_color: Color = Color(0.18, 0.20, 0.24)
@@ -123,8 +124,9 @@ func _damage_entity(entity: Node3D) -> void:
 			entity.take_damage(trap_damage, lift_vector, true)
 
 func _play_trap_sfx(freq: float, duration: float, volume: float) -> void:
-	var sfx := AudioStreamPlayer3D.new()
-	sfx.bus = "Master"
+	if not trap_audio:
+		return
+
 	var sample_hz := 22050.0
 	var total_samples := int(sample_hz * duration)
 	var buffer := PackedByteArray()
@@ -140,7 +142,5 @@ func _play_trap_sfx(freq: float, duration: float, volume: float) -> void:
 	wav.format = AudioStreamWAV.FORMAT_16_BITS
 	wav.mix_rate = int(sample_hz)
 	wav.data = buffer
-	sfx.stream = wav
-	add_child(sfx)
-	sfx.play()
-	sfx.finished.connect(sfx.queue_free)
+	trap_audio.stream = wav
+	trap_audio.play()

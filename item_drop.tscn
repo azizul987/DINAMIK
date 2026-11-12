@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bf5jc4jqhyyya"]
+
+[ext_resource type="Script" path="res://item_drop.gd" id="1_item_drop"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_drop"]
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer"]
+transparency = 1
+albedo_color = Color(0.15, 0.85, 0.45, 0.95)
+roughness = 0.15
+emission_enabled = true
+emission = Color(0.1, 0.6, 0.3, 1)
+emission_energy_multiplier = 0.9
+
+[sub_resource type="SphereMesh" id="SphereMesh_outer"]
+material = SubResource("StandardMaterial3D_outer")
+radius = 0.22
+height = 0.32
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_inner"]
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_inner"]
+material = SubResource("StandardMaterial3D_inner")
+radius = 0.1
+height = 0.14
+
+[node name="ItemDrop" type="CharacterBody3D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_item_drop")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_drop")
+
+[node name="MeshNode" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_outer")
+
+[node name="InnerMesh" type="MeshInstance3D" parent="MeshNode"]
+mesh = SubResource("SphereMesh_inner")
+
+[node name="PickupAudio" type="AudioStreamPlayer" parent="."]
+bus = &"Master"

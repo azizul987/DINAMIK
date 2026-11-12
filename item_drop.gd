@@ -1,6 +1,8 @@
 extends CharacterBody3D
 class_name ItemDrop3D
 
+const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
+
 enum State { POP, IDLE, MAGNET_PULL, COLLECTED }
 
 @export var item_type: String = "slime_gel"
@@ -24,15 +26,20 @@ var idle_timer: float = 0.0
 var base_floor_y: float = 0.0
 var current_magnet_speed: float = 0.0
 
-var mesh_node: MeshInstance3D = null
-var inner_mesh: MeshInstance3D = null
+@onready var mesh_node: MeshInstance3D = $MeshNode if has_node("MeshNode") else null
+@onready var inner_mesh: MeshInstance3D = $MeshNode/InnerMesh if has_node("MeshNode/InnerMesh") else null
+@onready var collision_shape: CollisionShape3D = $CollisionShape3D if has_node("CollisionShape3D") else null
+@onready var pickup_audio: AudioStreamPlayer = $PickupAudio if has_node("PickupAudio") else null
+
 var drop_material: StandardMaterial3D = null
 var player_ref: Node3D = null
+var _pickup_stream: AudioStreamWAV = null
 
 func _ready() -> void:
 	add_to_group("item_drops")
-	_setup_collision()
-	_setup_visuals()
+	_setup_nodes()
+	_setup_pickup_audio()
+	set_drop_color(item_color)
 
 	# Initial launch impulse
 	velocity = Vector3(
@@ -41,49 +48,60 @@ func _ready() -> void:
 		randf_range(-pop_spread_xz, pop_spread_xz)
 	)
 
-func _setup_collision() -> void:
-	var col := CollisionShape3D.new()
-	var shape := SphereShape3D.new()
-	shape.radius = 0.22
-	col.shape = shape
-	add_child(col)
+func _setup_nodes() -> void:
+	if not mesh_node and has_node("MeshNode"):
+		mesh_node = $MeshNode as MeshInstance3D
+	if not inner_mesh and has_node("MeshNode/InnerMesh"):
+		inner_mesh = $MeshNode/InnerMesh as MeshInstance3D
+	if not collision_shape and has_node("CollisionShape3D"):
+		collision_shape = $CollisionShape3D as CollisionShape3D
 
-func _setup_visuals() -> void:
-	mesh_node = MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = 0.22
-	sphere.height = 0.32
-	sphere.radial_segments = 16
-	sphere.rings = 8
-	mesh_node.mesh = sphere
-
-	drop_material = StandardMaterial3D.new()
-	drop_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	drop_material.albedo_color = item_color
-	drop_material.roughness = 0.15
-	drop_material.emission_enabled = true
-	drop_material.emission = item_color.darkened(0.15)
-	drop_material.emission_energy_multiplier = 0.9
-	mesh_node.material_override = drop_material
-	add_child(mesh_node)
-
-	# Inner glowing nucleus
-	inner_mesh = MeshInstance3D.new()
-	var inner_sphere := SphereMesh.new()
-	inner_sphere.radius = 0.10
-	inner_sphere.height = 0.14
-	inner_mesh.mesh = inner_sphere
-	var inner_mat := StandardMaterial3D.new()
-	inner_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	inner_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.9)
-	inner_mesh.material_override = inner_mat
-	mesh_node.add_child(inner_mesh)
+	if mesh_node:
+		var base_mat: Material = mesh_node.material_override
+		if not base_mat and mesh_node.mesh:
+			base_mat = mesh_node.mesh.material
+		if base_mat and base_mat is StandardMaterial3D:
+			drop_material = base_mat.duplicate() as StandardMaterial3D
+			mesh_node.material_override = drop_material
+		elif not drop_material:
+			drop_material = StandardMaterial3D.new()
+			drop_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			drop_material.roughness = 0.15
+			drop_material.emission_enabled = true
+			mesh_node.material_override = drop_material
 
 func set_drop_color(new_color: Color) -> void:
 	item_color = new_color
 	if drop_material:
 		drop_material.albedo_color = item_color
 		drop_material.emission = item_color.darkened(0.15)
+		drop_material.emission_energy_multiplier = 0.9
+
+func _setup_pickup_audio() -> void:
+	if not pickup_audio and has_node("PickupAudio"):
+		pickup_audio = $PickupAudio as AudioStreamPlayer
+
+	var sample_hz := 22050.0
+	var dur := 0.22
+	var total_samples := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total_samples * 2)
+
+	for i in range(total_samples):
+		var t := float(i) / sample_hz
+		var freq := 880.0 if t < 0.09 else 1320.0
+		var note_t := t if t < 0.09 else (t - 0.09)
+		var env := exp(-note_t * 18.0)
+		var val := int((sin(t * freq * TAU) + 0.3 * sin(t * freq * 2.0 * TAU)) * env * 0.45 * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	_pickup_stream = AudioStreamWAV.new()
+	_pickup_stream.format = AudioStreamWAV.FORMAT_16_BITS
+	_pickup_stream.mix_rate = int(sample_hz)
+	_pickup_stream.data = buffer
+
+	if pickup_audio:
+		pickup_audio.stream = _pickup_stream
 
 func _physics_process(delta: float) -> void:
 	if current_state == State.COLLECTED:
@@ -190,48 +208,20 @@ func _collect() -> void:
 	tw.chain().tween_callback(queue_free)
 
 func _play_pickup_chime() -> void:
-	var sfx := AudioStreamPlayer.new()
-	sfx.bus = "Master"
-	var sample_hz := 22050.0
-	var dur := 0.22
-	var total_samples := int(sample_hz * dur)
-	var buffer := PackedByteArray()
-	buffer.resize(total_samples * 2)
-
-	# 2-note ascending arpeggio chime (880 Hz -> 1320 Hz)
-	for i in range(total_samples):
-		var t := float(i) / sample_hz
-		var freq := 880.0 if t < 0.09 else 1320.0
-		var note_t := t if t < 0.09 else (t - 0.09)
-		var env := exp(-note_t * 18.0)
-		var val := int((sin(t * freq * TAU) + 0.3 * sin(t * freq * 2.0 * TAU)) * env * 0.45 * 32767.0)
-		buffer.encode_s16(i * 2, val)
-
-	var wav := AudioStreamWAV.new()
-	wav.format = AudioStreamWAV.FORMAT_16_BITS
-	wav.mix_rate = int(sample_hz)
-	wav.data = buffer
-	sfx.stream = wav
-	get_tree().root.add_child(sfx)
-	sfx.play()
-	sfx.finished.connect(sfx.queue_free)
+	if pickup_audio:
+		if not pickup_audio.stream and _pickup_stream:
+			pickup_audio.stream = _pickup_stream
+		# Reparent ke root agar tidak terpotong saat item_drop di-queue_free
+		pickup_audio.reparent(get_tree().root)
+		pickup_audio.play()
+		pickup_audio.finished.connect(pickup_audio.queue_free)
 
 func _spawn_floating_toast() -> void:
-	var label := Label3D.new()
-	label.text = "+%d Slime Gel" % item_amount
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.modulate = item_color.lightened(0.3)
-	label.outline_modulate = Color(0.05, 0.08, 0.1, 0.95)
-	label.outline_size = 8
-	label.font_size = 28
-	label.no_depth_test = true
-	label.pixel_size = 0.0055
-
+	if not FLOATING_TEXT_SCENE:
+		return
+	var label = FLOATING_TEXT_SCENE.instantiate() as FloatingText
+	if not label:
+		return
 	get_tree().root.add_child(label)
 	label.global_position = global_position + Vector3(0.0, 0.3, 0.0)
-
-	var tw := label.create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(label, "global_position:y", label.global_position.y + 0.85, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(label, "modulate:a", 0.0, 0.55).set_ease(Tween.EASE_IN)
-	tw.chain().tween_callback(label.queue_free)
+	label.pop("+%d Slime Gel" % item_amount, item_color.lightened(0.3), 28, 0.85, 0.55)
