@@ -1,0 +1,275 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://main_menu.gd" id="1_menu"]
+[ext_resource type="Theme" uid="uid://b4jllf78fk441" path="res://resources/ui/alchemy_theme.tres" id="2_theme"]
+[ext_resource type="StyleBox" uid="uid://df72836abc101" path="res://resources/ui/panel_box.tres" id="3_panel"]
+
+[sub_resource type="Curve" id="Curve_embers"]
+_data = [Vector2(0, 0.4), 0.0, 1.2, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_embers"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.2, 0.9, 0.5, 0, 0.2, 0.9, 0.5, 0.7, 0.3, 0.75, 1, 0)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.09, 1)
+
+[node name="Embers" type="CPUParticles2D" parent="."]
+position = Vector2(576, 648)
+amount = 28
+lifetime = 3.2
+preprocess = 2.0
+emission_shape = 3
+emission_rect_extents = Vector2(600, 20)
+direction = Vector2(0, -1)
+spread = 20.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 35.0
+initial_velocity_max = 85.0
+scale_amount_min = 2.5
+scale_amount_max = 5.0
+scale_amount_curve = SubResource("Curve_embers")
+color_ramp = SubResource("Gradient_embers")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="HeaderBox" type="VBoxContainer" parent="CenterContainer/MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="LogoSubtitle" type="Label" parent="CenterContainer/MainVBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.5, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "AN ALCHEMICAL ROGUELIKE"
+horizontal_alignment = 1
+
+[node name="LogoTitle" type="Label" parent="CenterContainer/MainVBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.94, 0.97, 1)
+theme_override_font_sizes/font_size = 56
+text = "TOXEMIA"
+horizontal_alignment = 1
+
+[node name="LogoTagline" type="Label" parent="CenterContainer/MainVBox/HeaderBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.6, 0.68, 1)
+theme_override_font_sizes/font_size = 13
+text = "Kuasai Racun, Racik Transmutasi, Taklukkan Kedalaman"
+horizontal_alignment = 1
+
+[node name="MenuCard" type="PanelContainer" parent="CenterContainer/MainVBox"]
+custom_minimum_size = Vector2(340, 240)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = ExtResource("3_panel")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/MainVBox/MenuCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="Buttons" type="VBoxContainer" parent="CenterContainer/MainVBox/MenuCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BtnPlay" type="Button" parent="CenterContainer/MainVBox/MenuCard/Margin/Buttons"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "Mulai Petualangan"
+
+[node name="BtnGuide" type="Button" parent="CenterContainer/MainVBox/MenuCard/Margin/Buttons"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Panduan Kendali"
+
+[node name="BtnQuit" type="Button" parent="CenterContainer/MainVBox/MenuCard/Margin/Buttons"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Keluar Permainan"
+
+[node name="VersionLabel" type="Label" parent="CenterContainer/MainVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.45, 0.52, 0.8)
+theme_override_font_sizes/font_size = 11
+text = "v0.4.0 • Godot 4.6 Jolt"
+horizontal_alignment = 1
+
+[node name="GuideModal" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DarkOverlay" type="ColorRect" parent="GuideModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 0.85)
+
+[node name="Center" type="CenterContainer" parent="GuideModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="GuideModal/Center"]
+custom_minimum_size = Vector2(460, 440)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_panel")
+
+[node name="Margin" type="MarginContainer" parent="GuideModal/Center/Card"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="VBox" type="VBoxContainer" parent="GuideModal/Center/Card/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="GuideModal/Center/Card/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "PANDUAN KENDALI & ALKIMIA"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="GuideModal/Center/Card/Margin/VBox"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="GuideModal/Center/Card/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="Key1" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "W, A, S, D"
+
+[node name="Desc1" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Gerak / Manuver Karakter"
+
+[node name="Key2" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "Shift"
+
+[node name="Desc2" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Lari Cepat (Sprint)"
+
+[node name="Key3" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "Spasi"
+
+[node name="Desc3" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Melompat (Jump)"
+
+[node name="Key4" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "Klik Kiri"
+
+[node name="Desc4" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Serangan Pedang & Lunge"
+
+[node name="Key5" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "Klik Kanan"
+
+[node name="Desc5" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Kunci Target (Lock-On)"
+
+[node name="Key6" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "E"
+
+[node name="Desc6" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Ambil Item / Interaksi"
+
+[node name="Key7" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "C"
+
+[node name="Desc7" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Buka / Tutup Meja Alkimia"
+
+[node name="Key8" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "1, 2, 3, 4, 5"
+
+[node name="Desc8" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Minum Ramuan Cepat"
+
+[node name="Key9" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+text = "ESC"
+
+[node name="Desc9" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Jeda Permainan (Pause)"
+
+[node name="HSeparator2" type="HSeparator" parent="GuideModal/Center/Card/Margin/VBox"]
+layout_mode = 2
+
+[node name="BtnCloseGuide" type="Button" parent="GuideModal/Center/Card/Margin/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Tutup Panduan"

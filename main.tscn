@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://bf5jc4jqhyyya" path="res://item_drop.tscn" id="14_item_drop"]
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="15_door"]
 [ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
+[ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -765,6 +766,9 @@ custom_minimum_size = Vector2(75, 32)
 layout_mode = 2
 size_flags_vertical = 4
 text = "Racik"
+
+[node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("17_pause_menu")]
+unique_name_in_owner = true
 
 [node name="Node3D" parent="." unique_id=1257887040 instance=ExtResource("7_272bh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7486942, 0)

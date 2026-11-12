@@ -289,3 +289,37 @@ func complete_tutorial() -> void:
 	is_tutorial_active = false
 	current_tutorial_step = 4
 	tutorial_completed.emit()
+
+func reset_game_state() -> void:
+	is_dead = false
+	is_berserk_active = false
+	is_strength_active = false
+	is_slow_active = false
+	is_ironskin_active = false
+	ironskin_timer = 0.0
+	current_hp = max_hp
+	current_toxicity = 0.0
+	tolerance_level = 1
+	max_toxicity = 100.0
+	current_tutorial_step = 0
+	is_tutorial_active = true
+	materials = {
+		"slime_gel": 0,
+		"fire_essence": 0,
+		"frost_wing": 0
+	}
+	potions = {
+		"healing": 0,
+		"strength": 0,
+		"slow": 0,
+		"berserk": 0,
+		"ironskin": 0
+	}
+	if lpf_effect:
+		lpf_effect.cutoff_hz = 20500.0
+	if tinnitus_player:
+		tinnitus_player.volume_db = -80.0
+	player_hp_changed.emit(current_hp, max_hp)
+	toxicity_changed.emit(current_toxicity, max_toxicity)
+	toxicity_stage_changed.emit(ToxicityStage.SAFE)
+	inventory_updated.emit()

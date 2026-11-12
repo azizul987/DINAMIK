@@ -1,0 +1,95 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://pause_menu.gd" id="1_pause"]
+[ext_resource type="Theme" uid="uid://b4jllf78fk441" path="res://resources/ui/alchemy_theme.tres" id="2_theme"]
+[ext_resource type="StyleBox" uid="uid://df72836abc101" path="res://resources/ui/panel_box.tres" id="3_panel"]
+
+[node name="PauseMenu" type="Control"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_pause")
+
+[node name="DarkOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.07, 0.78)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuCard" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(340, 360)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_panel")
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/MenuCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/MenuCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleBox" type="VBoxContainer" parent="CenterContainer/MenuCard/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="CenterContainer/MenuCard/Margin/VBox/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.88, 0.92, 1)
+theme_override_font_sizes/font_size = 22
+text = "PERMAINAN DIJEDA"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CenterContainer/MenuCard/Margin/VBox/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.5, 0.85)
+theme_override_font_sizes/font_size = 11
+text = "— TOXEMIA —"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/MenuCard/Margin/VBox"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="VBoxContainer" parent="CenterContainer/MenuCard/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnResume" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Lanjutkan (ESC)"
+
+[node name="BtnRestart" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Ulangi Lantai"
+
+[node name="BtnMainMenu" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Menu Utama"
+
+[node name="BtnQuit" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Keluar Game"
