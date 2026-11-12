@@ -7,10 +7,14 @@ signal player_overdosed()
 signal player_died()
 signal inventory_updated()
 signal potion_consumed(potion_name: String)
+signal tutorial_step_changed(step: int)
+signal tutorial_completed()
 
 enum ToxicityStage { SAFE, MODERATE, HIGH, OVERDOSE }
 
 var current_floor: int = 1
+var is_tutorial_active: bool = true
+var current_tutorial_step: int = 0
 var max_hp: float = 100.0
 var current_hp: float = 100.0
 
@@ -280,3 +284,12 @@ func hit_stop(duration: float = 0.05, slow: float = 0.05) -> void:
 	await get_tree().create_timer(duration, true, false, true).timeout
 	if current_id == _hit_stop_id:
 		Engine.time_scale = 1.0
+
+func set_tutorial_step(step: int) -> void:
+	current_tutorial_step = step
+	tutorial_step_changed.emit(step)
+
+func complete_tutorial() -> void:
+	is_tutorial_active = false
+	current_tutorial_step = 4
+	tutorial_completed.emit()

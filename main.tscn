@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://cs2ie3ic3a16i" path="res://dummy_enemy.gd" id="5_dummy"]
 [ext_resource type="PackedScene" path="res://spike_trap.tscn" id="6_spike_trap"]
 [ext_resource type="PackedScene" uid="uid://3fjrei2e1v2b" path="res://DungeonTiles/scenes/Level/Test.tscn" id="7_272bh"]
+[ext_resource type="Script" uid="uid://cviihlw6jciwi" path="res://tutorial_controller.gd" id="8_tutorial"]
+[ext_resource type="StyleBox" uid="uid://df72836abc101" path="res://resources/ui/panel_box.tres" id="9_panel_box"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -54,20 +56,6 @@ corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crafting"]
-bg_color = Color(0.08, 0.09, 0.12, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.22, 0.35, 0.45, 0.8)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.4)
-shadow_size = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chip"]
 content_margin_left = 8.0
@@ -453,7 +441,7 @@ offset_right = 230.0
 offset_bottom = 180.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_crafting")
+theme_override_styles/panel = ExtResource("9_panel_box")
 
 [node name="Margin" type="MarginContainer" parent="CanvasLayer/Control/CraftingPanel" unique_id=1058788858]
 layout_mode = 2
@@ -715,3 +703,6 @@ text = "Racik"
 
 [node name="Node3D" parent="." unique_id=1257887040 instance=ExtResource("7_272bh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7486942, 0)
+
+[node name="TutorialController" type="Node3D" parent="." unique_id=2100000001]
+script = ExtResource("8_tutorial")
