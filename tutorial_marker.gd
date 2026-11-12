@@ -96,18 +96,15 @@ func _process(delta: float) -> void:
 
 	_time += delta
 
-	# 1. Rotasi berlawanan dua cincin lingkaran
 	if outer_ring:
 		outer_ring.rotate_y(delta * 0.6)
 	if inner_ring:
 		inner_ring.rotate_y(-delta * 1.1)
 
-	# 2. Kristal diamond mengapung, berputar dan melayang vertikal
 	if floating_diamond:
 		floating_diamond.rotate_y(delta * 1.6)
 		floating_diamond.position.y = _initial_diamond_y + sin(_time * float_speed) * float_height
 
-	# 3. Efek denyut halus pilar cahaya dan cincin luar
 	var pulse := (sin(_time * pulse_speed) + 1.0) * 0.5
 	if _outer_mat:
 		_outer_mat.albedo_color.a = lerpf(0.65, 0.95, pulse)

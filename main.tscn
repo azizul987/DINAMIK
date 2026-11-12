@@ -11,7 +11,7 @@
 [ext_resource type="Theme" uid="uid://b4jllf78fk441" path="res://resources/ui/alchemy_theme.tres" id="10_theme"]
 [ext_resource type="StyleBox" uid="uid://ca83a18def202" path="res://resources/ui/slot_box.tres" id="11_slot_box"]
 [ext_resource type="Shader" uid="uid://clf73n3am1ia3" path="res://shaders/toxic_veins.gdshader" id="12_toxic_shader"]
-[ext_resource type="PackedScene" path="res://dummy_slime.tscn" id="13_dummy_slime"]
+[ext_resource type="PackedScene" uid="uid://dg40l3lyf8uts" path="res://dummy_slime.tscn" id="13_dummy_slime"]
 [ext_resource type="Material" uid="uid://dbtk0ncyclvyf" path="res://DungeonTiles/material/PropSet_5_Mat.tres" id="13_w48qg"]
 [ext_resource type="PackedScene" uid="uid://bf5jc4jqhyyya" path="res://item_drop.tscn" id="14_item_drop"]
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="15_door"]
@@ -73,47 +73,6 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_marker"]
-height = 1.0
-radius = 1.4
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2cqfq"]
-transparency = 1
-shading_mode = 0
-albedo_color = Color(0.33218154, 0, 0.10517485, 0.8)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
-transparency = 1
-shading_mode = 0
-albedo_color = Color(0.2, 0.9, 0.5, 0.8)
-
-[sub_resource type="TorusMesh" id="TorusMesh_ring"]
-material = SubResource("StandardMaterial3D_ring")
-inner_radius = 1.28
-outer_radius = 1.4
-rings = 24
-ring_segments = 12
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yaehf"]
-transparency = 1
-albedo_color = Color(0.33218154, 0, 0.10517485, 0.18)
-emission_enabled = true
-emission = Color(0.33218154, 0, 0.10517485, 1)
-emission_energy_multiplier = 0.6
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_disc"]
-transparency = 1
-albedo_color = Color(0.2, 0.9, 0.5, 0.18)
-emission_enabled = true
-emission = Color(0.2, 0.9, 0.5, 1)
-emission_energy_multiplier = 0.6
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_disc"]
-material = SubResource("StandardMaterial3D_disc")
-top_radius = 1.25
-bottom_radius = 1.25
-height = 0.01
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_v0ej8"]
 _surfaces = [{
@@ -814,10 +773,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7486942, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.069235, 0, 3.6500878)
 script = ExtResource("8_tutorial")
 marker_color = Color(0.33218154, 0, 0.10517485, 1)
+drop_position = Vector3(4.081149, 1.9657038, -5.7915773)
 
 [node name="TutorialMarker" parent="TutorialController" unique_id=2100000004 instance=ExtResource("16_marker")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, -4.5)
+marker_color = Color(0.33218154, 0, 0.10517485, 1)
 
 [node name="TutorialSlimeDrop" parent="TutorialController" unique_id=2100000009 instance=ExtResource("14_item_drop")]
 unique_name_in_owner = true
@@ -826,12 +787,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.081149, 1.9657038, -5.79157
 [node name="ChimePlayer" type="AudioStreamPlayer" parent="TutorialController" unique_id=2100000008]
 unique_name_in_owner = true
 
-[node name="PropSet_5_Entrance_SteelBar_2" type="MeshInstance3D" parent="." unique_id=1165740232]
+[node name="door" type="MeshInstance3D" parent="." unique_id=1165740232]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.984684, 0.33593762, 2.98666)
 mesh = SubResource("ArrayMesh_4caia")
 script = ExtResource("15_door")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="PropSet_5_Entrance_SteelBar_2" unique_id=1140452395]
+[node name="StaticBody3D" type="StaticBody3D" parent="door" unique_id=1140452395]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PropSet_5_Entrance_SteelBar_2/StaticBody3D" unique_id=1938245530]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="door/StaticBody3D" unique_id=1938245530]
 shape = SubResource("ConcavePolygonShape3D_6dlmt")

@@ -92,7 +92,6 @@ func _ready() -> void:
 	_on_inventory_updated()
 
 func _setup_ironskin_ui() -> void:
-	# 1. Setup Slot 5 in QuickSlotsBar
 	if quick_slots_bar and slot_berserk:
 		slot_ironskin = slot_berserk.duplicate()
 		slot_ironskin.name = "SlotIronskin"
@@ -114,7 +113,6 @@ func _setup_ironskin_ui() -> void:
 		if key_label:
 			key_label.text = "5"
 
-	# 2. Setup Recipe in CraftingPanel
 	var recipe_list = crafting_panel.find_child("RecipeList", true, false)
 	var row_berserk = crafting_panel.find_child("RowBerserk", true, false)
 	if recipe_list and row_berserk:
@@ -177,7 +175,6 @@ func _on_inventory_updated() -> void:
 	count_slow.text = str(p.get("slow", 0))
 	count_berserk.text = str(p.get("berserk", 0))
 
-	# Dynamic quick-slots: only show if potion count > 0
 	slot_heal.visible = p.get("healing", 0) > 0
 	slot_strength.visible = p.get("strength", 0) > 0
 	slot_slow.visible = p.get("slow", 0) > 0

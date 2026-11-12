@@ -1,5 +1,4 @@
 @tool
-# tutorial_controller.gd
 class_name TutorialController
 extends Node3D
 
@@ -39,7 +38,6 @@ var current_step: Step = Step.MOVEMENT
 var is_transitioning: bool = false
 var _elapsed_time: float = 0.0
 
-# 3D Visual Elements & Audio (Node resmi di scene main.tscn)
 @onready var marker_area: Area3D = $TutorialMarker if has_node("TutorialMarker") else null
 @onready var marker_ring: MeshInstance3D = $TutorialMarker/MarkerRing if has_node("TutorialMarker/MarkerRing") else null
 @onready var marker_disc: MeshInstance3D = $TutorialMarker/MarkerDisc if has_node("TutorialMarker/MarkerDisc") else null
@@ -52,7 +50,6 @@ var _chime_stream: AudioStreamWAV = null
 var tutorial_drop_node: Node3D = null
 var combat_dummy_ref: Node3D = null
 
-# Minimalist HUD Elements (Menggunakan Palet Eksak Meja Alkimia / CraftingPanel)
 var ui_canvas: CanvasLayer = null
 var ui_container: PanelContainer = null
 var ui_task: Label = null
@@ -88,7 +85,6 @@ func _setup_marker_nodes() -> void:
 	if not marker_area and has_node("TutorialMarker"):
 		marker_area = $TutorialMarker as Area3D
 	if marker_area:
-		# Jika posisi TutorialMarker digeser langsung di 3D viewport scene, gunakan posisi tersebut
 		if marker_area.position != marker_position and marker_position == Vector3(0.0, 0.26, -4.5):
 			marker_position = marker_area.position
 
@@ -167,9 +163,6 @@ func start_step(step: Step) -> void:
 		Step.COMPLETED:
 			_start_completed_step()
 
-# ==============================================================================
-# STEP 1: GERAKAN
-# ==============================================================================
 func _start_movement_step() -> void:
 	_set_task("Berjalan ke lingkaran target (W, A, S, D)")
 	_spawn_ground_marker()
@@ -232,9 +225,6 @@ func _update_marker_visuals(delta: float) -> void:
 			var pulse := (sin(_elapsed_time * 3.5) + 1.0) * 0.5
 			marker_mat_ring.albedo_color = Color(marker_color.r, marker_color.g, marker_color.b, lerpf(0.55, 0.9, pulse))
 
-# ==============================================================================
-# STEP 2: AMBIL BAHAN
-# ==============================================================================
 func _start_pickup_step() -> void:
 	_set_task("Ambil Slime Gel di depan (E)")
 	_spawn_slime_drop()
@@ -293,9 +283,6 @@ func _on_inventory_updated() -> void:
 		await get_tree().create_timer(1.2).timeout
 		start_step(Step.POTION)
 
-# ==============================================================================
-# STEP 3: MINUM RAMUAN & TOXICITY
-# ==============================================================================
 func _start_potion_step() -> void:
 	if GlobalLogic.potions.get("healing", 0) <= 0:
 		GlobalLogic.potions["healing"] = 1
@@ -319,9 +306,6 @@ func _on_potion_consumed(potion_name: String) -> void:
 			await get_tree().create_timer(1.3).timeout
 			start_step(Step.COMBAT)
 
-# ==============================================================================
-# STEP 4: PERTARUNGAN
-# ==============================================================================
 func _start_combat_step() -> void:
 	_set_task("Serang boneka slime di depan (Klik Kiri)")
 	combat_dummy_ref = _get_dummy_slime()
@@ -340,9 +324,6 @@ func _on_dummy_damaged(_amount: float) -> void:
 		await get_tree().create_timer(1.2).timeout
 		start_step(Step.COMPLETED)
 
-# ==============================================================================
-# STEP 5: SELESAI
-# ==============================================================================
 func _start_completed_step() -> void:
 	_set_task("Latihan selesai • Pintu dungeon terbuka")
 	if ui_task:
@@ -358,11 +339,7 @@ func _start_completed_step() -> void:
 		tw.tween_property(ui_container, "modulate:a", 0.0, 0.6)
 		tw.chain().tween_callback(ui_container.hide)
 
-# ==============================================================================
-# MINIMALIST HUD (Menggunakan Template res://resources/ui/panel_box.tres)
-# ==============================================================================
 func _setup_ui() -> void:
-	# Hubungkan ke ObjectiveBar yang ada di scene utama (main.tscn)
 	var main_control = get_tree().root.find_child("Control", true, false)
 	if main_control:
 		var bar = main_control.get_node_or_null("ObjectiveBar")

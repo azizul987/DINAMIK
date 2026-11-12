@@ -41,7 +41,6 @@ func _ready() -> void:
 	_setup_pickup_audio()
 	set_drop_color(item_color)
 
-	# Initial launch impulse
 	velocity = Vector3(
 		randf_range(-pop_spread_xz, pop_spread_xz),
 		pop_force_y,
@@ -118,7 +117,6 @@ func _physics_process(delta: float) -> void:
 		target_pos = player_ref.global_position + Vector3(0.0, 0.9, 0.0)
 		dist_to_player = global_position.distance_to(target_pos)
 
-		# Immediate absorption if inside pickup perimeter in ANY state!
 		if dist_to_player <= pickup_distance:
 			_collect()
 			return
@@ -130,7 +128,6 @@ func _physics_process(delta: float) -> void:
 			mesh_node.rotate_x(delta * 6.0)
 			mesh_node.rotate_y(delta * 4.0)
 
-			# If player is in magnet range and grace period elapsed, start pulling immediately
 			if dist_to_player < magnet_radius and pop_grace_timer <= 0.0:
 				_start_magnet_pull()
 				return
@@ -150,7 +147,6 @@ func _physics_process(delta: float) -> void:
 
 		State.IDLE:
 			idle_timer += delta
-			# Gentle bobbing and spinning
 			mesh_node.position.y = sin(idle_timer * 3.5) * 0.07
 			mesh_node.rotate_y(delta * 2.2)
 
@@ -171,25 +167,21 @@ func _physics_process(delta: float) -> void:
 				_collect()
 				return
 
-			# Accelerate toward player
 			current_magnet_speed = minf(magnet_speed_max, current_magnet_speed + magnet_acceleration * delta)
 			var move_dir := to_player.normalized()
 			velocity = move_dir * current_magnet_speed
 
-			# Look at player & aerodynamic drop stretch
 			var look_target := global_position + move_dir
 			if not global_position.is_equal_approx(look_target):
 				look_at(look_target, Vector3.UP)
 			mesh_node.scale = Vector3(0.75, 0.75, 1.4)
 
-			# Direct smooth glide towards player with zero obstacle friction
 			global_position += velocity * delta
 
 func _start_magnet_pull() -> void:
 	current_state = State.MAGNET_PULL
 	current_magnet_speed = magnet_speed_initial
 	mesh_node.position.y = 0.0
-	# Turn off collision so droplet glides freely without snagging on player's collider
 	collision_layer = 0
 	collision_mask = 0
 
@@ -211,7 +203,6 @@ func _play_pickup_chime() -> void:
 	if pickup_audio:
 		if not pickup_audio.stream and _pickup_stream:
 			pickup_audio.stream = _pickup_stream
-		# Reparent ke root agar tidak terpotong saat item_drop di-queue_free
 		pickup_audio.reparent(get_tree().root)
 		pickup_audio.play()
 		pickup_audio.finished.connect(pickup_audio.queue_free)

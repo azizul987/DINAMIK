@@ -5,13 +5,9 @@ signal door_opened()
 signal door_closed()
 
 @export_group("Door Settings")
-## Jarak ketinggian terangkat ke atas saat pintu membuka
 @export var open_height: float = 3.5
-## Durasi animasi pergerakan pintu dalam detik
 @export var open_duration: float = 1.5
-## Apakah pintu terbuka otomatis saat tutorial selesai
 @export var open_on_tutorial_complete: bool = true
-## Langkah tutorial tertentu untuk membuka pintu (-1 jika diabaikan)
 @export var open_on_tutorial_step: int = 4
 
 var is_open: bool = false

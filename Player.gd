@@ -157,7 +157,6 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
-	# Validate locked target
 	if locked_target != null:
 		if not is_instance_valid(locked_target) or locked_target.get("is_dead") == true or global_position.distance_to(locked_target.global_position) > 22.0:
 			locked_target = null
@@ -215,7 +214,6 @@ func _physics_process(delta: float) -> void:
 		velocity.x = lerpf(velocity.x, target_vel_x, air_control)
 		velocity.z = lerpf(velocity.z, target_vel_z, air_control)
 
-	# Face locked target or face movement direction
 	if locked_target and is_instance_valid(locked_target):
 		var to_enemy: Vector3 = locked_target.global_position - global_position
 		to_enemy.y = 0.0
@@ -385,13 +383,11 @@ func _find_soft_target() -> Node3D:
 		var dir: Vector3 = to_enemy.normalized()
 		var dot: float = forward.dot(dir)
 
-		# 1. Point-blank check (dist <= auto_target_point_blank_radius): 360 degrees
 		if dist <= auto_target_point_blank_radius:
 			var score: float = 100.0 - dist * 10.0
 			if score > best_score:
 				best_score = score
 				best_target = enemy_node
-		# 2. Cone check (within auto_target_cone_deg)
 		elif dot >= cos(deg_to_rad(auto_target_cone_deg * 0.5)):
 			var score: float = (dot * 2.0) - (dist / auto_target_radius)
 			if score > best_score:
@@ -405,7 +401,6 @@ func attack() -> void:
 	is_attacking = true
 	_hit_targets_this_swing.clear()
 
-	# Snap orientation directly to locked target, soft auto-target, or camera forward!
 	var target_to_face: Node3D = locked_target if (locked_target and is_instance_valid(locked_target)) else _find_soft_target()
 
 	if target_to_face and is_instance_valid(target_to_face):
@@ -426,7 +421,6 @@ func attack() -> void:
 	elif GlobalLogic.is_strength_active:
 		damage *= strength_damage_multiplier
 
-	# Attack lunge & slash arc
 	lunge_direction = Vector3(sin(mesh_instance.rotation.y), 0.0, cos(mesh_instance.rotation.y)).normalized()
 	lunge_timer = attack_lunge_duration
 	_trigger_slash_arc()
@@ -472,7 +466,6 @@ func _apply_hit_to_target(target: Node) -> void:
 
 	target.take_damage(damage, knockback_dir * kb_force)
 
-	# Combat Juice Feedback
 	GlobalLogic.hit_stop(0.05, 0.05)
 	if camera_pivot:
 		var is_buffed: bool = GlobalLogic.is_berserk_active or GlobalLogic.is_strength_active
@@ -508,20 +501,16 @@ func _trigger_hit_feedback() -> void:
 	if _hit_blink_tween:
 		_hit_blink_tween.kill()
 
-	# 1. Pure White Hit Flash on Impact
 	mesh_instance.material_override = flash_material
 	mesh_instance.visible = true
 
 	_hit_blink_tween = create_tween()
-	# Hold solid white flash for hit_flash_duration (0.08s)
 	_hit_blink_tween.tween_interval(hit_flash_duration)
-	# Remove white flash material
 	_hit_blink_tween.tween_callback(func():
 		if is_instance_valid(mesh_instance):
 			mesh_instance.material_override = null
 	)
 
-	# 2. i-Frame Blinking during remainder of invulnerability_duration
 	var remaining_time: float = maxf(0.0, invulnerability_duration - hit_flash_duration)
 	var cycles: int = int(remaining_time / (hit_blink_interval * 2.0))
 	for i in range(cycles):
@@ -536,7 +525,6 @@ func _trigger_hit_feedback() -> void:
 		)
 		_hit_blink_tween.tween_interval(hit_blink_interval)
 
-	# 3. Final cleanup and invulnerability reset
 	_hit_blink_tween.tween_callback(func():
 		if is_instance_valid(mesh_instance):
 			mesh_instance.visible = true
@@ -548,7 +536,6 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 	if is_invulnerable or GlobalLogic.is_dead:
 		return
 
-	# Sharp hazard deflection when Ironskin potion is active
 	if is_sharp and GlobalLogic.is_ironskin_active:
 		_trigger_ironskin_deflection()
 		return
@@ -573,11 +560,9 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 	_trigger_hit_feedback()
 
 func _trigger_ironskin_deflection() -> void:
-	# 1. Metallic Clang SFX
 	if deflect_audio:
 		deflect_audio.play()
 
-	# 2. Floating Toast "DEFLECTED!"
 	if FLOATING_TEXT_SCENE:
 		var label := FLOATING_TEXT_SCENE.instantiate() as FloatingText
 		if label:
@@ -585,6 +570,5 @@ func _trigger_ironskin_deflection() -> void:
 			label.global_position = global_position + Vector3(0.0, 1.2, 0.0)
 			label.pop("DEFLECTED!", Color(0.92, 0.94, 0.98, 1.0), 28, 0.85, 0.55)
 
-	# 3. Micro trauma shake
 	if camera_pivot and camera_pivot.has_method("add_trauma"):
 		camera_pivot.add_trauma(0.18)

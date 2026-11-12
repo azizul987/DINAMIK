@@ -1,4 +1,3 @@
-# dummy_enemy.gd
 class_name SlimeEnemy
 extends CharacterBody3D
 
@@ -193,7 +192,6 @@ func _physics_process(delta: float) -> void:
 			velocity.x = move_toward(velocity.x, 0.0, 10.0 * delta)
 			velocity.z = move_toward(velocity.z, 0.0, 10.0 * delta)
 
-			# Turn toward target destination or player
 			var target_pos: Vector3 = player_ref.global_position if (is_chasing and is_instance_valid(player_ref)) else target_destination
 			var to_target: Vector3 = target_pos - global_position
 			to_target.y = 0.0
@@ -285,7 +283,6 @@ func _check_contact_damage() -> void:
 	if attack_timer > 0.0:
 		return
 
-	# Check slide collisions
 	for i in range(get_slide_collision_count()):
 		var col := get_slide_collision(i)
 		var collider := col.get_collider() as Node3D
@@ -293,7 +290,6 @@ func _check_contact_damage() -> void:
 			_deal_damage_to_player(collider)
 			return
 
-	# Also check proximity overlap
 	if is_instance_valid(player_ref) and not GlobalLogic.is_dead:
 		if global_position.distance_to(player_ref.global_position) < proximity_damage_range:
 			_deal_damage_to_player(player_ref)
@@ -309,7 +305,6 @@ func _deal_damage_to_player(target: Node3D) -> void:
 	if target.has_method("take_damage"):
 		target.take_damage(attack_damage, knockback_dir * contact_knockback_force)
 
-	# Little bounce-back upon impact only if not in player knockback
 	if current_state != State.HOPPING:
 		velocity.x = -knockback_dir.x * contact_bounce_recoil
 		velocity.z = -knockback_dir.z * contact_bounce_recoil
@@ -329,9 +324,7 @@ func _trigger_hit_flash() -> void:
 	mesh.material_override = flash_material
 
 	_flash_tween = create_tween()
-	# Tahan putih pekat selama 0.08 detik (mencakup hit-stop 0.05 detik)
 	_flash_tween.tween_interval(0.08)
-	# Memudar halus ke transparan selama 0.08 detik
 	_flash_tween.tween_property(flash_material, "albedo_color:a", 0.0, 0.08)
 	_flash_tween.tween_callback(func():
 		if is_instance_valid(mesh):

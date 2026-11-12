@@ -53,13 +53,11 @@ func _ready() -> void:
 	_setup_toxicity_audio()
 
 func _setup_toxicity_audio() -> void:
-	# 1. Setup LowPassFilter on Master Bus
 	lpf_effect = AudioEffectLowPassFilter.new()
 	lpf_effect.cutoff_hz = 20500.0
 	lpf_effect.resonance = 0.5
 	AudioServer.add_bus_effect(0, lpf_effect)
 
-	# 2. Setup Tinnitus Sine Ringing Tone (3800 Hz)
 	tinnitus_player = AudioStreamPlayer.new()
 	tinnitus_player.bus = "Master"
 	var sample_hz := 22050.0
@@ -85,7 +83,6 @@ func _setup_toxicity_audio() -> void:
 	add_child(tinnitus_player)
 	tinnitus_player.play()
 
-	# 3. Setup Heartbeat Thump Sound (55 Hz damped pulse)
 	heartbeat_player = AudioStreamPlayer.new()
 	heartbeat_player.bus = "Master"
 	var hb_hz := 22050.0
@@ -108,7 +105,6 @@ func _setup_toxicity_audio() -> void:
 func _process(delta: float) -> void:
 	var ratio := get_toxicity_ratio()
 
-	# Toxicity Audio Processing (>75%)
 	if lpf_effect:
 		if ratio > 0.75:
 			var factor := clampf((ratio - 0.75) / 0.25, 0.0, 1.0)

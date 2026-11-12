@@ -52,7 +52,6 @@ func _process(delta: float) -> void:
 				_start_warning()
 
 		TrapState.WARNING:
-			# Rattle jitter before snapping
 			if spikes_pivot:
 				spikes_pivot.position.y = RETRACTED_Y + randf_range(0.04, 0.10)
 			if state_timer <= 0.0:
@@ -103,7 +102,6 @@ func _on_body_entered(body: Node3D) -> void:
 	if current_state == TrapState.EXTENDED:
 		_damage_entity(body)
 	elif current_state == TrapState.IDLE:
-		# Pressure plate trigger: step on trap starts warning faster!
 		state_timer = minf(state_timer, 0.25)
 
 func _apply_damage_to_overlapping() -> void:
@@ -119,9 +117,7 @@ func _damage_entity(entity: Node3D) -> void:
 
 	if entity.has_method("take_damage"):
 		var lift_vector := Vector3(0.0, trap_knockback_lift, 0.0)
-		# Pass is_sharp = true for sharp trap damage!
-		if entity.has_method("take_damage"):
-			entity.take_damage(trap_damage, lift_vector, true)
+		entity.take_damage(trap_damage, lift_vector, true)
 
 func _play_trap_sfx(freq: float, duration: float, volume: float) -> void:
 	if not trap_audio:
