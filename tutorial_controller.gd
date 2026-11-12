@@ -92,10 +92,17 @@ func _setup_marker_nodes() -> void:
 		if marker_area.position != marker_position and marker_position == Vector3(0.0, 0.26, -4.5):
 			marker_position = marker_area.position
 
+		if marker_area.has_method("set"):
+			marker_area.set("marker_color", marker_color)
+
 		if not marker_ring:
-			marker_ring = marker_area.get_node_or_null("MarkerRing") as MeshInstance3D
+			marker_ring = marker_area.get_node_or_null("OuterRing") as MeshInstance3D
+			if not marker_ring:
+				marker_ring = marker_area.get_node_or_null("MarkerRing") as MeshInstance3D
 		if not marker_disc:
-			marker_disc = marker_area.get_node_or_null("MarkerDisc") as MeshInstance3D
+			marker_disc = marker_area.get_node_or_null("CenterDisc") as MeshInstance3D
+			if not marker_disc:
+				marker_disc = marker_area.get_node_or_null("MarkerDisc") as MeshInstance3D
 
 		if marker_ring:
 			if not marker_ring.material_override:
@@ -112,9 +119,8 @@ func _setup_marker_nodes() -> void:
 		_apply_marker_color()
 
 func _apply_marker_color() -> void:
-	if not marker_ring or not marker_disc:
-		if has_node("TutorialMarker"):
-			_setup_marker_nodes()
+	if marker_area and is_instance_valid(marker_area) and marker_area.has_method("set"):
+		marker_area.set("marker_color", marker_color)
 	if marker_mat_ring:
 		var current_a: float = marker_mat_ring.albedo_color.a
 		marker_mat_ring.albedo_color = Color(marker_color.r, marker_color.g, marker_color.b, current_a)
@@ -176,9 +182,12 @@ func _spawn_ground_marker() -> void:
 		return
 
 	marker_area.position = marker_position
-	marker_area.scale = Vector3.ONE
-	marker_area.visible = true
-	marker_area.monitoring = true
+	if marker_area.has_method("reset_marker"):
+		marker_area.reset_marker()
+	else:
+		marker_area.scale = Vector3.ONE
+		marker_area.visible = true
+		marker_area.monitoring = true
 
 	_apply_marker_color()
 	if marker_mat_ring:
@@ -195,15 +204,18 @@ func _on_marker_body_entered(body: Node3D) -> void:
 		_play_chime()
 
 		if marker_area and is_instance_valid(marker_area):
-			var tw := create_tween()
-			tw.tween_property(marker_area, "scale", Vector3(1.25, 0.2, 1.25), 0.2).set_trans(Tween.TRANS_SINE)
-			if marker_mat_ring:
-				tw.parallel().tween_property(marker_mat_ring, "albedo_color:a", 0.0, 0.2)
-			tw.chain().tween_callback(func():
-				if is_instance_valid(marker_area):
-					marker_area.visible = false
-					marker_area.monitoring = false
-			)
+			if marker_area.has_method("play_reached_animation"):
+				marker_area.play_reached_animation()
+			else:
+				var tw := create_tween()
+				tw.tween_property(marker_area, "scale", Vector3(1.25, 0.2, 1.25), 0.2).set_trans(Tween.TRANS_SINE)
+				if marker_mat_ring:
+					tw.parallel().tween_property(marker_mat_ring, "albedo_color:a", 0.0, 0.2)
+				tw.chain().tween_callback(func():
+					if is_instance_valid(marker_area):
+						marker_area.visible = false
+						marker_area.monitoring = false
+				)
 
 		_show_step_done("✓ Lingkaran target tercapai")
 		step_completed.emit(Step.MOVEMENT)
@@ -212,6 +224,8 @@ func _on_marker_body_entered(body: Node3D) -> void:
 		start_step(Step.PICKUP)
 
 func _update_marker_visuals(delta: float) -> void:
+	if marker_area and marker_area.has_method("play_reached_animation"):
+		return
 	if marker_ring and is_instance_valid(marker_ring) and not is_transitioning:
 		marker_ring.rotate_y(delta * 0.7)
 		if marker_mat_ring:

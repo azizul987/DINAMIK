@@ -15,6 +15,7 @@
 [ext_resource type="Material" uid="uid://dbtk0ncyclvyf" path="res://DungeonTiles/material/PropSet_5_Mat.tres" id="13_w48qg"]
 [ext_resource type="PackedScene" uid="uid://bf5jc4jqhyyya" path="res://item_drop.tscn" id="14_item_drop"]
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="15_door"]
+[ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -814,25 +815,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.069235, 0, 3.6500878)
 script = ExtResource("8_tutorial")
 marker_color = Color(0.33218154, 0, 0.10517485, 1)
 
-[node name="TutorialMarker" type="Area3D" parent="TutorialController" unique_id=2100000004]
+[node name="TutorialMarker" parent="TutorialController" unique_id=2100000004 instance=ExtResource("16_marker")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, -4.5)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="TutorialController/TutorialMarker" unique_id=2100000005]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-shape = SubResource("CylinderShape3D_marker")
-
-[node name="MarkerRing" type="MeshInstance3D" parent="TutorialController/TutorialMarker" unique_id=2100000006]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
-material_override = SubResource("StandardMaterial3D_2cqfq")
-mesh = SubResource("TorusMesh_ring")
-
-[node name="MarkerDisc" type="MeshInstance3D" parent="TutorialController/TutorialMarker" unique_id=2100000007]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
-material_override = SubResource("StandardMaterial3D_yaehf")
-mesh = SubResource("CylinderMesh_disc")
 
 [node name="TutorialSlimeDrop" parent="TutorialController" unique_id=2100000009 instance=ExtResource("14_item_drop")]
 unique_name_in_owner = true

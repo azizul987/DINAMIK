@@ -1,0 +1,121 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tutorial_marker.gd" id="1_marker"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_area"]
+height = 1.5
+radius = 1.4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 0.5, 0.85)
+
+[sub_resource type="TorusMesh" id="TorusMesh_outer"]
+material = SubResource("StandardMaterial3D_outer")
+inner_radius = 1.28
+outer_radius = 1.4
+rings = 32
+ring_segments = 16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_inner"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 0.5, 0.7)
+
+[sub_resource type="TorusMesh" id="TorusMesh_inner"]
+material = SubResource("StandardMaterial3D_inner")
+inner_radius = 0.74
+outer_radius = 0.82
+rings = 24
+ring_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_disc"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 0.5, 0.16)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_disc"]
+material = SubResource("StandardMaterial3D_disc")
+top_radius = 0.55
+bottom_radius = 0.55
+height = 0.01
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pillar"]
+transparency = 1
+cull_mode = 2
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 0.5, 0.14)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pillar"]
+material = SubResource("StandardMaterial3D_pillar")
+top_radius = 1.15
+bottom_radius = 1.35
+height = 2.2
+cap_top = false
+cap_bottom = false
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_diamond"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.9, 0.5, 0.9)
+emission_enabled = true
+emission = Color(0.2, 0.9, 0.5, 1)
+emission_energy_multiplier = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_diamond"]
+material = SubResource("StandardMaterial3D_diamond")
+size = Vector3(0.26, 0.26, 0.26)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_spark"]
+material = SubResource("StandardMaterial3D_spark")
+radius = 0.035
+height = 0.07
+radial_segments = 8
+rings = 4
+
+[node name="TutorialMarker" type="Area3D"]
+script = ExtResource("1_marker")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+shape = SubResource("CylinderShape3D_area")
+
+[node name="OuterRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, 0)
+mesh = SubResource("TorusMesh_outer")
+
+[node name="InnerRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("TorusMesh_inner")
+
+[node name="CenterDisc" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+mesh = SubResource("CylinderMesh_disc")
+
+[node name="LightPillar" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+mesh = SubResource("CylinderMesh_pillar")
+
+[node name="FloatingDiamond" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 1.1, 0)
+mesh = SubResource("BoxMesh_diamond")
+
+[node name="Particles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+amount = 16
+lifetime = 1.5
+mesh = SubResource("SphereMesh_spark")
+emission_shape = 2
+emission_sphere_radius = 1.1
+direction = Vector3(0, 1, 0)
+spread = 20.0
+gravity = Vector3(0, 0.25, 0)
+initial_velocity_min = 0.4
+initial_velocity_max = 0.9
+color = Color(0.2, 0.9, 0.5, 0.85)
