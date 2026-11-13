@@ -164,9 +164,9 @@ func start_step(step: Step) -> void:
 			_start_completed_step()
 
 func _start_movement_step() -> void:
-	_set_task("Berjalan ke lingkaran target (W, A, S, D)")
+	_set_task("Berjalan ke lingkaran target")
 	_spawn_ground_marker()
-	step_started.emit(Step.MOVEMENT, "Berjalan ke lingkaran target (W, A, S, D)")
+	step_started.emit(Step.MOVEMENT, "Berjalan ke lingkaran target")
 
 func _spawn_ground_marker() -> void:
 	if not marker_area:
@@ -226,9 +226,9 @@ func _update_marker_visuals(delta: float) -> void:
 			marker_mat_ring.albedo_color = Color(marker_color.r, marker_color.g, marker_color.b, lerpf(0.55, 0.9, pulse))
 
 func _start_pickup_step() -> void:
-	_set_task("Ambil Slime Gel di depan (E)")
+	_set_task("Ambil Slime Gel di depan")
 	_spawn_slime_drop()
-	step_started.emit(Step.PICKUP, "Ambil Slime Gel di depan (E)")
+	step_started.emit(Step.PICKUP, "Ambil Slime Gel di depan")
 
 func _spawn_slime_drop() -> void:
 	if not tutorial_drop_node and has_node("TutorialSlimeDrop"):
@@ -292,37 +292,48 @@ func _start_potion_step() -> void:
 		GlobalLogic.current_hp = starting_player_hp
 		GlobalLogic.player_hp_changed.emit(starting_player_hp, GlobalLogic.max_hp)
 
-	_set_task("Gunakan Healing Potion (1) • Waspada bar Toxicity di kiri atas")
-	step_started.emit(Step.POTION, "Gunakan Healing Potion (1)")
+	_set_task("Gunakan Healing Potion")
+	step_started.emit(Step.POTION, "Gunakan Healing Potion")
 
 func _on_potion_consumed(potion_name: String) -> void:
 	if current_step == Step.POTION and not is_transitioning:
 		if potion_name == "healing":
 			is_transitioning = true
 			_play_chime()
-			_show_step_done("✓ Ramuan diminum (Racun bertambah)")
+			_show_step_done("✓ Ramuan diminum")
 			step_completed.emit(Step.POTION)
 
-			await get_tree().create_timer(1.3).timeout
+			await get_tree().create_timer(0.9).timeout
+			_set_task("Waspada peningkatan bar Toxicity di kiri atas")
+			if ui_task:
+				ui_task.add_theme_color_override("font_color", Color(0.2, 0.9, 0.5))
+
+			await get_tree().create_timer(2.2).timeout
 			start_step(Step.COMBAT)
 
 func _start_combat_step() -> void:
-	_set_task("Serang boneka slime di depan (Klik Kiri)")
+	_set_task("Serang boneka slime di depan • Pintu dungeon terbuka")
 	combat_dummy_ref = _get_dummy_slime()
-	if combat_dummy_ref and combat_dummy_ref.has_signal("damaged"):
-		if not combat_dummy_ref.is_connected("damaged", _on_dummy_damaged):
+	if combat_dummy_ref:
+		if combat_dummy_ref.has_signal("damaged") and not combat_dummy_ref.is_connected("damaged", _on_dummy_damaged):
 			combat_dummy_ref.connect("damaged", _on_dummy_damaged)
-	step_started.emit(Step.COMBAT, "Serang boneka slime di depan (Klik Kiri)")
+		if combat_dummy_ref.has_signal("defeated") and not combat_dummy_ref.is_connected("defeated", _on_dummy_defeated):
+			combat_dummy_ref.connect("defeated", _on_dummy_defeated)
+	step_started.emit(Step.COMBAT, "Serang boneka slime di depan • Pintu dungeon terbuka")
 
 func _on_dummy_damaged(_amount: float) -> void:
 	if current_step == Step.COMBAT and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Serangan berhasil mendarat")
+		_show_step_done("✓ Serangan berhasil mendarat • Pintu terbuka")
 		step_completed.emit(Step.COMBAT)
 
 		await get_tree().create_timer(1.2).timeout
 		start_step(Step.COMPLETED)
+
+func _on_dummy_defeated() -> void:
+	if current_step == Step.COMBAT and not is_transitioning:
+		_on_dummy_damaged(0.0)
 
 func _start_completed_step() -> void:
 	_set_task("Latihan selesai • Pintu dungeon terbuka")

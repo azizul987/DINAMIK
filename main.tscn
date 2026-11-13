@@ -228,32 +228,29 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Toxic" type="Label" parent="CanvasLayer/Control" unique_id=1004612044]
+[node name="Toxic" type="ProgressBar" parent="CanvasLayer/Control" unique_id=2135592360]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 24.0
-offset_top = 20.0
-offset_right = 100.0
-offset_bottom = 65.0
+offset_left = 17.0
+offset_top = 73.0
+offset_right = 343.0
+offset_bottom = 122.0
 theme_override_colors/font_color = Color(3.85046e-07, 0.7551492, 0.49844563, 1)
 theme_override_font_sizes/font_size = 32
-text = "0"
 
-[node name="Hp" type="Label" parent="CanvasLayer/Control" unique_id=1084712337]
+[node name="Hp" type="ProgressBar" parent="CanvasLayer/Control" unique_id=2084889367]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -100.0
-offset_top = 20.0
-offset_right = -24.0
-offset_bottom = 65.0
+offset_left = -1131.0
+offset_top = 12.0
+offset_right = -817.0
+offset_bottom = 61.0
 grow_horizontal = 0
 theme_override_colors/font_color = Color(0.85, 0.15, 0.25, 1)
 theme_override_font_sizes/font_size = 32
-text = "0"
-horizontal_alignment = 2
 
 [node name="QuickSlotsBar" type="HBoxContainer" parent="CanvasLayer/Control" unique_id=592520786]
 layout_mode = 1
@@ -488,7 +485,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.88, 0.92, 1)
 theme_override_font_sizes/font_size = 13
-text = "Berjalan ke lingkaran target (W, A, S, D)"
+text = "Berjalan ke lingkaran target"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -767,7 +764,7 @@ layout_mode = 2
 size_flags_vertical = 4
 text = "Racik"
 
-[node name="PauseMenu" parent="CanvasLayer" instance=ExtResource("17_pause_menu")]
+[node name="PauseMenu" parent="CanvasLayer" unique_id=2146709889 instance=ExtResource("17_pause_menu")]
 unique_name_in_owner = true
 
 [node name="Node3D" parent="." unique_id=1257887040 instance=ExtResource("7_272bh")]
@@ -795,6 +792,9 @@ unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.984684, 0.33593762, 2.98666)
 mesh = SubResource("ArrayMesh_4caia")
 script = ExtResource("15_door")
+
+[node name="DoorAudio" type="AudioStreamPlayer3D" parent="door" unique_id=1165740233]
+max_distance = 40.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="door" unique_id=1140452395]
 

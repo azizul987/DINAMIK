@@ -1,12 +1,12 @@
 class_name PauseMenu
 extends Control
 
-@onready var btn_resume: Button = $CenterContainer/MenuCard/Margin/VBox/ButtonContainer/BtnResume
-@onready var btn_restart: Button = $CenterContainer/MenuCard/Margin/VBox/ButtonContainer/BtnRestart
-@onready var btn_main_menu: Button = $CenterContainer/MenuCard/Margin/VBox/ButtonContainer/BtnMainMenu
-@onready var btn_quit: Button = $CenterContainer/MenuCard/Margin/VBox/ButtonContainer/BtnQuit
-@onready var menu_card: PanelContainer = $CenterContainer/MenuCard
-@onready var dark_overlay: ColorRect = $DarkOverlay
+@onready var btn_resume: Button = %BtnResume
+@onready var btn_restart: Button = %BtnRestart
+@onready var btn_main_menu: Button = %BtnMainMenu
+@onready var btn_quit: Button = %BtnQuit
+@onready var menu_card: PanelContainer = %MenuCard
+@onready var dark_overlay: ColorRect = %DarkOverlay
 
 var is_paused: bool = false
 
@@ -19,9 +19,9 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE):
-		var hud = get_tree().root.find_child("Control", true, false)
+		var hud := get_tree().root.find_child("Control", true, false)
 		if hud:
-			var crafting = hud.get_node_or_null("CraftingPanel")
+			var crafting := hud.get_node_or_null("CraftingPanel")
 			if crafting and crafting.visible and not is_paused:
 				return
 		if is_paused:

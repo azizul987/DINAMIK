@@ -1,7 +1,7 @@
 extends Control
 
-@onready var toxic_label: Label = %Toxic
-@onready var hp_label: Label = %Hp
+@onready var toxic_bar: ProgressBar = %Toxic
+@onready var hp_bar: ProgressBar = %Hp
 @onready var crafting_panel: PanelContainer = %CraftingPanel
 @onready var btn_heal: Button = %BtnHeal
 @onready var btn_strength: Button = %BtnStrength
@@ -40,6 +40,8 @@ var icon_ironskin: TextureRect = null
 var btn_ironskin: Button = null
 
 var toxic_mat: ShaderMaterial = null
+var _prev_hp: float = 100.0
+var _prev_toxic: float = 0.0
 
 func _setup_toxic_overlay() -> void:
 	if not toxic_overlay and has_node("ToxicOverlay"):
@@ -138,33 +140,49 @@ func _setup_ironskin_ui() -> void:
 			btn_ironskin.name = "BtnIronskin"
 			btn_ironskin.pressed.connect(func(): GlobalLogic.craft_potion("ironskin"))
 
-func _on_toxicity_changed(current: float, _max_val: float) -> void:
+func _on_toxicity_changed(current: float, max_val: float) -> void:
 	if toxic_mat:
 		var ratio := GlobalLogic.get_toxicity_ratio()
 		toxic_mat.set_shader_parameter("toxicity_ratio", ratio)
 
+	if toxic_bar:
+		toxic_bar.max_value = max_val
+		toxic_bar.value = current
+		if current > _prev_toxic:
+			var tw := create_tween()
+			toxic_bar.modulate = Color(0.6, 1.8, 0.8, 1.0)
+			tw.tween_property(toxic_bar, "modulate", Color.WHITE, 0.3)
+	_prev_toxic = current
+
 	match GlobalLogic.get_toxicity_stage():
 		GlobalLogic.ToxicityStage.SAFE:
-			toxic_label.add_theme_color_override("font_color", Color(0.2, 0.9, 0.5))
+			toxic_bar.add_theme_color_override("font_color", Color(0.2, 0.9, 0.5))
 		GlobalLogic.ToxicityStage.MODERATE:
-			toxic_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2))
+			toxic_bar.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2))
 		GlobalLogic.ToxicityStage.HIGH:
-			toxic_label.add_theme_color_override("font_color", Color(0.95, 0.45, 0.1))
+			toxic_bar.add_theme_color_override("font_color", Color(0.95, 0.45, 0.1))
 		GlobalLogic.ToxicityStage.OVERDOSE:
-			toxic_label.add_theme_color_override("font_color", Color(0.9, 0.1, 0.1))
+			toxic_bar.add_theme_color_override("font_color", Color(0.9, 0.1, 0.1))
 
-	toxic_label.text = str(roundi(current))
-
-func _on_hp_changed(current: float, _max_val: float) -> void:
-	if not GlobalLogic.is_dead:
-		hp_label.text = str(roundi(current))
+func _on_hp_changed(current: float, max_val: float) -> void:
+	if hp_bar:
+		hp_bar.max_value = max_val
+		if not GlobalLogic.is_dead:
+			hp_bar.value = current
+			if current < _prev_hp:
+				var tw := create_tween()
+				hp_bar.modulate = Color(1.8, 0.4, 0.4, 1.0)
+				tw.tween_property(hp_bar, "modulate", Color.WHITE, 0.25)
+	_prev_hp = current
 
 func _on_overdose() -> void:
-	toxic_label.add_theme_color_override("font_color", Color.RED)
+	if toxic_bar:
+		toxic_bar.add_theme_color_override("font_color", Color.RED)
 
 func _on_player_died() -> void:
-	hp_label.text = "0"
-	hp_label.add_theme_color_override("font_color", Color.RED)
+	if hp_bar:
+		hp_bar.value = 0.0
+		hp_bar.add_theme_color_override("font_color", Color.RED)
 
 func _on_inventory_updated() -> void:
 	var m = GlobalLogic.materials

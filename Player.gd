@@ -71,6 +71,7 @@ var dash_ghost_timer: float = 0.0
 
 var slash_arc_mat: StandardMaterial3D = null
 var flash_material: StandardMaterial3D = null
+var dash_material: StandardMaterial3D = null
 var _hit_blink_tween: Tween = null
 
 @onready var camera_pivot: Node3D = $CameraPivot
@@ -84,10 +85,18 @@ func _ready() -> void:
 	add_to_group("player")
 	GlobalLogic.toxicity_stage_changed.connect(_on_toxicity_stage_changed)
 	GlobalLogic.player_died.connect(_on_player_died)
+	GlobalLogic.potion_consumed.connect(_on_potion_consumed)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
 	_setup_slash_arc()
 	_setup_flash_material()
+	_setup_dash_material()
 	_setup_deflect_audio()
+
+func _setup_dash_material() -> void:
+	dash_material = StandardMaterial3D.new()
+	dash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	dash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	dash_material.albedo_color = Color(dash_ghost_color.r, dash_ghost_color.g, dash_ghost_color.b, 0.85)
 
 func _setup_deflect_audio() -> void:
 	if not deflect_audio and has_node("DeflectAudio"):
@@ -193,6 +202,8 @@ func _physics_process(delta: float) -> void:
 			is_invulnerable = false
 			mesh_instance.rotation.x = 0.0
 			mesh_instance.scale = Vector3.ONE
+			if mesh_instance.material_override == dash_material:
+				mesh_instance.material_override = null
 	elif lunge_timer > 0.0:
 		lunge_timer -= delta
 		velocity.x = lunge_direction.x * attack_lunge_speed
@@ -259,6 +270,11 @@ func dash() -> void:
 	dash_cooldown_timer = dash_cooldown
 	is_invulnerable = true
 	dash_ghost_timer = 0.0
+
+	if not dash_material:
+		_setup_dash_material()
+	dash_material.albedo_color = Color(dash_ghost_color.r, dash_ghost_color.g, dash_ghost_color.b, 0.85)
+	mesh_instance.material_override = dash_material
 
 	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var move_dir := _get_camera_relative_direction(input_dir)
@@ -501,6 +517,7 @@ func _trigger_hit_feedback() -> void:
 	if _hit_blink_tween:
 		_hit_blink_tween.kill()
 
+	flash_material.albedo_color = Color(1.0, 0.2, 0.2, 0.95)
 	mesh_instance.material_override = flash_material
 	mesh_instance.visible = true
 
@@ -542,6 +559,7 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 
 	is_invulnerable = true
 	GlobalLogic.modify_hp(-amount)
+	_spawn_player_floating_text("-%d" % roundi(amount), Color(1.0, 0.22, 0.25, 1.0), 38, 0.85, 0.6)
 
 	if knockback.length_squared() > 0.01:
 		velocity = knockback
@@ -558,6 +576,45 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 			camera_pivot.fov_punch(2.0)
 
 	_trigger_hit_feedback()
+
+func _on_potion_consumed(potion_name: String) -> void:
+	match potion_name:
+		"healing":
+			_spawn_player_floating_text("+35 HP", Color(0.35, 1.0, 0.5, 1.0), 32, 0.75, 0.6)
+			await get_tree().create_timer(0.08).timeout
+			_spawn_player_floating_text("+15 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.95, 0.6)
+		"strength":
+			_spawn_player_floating_text("+20 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
+		"slow":
+			_spawn_player_floating_text("+15 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
+		"berserk":
+			_spawn_player_floating_text("+35 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
+		"ironskin":
+			_spawn_player_floating_text("+20 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
+	_trigger_potion_mesh_flash()
+
+func _trigger_potion_mesh_flash() -> void:
+	if not mesh_instance or not flash_material:
+		return
+	flash_material.albedo_color = Color(0.25, 1.0, 0.5, 0.85)
+	mesh_instance.material_override = flash_material
+	var tw := create_tween()
+	tw.tween_interval(0.12)
+	tw.tween_callback(func():
+		if is_instance_valid(mesh_instance) and not is_invulnerable:
+			mesh_instance.material_override = null
+	)
+
+func _spawn_player_floating_text(display_text: String, text_color: Color, size: int = 32, rise: float = 0.85, duration: float = 0.6) -> void:
+	if not FLOATING_TEXT_SCENE or not is_inside_tree():
+		return
+	var label := FLOATING_TEXT_SCENE.instantiate() as FloatingText
+	if not label:
+		return
+	get_tree().root.add_child(label)
+	var spawn_pos := global_position + Vector3(randf_range(-0.15, 0.15), 1.2, randf_range(-0.15, 0.15))
+	label.global_position = spawn_pos
+	label.pop(display_text, text_color, size, rise, duration)
 
 func _trigger_ironskin_deflection() -> void:
 	if deflect_audio:
