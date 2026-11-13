@@ -1,0 +1,261 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://archer_enemy.gd" id="1_archer"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_archer"]
+size = Vector3(0.75, 1.65, 0.75)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_armor"]
+shading_mode = 1
+albedo_color = Color(0.26, 0.22, 0.3, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_torso"]
+material = SubResource("StandardMaterial3D_armor")
+size = Vector3(0.52, 0.68, 0.36)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hood"]
+shading_mode = 1
+albedo_color = Color(0.32, 0.27, 0.38, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+material = SubResource("StandardMaterial3D_hood")
+size = Vector3(0.36, 0.36, 0.36)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_visor"]
+shading_mode = 1
+albedo_color = Color(1, 0.25, 0.15, 1)
+emission_enabled = true
+emission = Color(1, 0.3, 0.15, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_visor"]
+material = SubResource("StandardMaterial3D_visor")
+size = Vector3(0.28, 0.08, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_leather"]
+shading_mode = 1
+albedo_color = Color(0.42, 0.28, 0.18, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_quiver"]
+material = SubResource("StandardMaterial3D_leather")
+size = Vector3(0.2, 0.52, 0.14)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fletch_red"]
+shading_mode = 1
+albedo_color = Color(0.85, 0.18, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_quiver_arrow"]
+material = SubResource("StandardMaterial3D_fletch_red")
+size = Vector3(0.04, 0.22, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_limbs"]
+shading_mode = 1
+albedo_color = Color(0.22, 0.18, 0.26, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_arm"]
+material = SubResource("StandardMaterial3D_limbs")
+size = Vector3(0.14, 0.46, 0.14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_leg"]
+material = SubResource("StandardMaterial3D_limbs")
+size = Vector3(0.18, 0.52, 0.18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bow_wood"]
+shading_mode = 1
+albedo_color = Color(0.5, 0.3, 0.16, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bow_grip"]
+material = SubResource("StandardMaterial3D_bow_wood")
+size = Vector3(0.05, 0.18, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bow_limb"]
+material = SubResource("StandardMaterial3D_bow_wood")
+size = Vector3(0.04, 0.32, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_string"]
+shading_mode = 1
+albedo_color = Color(0.9, 0.9, 0.92, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_bow_string"]
+material = SubResource("StandardMaterial3D_string")
+size = Vector3(0.012, 0.72, 0.012)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_laser"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.15, 0.15, 0.45)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_laser"]
+material = SubResource("StandardMaterial3D_laser")
+top_radius = 0.015
+bottom_radius = 0.015
+height = 10.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hit_spark"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.4, 0.2, 0.95)
+
+[sub_resource type="SphereMesh" id="SphereMesh_hit_spark"]
+material = SubResource("StandardMaterial3D_hit_spark")
+radius = 0.04
+height = 0.08
+radial_segments = 6
+rings = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
+bg_color = Color(0.08, 0.08, 0.08, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.35, 0.35, 0.9)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_lag"]
+bg_color = Color(0.95, 0.65, 0.15, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.9, 0.22, 0.25, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="ArcherEnemy" type="CharacterBody3D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_archer")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.825, 0)
+shape = SubResource("BoxShape3D_archer")
+
+[node name="VisualRoot" type="Node3D" parent="."]
+
+[node name="Torso" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.86, 0)
+mesh = SubResource("BoxMesh_torso")
+
+[node name="Head" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mesh = SubResource("BoxMesh_head")
+
+[node name="Visor" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0.19)
+mesh = SubResource("BoxMesh_visor")
+
+[node name="Quiver" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 0.92, -0.24)
+mesh = SubResource("BoxMesh_quiver")
+
+[node name="QuiverArrow1" type="MeshInstance3D" parent="VisualRoot/Quiver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.04, 0.32, 0)
+mesh = SubResource("BoxMesh_quiver_arrow")
+
+[node name="QuiverArrow2" type="MeshInstance3D" parent="VisualRoot/Quiver"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04, 0.34, 0)
+mesh = SubResource("BoxMesh_quiver_arrow")
+
+[node name="LeftArm" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.34, 0.82, 0)
+mesh = SubResource("BoxMesh_arm")
+
+[node name="RightArm" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34, 0.82, 0)
+mesh = SubResource("BoxMesh_arm")
+
+[node name="LeftLeg" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.16, 0.26, 0)
+mesh = SubResource("BoxMesh_leg")
+
+[node name="RightLeg" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16, 0.26, 0)
+mesh = SubResource("BoxMesh_leg")
+
+[node name="BowPivot" type="Node3D" parent="VisualRoot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.38, 0.86, 0.32)
+
+[node name="BowGrip" type="MeshInstance3D" parent="VisualRoot/BowPivot"]
+mesh = SubResource("BoxMesh_bow_grip")
+
+[node name="BowUpper" type="MeshInstance3D" parent="VisualRoot/BowPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0.22, 0.05)
+mesh = SubResource("BoxMesh_bow_limb")
+
+[node name="BowLower" type="MeshInstance3D" parent="VisualRoot/BowPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, -0.22, 0.05)
+mesh = SubResource("BoxMesh_bow_limb")
+
+[node name="BowString" type="MeshInstance3D" parent="VisualRoot/BowPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.04)
+mesh = SubResource("BoxMesh_bow_string")
+
+[node name="ArrowSpawnPoint" type="Marker3D" parent="VisualRoot/BowPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.45)
+
+[node name="AimLaser" type="MeshInstance3D" parent="VisualRoot/BowPivot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 5)
+visible = false
+mesh = SubResource("CylinderMesh_laser")
+
+[node name="HitParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+emitting = false
+amount = 8
+lifetime = 0.3
+one_shot = true
+explosiveness = 0.9
+mesh = SubResource("SphereMesh_hit_spark")
+direction = Vector3(0, 1, 0)
+spread = 75.0
+gravity = Vector3(0, -10, 0)
+initial_velocity_min = 2.0
+initial_velocity_max = 4.0
+
+[node name="HpViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(130, 14)
+render_target_update_mode = 1
+
+[node name="HpLagBar" type="ProgressBar" parent="HpViewport"]
+custom_minimum_size = Vector2(130, 14)
+offset_right = 130.0
+offset_bottom = 14.0
+theme_override_styles/background = SubResource("StyleBoxFlat_hp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_lag")
+max_value = 35.0
+value = 35.0
+show_percentage = false
+
+[node name="HpBar" type="ProgressBar" parent="HpViewport"]
+custom_minimum_size = Vector2(130, 14)
+offset_right = 130.0
+offset_bottom = 14.0
+theme_override_styles/background = SubResource("StyleBoxEmpty_hp")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+max_value = 35.0
+value = 35.0
+show_percentage = false
+
+[node name="HpSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.85, 0)
+billboard = 1
+no_depth_test = true
+
+[node name="ShootAudio" type="AudioStreamPlayer3D" parent="."]
+max_distance = 35.0
+bus = &"Master"
+
+[node name="HitAudio" type="AudioStreamPlayer3D" parent="."]
+max_distance = 30.0
+bus = &"Master"

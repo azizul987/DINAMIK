@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
 [ext_resource type="PackedScene" path="res://portal.tscn" id="18_portal"]
+[ext_resource type="PackedScene" path="res://archer_enemy.tscn" id="19_archer"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -187,7 +188,11 @@ use_collision = true
 size = Vector3(1, 4.291504, 1)
 
 [node name="DummySlime" parent="." unique_id=711 instance=ExtResource("13_dummy_slime")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74075574, -9.617898)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.728136, 0.74075574, 5.923851)
+
+[node name="ArcherEnemy" parent="." unique_id=2100000011 instance=ExtResource("19_archer")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77186394, 0.8, 6.041749)
 
 [node name="SpikeTrap" parent="." unique_id=1970698199 instance=ExtResource("6_spike_trap")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.829979, 0.35161388, -2.2)
@@ -774,13 +779,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7486942, 0)
 [node name="TutorialController" type="Node3D" parent="." unique_id=2100000001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.069235, 0, 3.6500878)
 script = ExtResource("8_tutorial")
-marker_color = Color(0.15, 0.75, 1, 1)
 drop_position = Vector3(4.081149, 1.9657038, -5.7915773)
 
 [node name="TutorialMarker" parent="TutorialController" unique_id=2100000004 instance=ExtResource("16_marker")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, -4.5)
-marker_color = Color(0.15, 0.75, 1, 1)
 
 [node name="TutorialSlimeDrop" parent="TutorialController" unique_id=2100000009 instance=ExtResource("14_item_drop")]
 unique_name_in_owner = true
@@ -804,6 +807,5 @@ shape = SubResource("ConcavePolygonShape3D_6dlmt")
 
 [node name="LevelExitPortal" parent="." unique_id=2100000010 instance=ExtResource("18_portal")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.984684, 0.33593762, 5.5)
-target_scene_path = "res://scenes/level_1.tscn"
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.685307, 0.33593762, 14.931508)
 portal_id = "dungeon_exit_portal"

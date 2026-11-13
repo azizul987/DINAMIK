@@ -1,0 +1,100 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://arrow_projectile.gd" id="1_arrow"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hit"]
+size = Vector3(0.16, 0.16, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shaft"]
+shading_mode = 1
+albedo_color = Color(0.48, 0.34, 0.2, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_shaft"]
+material = SubResource("StandardMaterial3D_shaft")
+size = Vector3(0.04, 0.04, 0.65)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tip"]
+shading_mode = 1
+albedo_color = Color(0.85, 0.88, 0.95, 1)
+emission_enabled = true
+emission = Color(0.9, 0.4, 0.2, 1)
+emission_energy_multiplier = 0.4
+
+[sub_resource type="PrismMesh" id="PrismMesh_tip"]
+material = SubResource("StandardMaterial3D_tip")
+left_to_right = 0.5
+size = Vector3(0.12, 0.16, 0.04)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fletch"]
+shading_mode = 1
+albedo_color = Color(0.85, 0.18, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fletch"]
+material = SubResource("StandardMaterial3D_fletch")
+size = Vector3(0.12, 0.08, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.8, 0.3, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_spark"]
+material = SubResource("StandardMaterial3D_spark")
+radius = 0.03
+height = 0.06
+radial_segments = 6
+rings = 3
+
+[node name="ArrowProjectile" type="Area3D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_arrow")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05)
+shape = SubResource("BoxShape3D_hit")
+
+[node name="VisualNode" type="Node3D" parent="."]
+
+[node name="Shaft" type="MeshInstance3D" parent="VisualNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.05)
+mesh = SubResource("BoxMesh_shaft")
+
+[node name="Tip" type="MeshInstance3D" parent="VisualNode"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, -0.42)
+mesh = SubResource("PrismMesh_tip")
+
+[node name="Fletching" type="MeshInstance3D" parent="VisualNode"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.25)
+mesh = SubResource("BoxMesh_fletch")
+
+[node name="TrailParticles" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.2)
+amount = 6
+lifetime = 0.18
+mesh = SubResource("SphereMesh_spark")
+direction = Vector3(0, 0, 1)
+spread = 15.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.5
+initial_velocity_max = 1.0
+color = Color(1, 0.75, 0.35, 0.6)
+
+[node name="ImpactParticles" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 8
+lifetime = 0.25
+one_shot = true
+explosiveness = 0.95
+mesh = SubResource("SphereMesh_spark")
+direction = Vector3(0, 1, 0)
+spread = 60.0
+gravity = Vector3(0, -9.8, 0)
+initial_velocity_min = 1.5
+initial_velocity_max = 3.0
+color = Color(1, 0.85, 0.4, 0.9)
+
+[node name="AudioPlayer" type="AudioStreamPlayer3D" parent="."]
+max_distance = 30.0
+bus = &"Master"

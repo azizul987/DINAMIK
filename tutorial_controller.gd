@@ -312,20 +312,20 @@ func _on_potion_consumed(potion_name: String) -> void:
 			start_step(Step.COMBAT)
 
 func _start_combat_step() -> void:
-	_set_task("Serang boneka slime di depan • Pintu dungeon terbuka")
+	_set_task("Serang boneka slime di depan")
 	combat_dummy_ref = _get_dummy_slime()
 	if combat_dummy_ref:
 		if combat_dummy_ref.has_signal("damaged") and not combat_dummy_ref.is_connected("damaged", _on_dummy_damaged):
 			combat_dummy_ref.connect("damaged", _on_dummy_damaged)
 		if combat_dummy_ref.has_signal("defeated") and not combat_dummy_ref.is_connected("defeated", _on_dummy_defeated):
 			combat_dummy_ref.connect("defeated", _on_dummy_defeated)
-	step_started.emit(Step.COMBAT, "Serang boneka slime di depan • Pintu dungeon terbuka")
+	step_started.emit(Step.COMBAT, "Serang boneka slime di depan")
 
 func _on_dummy_damaged(_amount: float) -> void:
 	if current_step == Step.COMBAT and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Serangan berhasil mendarat • Pintu terbuka")
+		_show_step_done("✓ Serangan berhasil mendarat")
 		step_completed.emit(Step.COMBAT)
 
 		await get_tree().create_timer(1.2).timeout
@@ -336,7 +336,7 @@ func _on_dummy_defeated() -> void:
 		_on_dummy_damaged(0.0)
 
 func _start_completed_step() -> void:
-	_set_task("Latihan selesai • Pintu dungeon terbuka")
+	_set_task("Pintu dungeon terbuka")
 	if ui_task:
 		ui_task.add_theme_color_override("font_color", UIPalette.EMERALD)
 
