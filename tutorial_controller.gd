@@ -17,7 +17,7 @@ enum Step {
 @export_group("Positioning")
 @export var marker_position: Vector3 = Vector3(0.0, 0.26, -4.5)
 @export var marker_radius: float = 1.4
-@export var marker_color: Color = UIPalette.EMERALD:
+@export var marker_color: Color = Color(0.15, 0.75, 1.0, 1.0):
 	set(val):
 		marker_color = val
 		_apply_marker_color()

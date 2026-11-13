@@ -17,6 +17,7 @@
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="15_door"]
 [ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
+[ext_resource type="PackedScene" path="res://portal.tscn" id="18_portal"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -773,13 +774,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.7486942, 0)
 [node name="TutorialController" type="Node3D" parent="." unique_id=2100000001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.069235, 0, 3.6500878)
 script = ExtResource("8_tutorial")
-marker_color = Color(0.33218154, 0, 0.10517485, 1)
+marker_color = Color(0.15, 0.75, 1, 1)
 drop_position = Vector3(4.081149, 1.9657038, -5.7915773)
 
 [node name="TutorialMarker" parent="TutorialController" unique_id=2100000004 instance=ExtResource("16_marker")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, -4.5)
-marker_color = Color(0.33218154, 0, 0.10517485, 1)
+marker_color = Color(0.15, 0.75, 1, 1)
 
 [node name="TutorialSlimeDrop" parent="TutorialController" unique_id=2100000009 instance=ExtResource("14_item_drop")]
 unique_name_in_owner = true
@@ -800,3 +801,9 @@ max_distance = 40.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="door/StaticBody3D" unique_id=1938245530]
 shape = SubResource("ConcavePolygonShape3D_6dlmt")
+
+[node name="LevelExitPortal" parent="." unique_id=2100000010 instance=ExtResource("18_portal")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.984684, 0.33593762, 5.5)
+target_scene_path = "res://scenes/level_1.tscn"
+portal_id = "dungeon_exit_portal"

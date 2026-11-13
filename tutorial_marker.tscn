@@ -3,79 +3,91 @@
 [ext_resource type="Script" path="res://tutorial_marker.gd" id="1_marker"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_area"]
-height = 1.5
-radius = 1.4
+height = 2.0
+radius = 1.5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_outer"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.2, 0.9, 0.5, 0.85)
+albedo_color = Color(0.15, 0.75, 1, 0.85)
 
 [sub_resource type="TorusMesh" id="TorusMesh_outer"]
 material = SubResource("StandardMaterial3D_outer")
-inner_radius = 1.28
-outer_radius = 1.4
-rings = 32
+inner_radius = 1.35
+outer_radius = 1.5
+rings = 36
 ring_segments = 16
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_inner"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.2, 0.9, 0.5, 0.7)
+albedo_color = Color(0.15, 0.75, 1, 0.75)
 
 [sub_resource type="TorusMesh" id="TorusMesh_inner"]
 material = SubResource("StandardMaterial3D_inner")
-inner_radius = 0.74
-outer_radius = 0.82
+inner_radius = 0.85
+outer_radius = 0.95
+rings = 28
+ring_segments = 14
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vortex"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.25, 0.85, 1, 0.9)
+
+[sub_resource type="TorusMesh" id="TorusMesh_vortex"]
+material = SubResource("StandardMaterial3D_vortex")
+inner_radius = 0.45
+outer_radius = 0.54
 rings = 24
 ring_segments = 12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_disc"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.2, 0.9, 0.5, 0.16)
+albedo_color = Color(0.15, 0.75, 1, 0.22)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_disc"]
 material = SubResource("StandardMaterial3D_disc")
-top_radius = 0.55
-bottom_radius = 0.55
-height = 0.01
+top_radius = 0.65
+bottom_radius = 0.65
+height = 0.015
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pillar"]
 transparency = 1
 cull_mode = 2
 shading_mode = 0
-albedo_color = Color(0.2, 0.9, 0.5, 0.14)
+albedo_color = Color(0.15, 0.75, 1, 0.18)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_pillar"]
 material = SubResource("StandardMaterial3D_pillar")
-top_radius = 1.15
-bottom_radius = 1.35
-height = 2.2
+top_radius = 1.25
+bottom_radius = 1.48
+height = 3.2
 cap_top = false
 cap_bottom = false
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_diamond"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.2, 0.9, 0.5, 0.9)
+albedo_color = Color(0.15, 0.75, 1, 0.95)
 emission_enabled = true
-emission = Color(0.2, 0.9, 0.5, 1)
-emission_energy_multiplier = 0.8
+emission = Color(0.15, 0.75, 1, 1)
+emission_energy_multiplier = 1.2
 
 [sub_resource type="BoxMesh" id="BoxMesh_diamond"]
 material = SubResource("StandardMaterial3D_diamond")
-size = Vector3(0.26, 0.26, 0.26)
+size = Vector3(0.32, 0.32, 0.32)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(1, 1, 1, 0.9)
+albedo_color = Color(0.8, 0.95, 1, 0.9)
 
 [sub_resource type="SphereMesh" id="SphereMesh_spark"]
 material = SubResource("StandardMaterial3D_spark")
-radius = 0.035
-height = 0.07
+radius = 0.04
+height = 0.08
 radial_segments = 8
 rings = 4
 
@@ -83,7 +95,7 @@ rings = 4
 script = ExtResource("1_marker")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_area")
 
 [node name="OuterRing" type="MeshInstance3D" parent="."]
@@ -94,28 +106,41 @@ mesh = SubResource("TorusMesh_outer")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 mesh = SubResource("TorusMesh_inner")
 
+[node name="VortexRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 0)
+mesh = SubResource("TorusMesh_vortex")
+
 [node name="CenterDisc" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
 mesh = SubResource("CylinderMesh_disc")
 
 [node name="LightPillar" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 mesh = SubResource("CylinderMesh_pillar")
 
 [node name="FloatingDiamond" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 1.1, 0)
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 1.3, 0)
 mesh = SubResource("BoxMesh_diamond")
 
 [node name="Particles" type="CPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-amount = 16
-lifetime = 1.5
+amount = 24
+lifetime = 1.8
 mesh = SubResource("SphereMesh_spark")
 emission_shape = 2
-emission_sphere_radius = 1.1
+emission_sphere_radius = 1.2
 direction = Vector3(0, 1, 0)
-spread = 20.0
-gravity = Vector3(0, 0.25, 0)
-initial_velocity_min = 0.4
-initial_velocity_max = 0.9
-color = Color(0.2, 0.9, 0.5, 0.85)
+spread = 22.0
+gravity = Vector3(0, 0.45, 0)
+initial_velocity_min = 0.5
+initial_velocity_max = 1.2
+radial_accel_min = -0.4
+radial_accel_max = 0.2
+color = Color(0.15, 0.75, 1, 0.88)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+light_color = Color(0.15, 0.75, 1, 1)
+light_energy = 1.6
+omni_range = 7.0
+omni_attenuation = 1.4
