@@ -211,7 +211,7 @@ func _on_inventory_updated() -> void:
 		mat_slime_count.scale = Vector2(1.35, 1.35)
 		tw.tween_property(mat_slime_count, "scale", Vector2.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-	mat_fire_count.text = str(m["fire_essence"])
+	mat_fire_count.text = str(m.get("goblin_ear", 0) + m.get("fire_essence", 0))
 	mat_frost_count.text = str(m["frost_wing"])
 
 	btn_heal.disabled = not GlobalLogic.can_craft("healing")

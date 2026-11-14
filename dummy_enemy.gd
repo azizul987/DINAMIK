@@ -18,7 +18,9 @@ enum State {
 @export var max_health: float = 30.0
 @export var attack_damage: float = 10.0
 @export var attack_cooldown: float = 1.0
+@export var can_respawn: bool = false
 @export var respawn_time: float = 3.0
+@export var max_respawns: int = 0
 
 @export_group("AI Ranges")
 @export var patrol_radius: float = 6.0
@@ -58,6 +60,7 @@ var is_chasing: bool = false
 var idle_timer: float = 0.0
 var state_timer: float = 0.0
 var attack_timer: float = 0.0
+var _current_respawns: int = 0
 var player_ref: Node3D = null
 
 const SLIME_PALETTE: Array[Color] = [
@@ -84,8 +87,8 @@ var base_material: StandardMaterial3D = null
 var hp_fill_style: StyleBoxFlat = null
 var hp_lag_fill_style: StyleBoxFlat = null
 var _hp_lag_tween: Tween = null
-var flash_material: StandardMaterial3D = null
 var _flash_tween: Tween = null
+var _scale_tween: Tween = null
 
 func _ready() -> void:
 	add_to_group("enemies")
@@ -93,19 +96,15 @@ func _ready() -> void:
 	current_health = max_health
 	idle_timer = randf_range(min_idle_time, max_idle_time)
 	_setup_health_bar()
-	_setup_flash_material()
 	_setup_splat_particles()
 	_apply_random_slime_color()
 
 func _apply_random_slime_color() -> void:
 	slime_base_color = SLIME_PALETTE.pick_random()
-	base_material = StandardMaterial3D.new()
-	base_material.albedo_color = Color(slime_base_color.r, slime_base_color.g, slime_base_color.b, 0.9)
-	base_material.roughness = 0.15
-	base_material.emission_enabled = true
-	base_material.emission = slime_base_color * 0.7
-	base_material.emission_energy_multiplier = 0.5
-	mesh.set_surface_override_material(0, base_material)
+	if mesh:
+		mesh.set_instance_shader_parameter("slime_color", slime_base_color)
+		mesh.set_instance_shader_parameter("hit_flash", 0.0)
+		mesh.set_instance_shader_parameter("flash_color", Color(1.0, 1.0, 1.0, 1.0))
 
 	if splat_particles and splat_particles.mesh and splat_particles.mesh.material:
 		var p_mat := splat_particles.mesh.material as StandardMaterial3D
@@ -119,12 +118,6 @@ func _setup_splat_particles() -> void:
 	if not splat_particles and has_node("SplatParticles"):
 		splat_particles = $SplatParticles as CPUParticles3D
 
-func _setup_flash_material() -> void:
-	flash_material = StandardMaterial3D.new()
-	flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	flash_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-
 func _setup_health_bar() -> void:
 	if not hp_viewport and has_node("HpViewport"):
 		hp_viewport = $HpViewport as SubViewport
@@ -134,6 +127,9 @@ func _setup_health_bar() -> void:
 		hp_bar = $HpViewport/HpBar as ProgressBar
 	if not hp_lag_bar and has_node("HpViewport/HpLagBar"):
 		hp_lag_bar = $HpViewport/HpLagBar as ProgressBar
+
+	if hp_viewport:
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 	if hp_sprite and hp_viewport and not hp_sprite.texture:
 		hp_sprite.texture = hp_viewport.get_texture()
@@ -179,8 +175,8 @@ func _physics_process(delta: float) -> void:
 					var target_yaw := atan2(to_player.x, to_player.z)
 					rotation.y = lerp_angle(rotation.y, target_yaw, turn_speed * delta)
 
-				state_timer -= delta
-				if state_timer <= 0.0:
+				idle_timer -= delta
+				if idle_timer <= 0.0:
 					_start_prepare_hop(true)
 			else:
 				idle_timer -= delta
@@ -242,8 +238,10 @@ func _start_prepare_hop(chasing: bool) -> void:
 	var prep_time := prep_hop_time_chase if chasing else prep_hop_time_patrol
 	state_timer = prep_time
 
-	var tween := create_tween()
-	tween.tween_property(mesh, "scale", Vector3(1.25, 0.65, 1.25), prep_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if _scale_tween and _scale_tween.is_valid():
+		_scale_tween.kill()
+	_scale_tween = create_tween()
+	_scale_tween.tween_property(mesh, "scale", Vector3(1.25, 0.65, 1.25), prep_time).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _launch_hop() -> void:
 	current_state = State.HOPPING
@@ -267,17 +265,21 @@ func _launch_hop() -> void:
 	velocity.x = dir.x * speed
 	velocity.z = dir.z * speed
 
-	var tween := create_tween()
-	tween.tween_property(mesh, "scale", Vector3(0.85, 1.35, 0.85), 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if _scale_tween and _scale_tween.is_valid():
+		_scale_tween.kill()
+	_scale_tween = create_tween()
+	_scale_tween.tween_property(mesh, "scale", Vector3(0.85, 1.35, 0.85), 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _land_hop() -> void:
 	current_state = State.LANDING
 	var recovery_time := landing_time_chase if is_chasing else landing_time_patrol
 	state_timer = recovery_time
 
-	var tween := create_tween()
-	tween.tween_property(mesh, "scale", Vector3(1.35, 0.6, 1.35), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(mesh, "scale", Vector3.ONE, recovery_time - 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	if _scale_tween and _scale_tween.is_valid():
+		_scale_tween.kill()
+	_scale_tween = create_tween()
+	_scale_tween.tween_property(mesh, "scale", Vector3(1.35, 0.6, 1.35), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_scale_tween.tween_property(mesh, "scale", Vector3.ONE, recovery_time - 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _check_contact_damage() -> void:
 	if attack_timer > 0.0:
@@ -315,22 +317,18 @@ func _pick_patrol_destination() -> void:
 	target_destination = spawn_position + Vector3(cos(angle) * dist, 0.0, sin(angle) * dist)
 
 func _trigger_hit_flash() -> void:
-	if not mesh or not flash_material:
+	if not mesh:
 		return
-	if _flash_tween:
+	if _flash_tween and _flash_tween.is_valid():
 		_flash_tween.kill()
 
-	flash_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-	mesh.material_override = flash_material
+	mesh.set_instance_shader_parameter("hit_flash", 1.0)
 
 	_flash_tween = create_tween()
-	_flash_tween.tween_interval(0.08)
-	_flash_tween.tween_property(flash_material, "albedo_color:a", 0.0, 0.08)
-	_flash_tween.tween_callback(func():
+	_flash_tween.tween_method(func(val: float):
 		if is_instance_valid(mesh):
-			mesh.material_override = null
-			flash_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
-	)
+			mesh.set_instance_shader_parameter("hit_flash", val)
+	, 1.0, 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _spawn_damage_number(amount: float) -> void:
 	if not is_inside_tree() or not FLOATING_TEXT_SCENE:
@@ -387,9 +385,14 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bo
 		splat_particles.restart()
 		splat_particles.emitting = true
 
-	var tween := create_tween()
+	if _scale_tween and _scale_tween.is_valid():
+		_scale_tween.kill()
+	_scale_tween = create_tween()
 	mesh.scale = Vector3(1.3, 0.7, 1.3)
-	tween.tween_property(mesh, "scale", Vector3.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_scale_tween.tween_property(mesh, "scale", Vector3.ONE, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	if hp_viewport:
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
 	if hp_bar:
 		var bar_tween := create_tween()
@@ -409,6 +412,10 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bo
 		_hp_lag_tween = create_tween()
 		_hp_lag_tween.tween_interval(0.20)
 		_hp_lag_tween.tween_property(hp_lag_bar, "value", current_health, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		_hp_lag_tween.tween_callback(func():
+			if is_instance_valid(hp_viewport):
+				hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+		)
 
 	if current_health <= 0.0:
 		die()
@@ -416,24 +423,39 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bo
 func die() -> void:
 	is_dead = true
 	current_state = State.DEAD
+	velocity = Vector3.ZERO
 	defeated.emit()
 
 	if mesh:
-		mesh.material_override = null
+		mesh.set_instance_shader_parameter("hit_flash", 0.0)
+
+	if hp_viewport:
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 
 	if hp_sprite:
 		hp_sprite.visible = false
 
+	if collision_shape:
+		collision_shape.set_deferred("disabled", true)
+
 	_spawn_item_drop()
 
-	var tween := create_tween()
-	tween.tween_property(mesh, "scale", Vector3.ZERO, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	await tween.finished
-	visible = false
-	collision_shape.disabled = true
+	if mesh:
+		if _scale_tween and _scale_tween.is_valid():
+			_scale_tween.kill()
+		_scale_tween = create_tween()
+		_scale_tween.tween_property(mesh, "scale", Vector3(1.35, 0.25, 1.35), 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		_scale_tween.tween_property(mesh, "scale", Vector3.ZERO, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		await _scale_tween.finished
 
-	await get_tree().create_timer(respawn_time).timeout
-	respawn()
+	visible = false
+
+	if can_respawn and (max_respawns < 0 or _current_respawns < max_respawns):
+		_current_respawns += 1
+		await get_tree().create_timer(respawn_time).timeout
+		respawn()
+	else:
+		queue_free()
 
 func _spawn_item_drop() -> void:
 	if not ITEM_DROP_SCENE:
@@ -457,9 +479,11 @@ func respawn() -> void:
 	current_state = State.IDLE
 	idle_timer = randf_range(1.0, 2.0)
 	visible = true
-	collision_shape.disabled = false
-	mesh.scale = Vector3.ONE
-	mesh.material_override = null
+	if collision_shape:
+		collision_shape.set_deferred("disabled", false)
+	if mesh:
+		mesh.scale = Vector3.ONE
+		mesh.set_instance_shader_parameter("hit_flash", 0.0)
 	velocity = Vector3.ZERO
 
 	if hp_sprite:
@@ -468,4 +492,6 @@ func respawn() -> void:
 		hp_bar.value = max_health
 	if hp_lag_bar:
 		hp_lag_bar.value = max_health
+	if hp_viewport:
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	_apply_random_slime_color()

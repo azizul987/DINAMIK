@@ -42,6 +42,12 @@ const ITEM_DROP_SCENE: PackedScene = preload("res://item_drop.tscn")
 @export var min_idle_time: float = 1.2
 @export var max_idle_time: float = 2.8
 
+@export_group("Loot Drop")
+@export var drop_item_type: String = "goblin_ear"
+@export var drop_item_name: String = "Telinga Goblin"
+@export var drop_item_amount: int = 1
+@export var drop_item_color: Color = Color(0.78, 0.62, 0.28, 0.95)
+
 var current_health: float = 35.0
 var current_state: State = State.IDLE
 var is_dead: bool = false
@@ -69,7 +75,8 @@ var _detection_check_timer: float = 0.0
 @onready var hit_audio: AudioStreamPlayer3D = $HitAudio if has_node("HitAudio") else null
 
 var _hp_lag_tween: Tween = null
-var _flash_material: StandardMaterial3D = null
+static var _cached_overlay_mat: ShaderMaterial = null
+var _flash_tween: Tween = null
 var _bow_initial_transform: Transform3D = Transform3D.IDENTITY
 var _flash_meshes: Array[MeshInstance3D] = []
 
@@ -115,10 +122,17 @@ func _setup_health_bar() -> void:
 		hp_lag_bar.value = current_health
 
 func _setup_flash_material() -> void:
-	_flash_material = StandardMaterial3D.new()
-	_flash_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_flash_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_flash_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+	if not _cached_overlay_mat:
+		var shader := load("res://shaders/hit_flash_overlay.gdshader") as Shader
+		if shader:
+			_cached_overlay_mat = ShaderMaterial.new()
+			_cached_overlay_mat.shader = shader
+	if _cached_overlay_mat:
+		for mesh_inst in _flash_meshes:
+			if is_instance_valid(mesh_inst):
+				mesh_inst.material_overlay = _cached_overlay_mat
+				mesh_inst.set_instance_shader_parameter("hit_flash", 0.0)
+				mesh_inst.set_instance_shader_parameter("flash_color", Color(1.0, 1.0, 1.0, 1.0))
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -395,19 +409,21 @@ func _update_hp_bar() -> void:
 			hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func _trigger_hit_flash() -> void:
-	if not _flash_material or _flash_meshes.is_empty():
+	if _flash_meshes.is_empty():
 		return
+	if _flash_tween and _flash_tween.is_valid():
+		_flash_tween.kill()
+
 	for mesh_inst in _flash_meshes:
 		if is_instance_valid(mesh_inst):
-			mesh_inst.material_override = _flash_material
+			mesh_inst.set_instance_shader_parameter("hit_flash", 1.0)
 
-	var tw := create_tween()
-	tw.tween_interval(0.08)
-	tw.tween_callback(func():
+	_flash_tween = create_tween()
+	_flash_tween.tween_method(func(val: float):
 		for mesh_inst in _flash_meshes:
 			if is_instance_valid(mesh_inst):
-				mesh_inst.material_override = null
-	)
+				mesh_inst.set_instance_shader_parameter("hit_flash", val)
+	, 1.0, 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func _spawn_damage_number(amount: float) -> void:
 	if not FLOATING_TEXT_SCENE:
@@ -445,10 +461,18 @@ func _die() -> void:
 	velocity = Vector3.ZERO
 	defeated.emit()
 
+	if _flash_tween and _flash_tween.is_valid():
+		_flash_tween.kill()
+	for mesh_inst in _flash_meshes:
+		if is_instance_valid(mesh_inst):
+			mesh_inst.set_instance_shader_parameter("hit_flash", 0.0)
+
 	if aim_laser:
 		aim_laser.visible = false
 	if hp_sprite:
 		hp_sprite.visible = false
+	if hp_viewport:
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 	if collision_shape:
 		collision_shape.disabled = true
 
@@ -471,12 +495,18 @@ func _spawn_loot() -> void:
 	if not drop:
 		return
 
+	drop.item_type = drop_item_type
+	drop.item_name_display = drop_item_name
+	drop.item_amount = drop_item_amount
+	drop.item_color = drop_item_color
+
 	var parent_node := get_parent()
 	if not parent_node:
 		parent_node = get_tree().current_scene
 	if parent_node:
 		parent_node.add_child(drop)
 		drop.global_position = global_position + Vector3(0.0, 0.5, 0.0)
+		drop.set_drop_color(drop_item_color)
 		drop.velocity = Vector3(randf_range(-1.0, 1.0), 3.0, randf_range(-1.0, 1.0))
 
 static func _ensure_cached_audio() -> void:

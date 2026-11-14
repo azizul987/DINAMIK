@@ -314,11 +314,13 @@ func _on_potion_consumed(potion_name: String) -> void:
 func _start_combat_step() -> void:
 	_set_task("Serang boneka slime di depan")
 	combat_dummy_ref = _get_dummy_slime()
-	if combat_dummy_ref:
-		if combat_dummy_ref.has_signal("damaged") and not combat_dummy_ref.is_connected("damaged", _on_dummy_damaged):
-			combat_dummy_ref.connect("damaged", _on_dummy_damaged)
-		if combat_dummy_ref.has_signal("defeated") and not combat_dummy_ref.is_connected("defeated", _on_dummy_defeated):
-			combat_dummy_ref.connect("defeated", _on_dummy_defeated)
+	if not combat_dummy_ref or not is_instance_valid(combat_dummy_ref):
+		_on_dummy_damaged(0.0)
+		return
+	if combat_dummy_ref.has_signal("damaged") and not combat_dummy_ref.is_connected("damaged", _on_dummy_damaged):
+		combat_dummy_ref.connect("damaged", _on_dummy_damaged)
+	if combat_dummy_ref.has_signal("defeated") and not combat_dummy_ref.is_connected("defeated", _on_dummy_defeated):
+		combat_dummy_ref.connect("defeated", _on_dummy_defeated)
 	step_started.emit(Step.COMBAT, "Serang boneka slime di depan")
 
 func _on_dummy_damaged(_amount: float) -> void:

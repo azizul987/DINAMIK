@@ -27,7 +27,8 @@ var is_dead: bool = false
 var materials := {
 	"slime_gel": 0,
 	"fire_essence": 0,
-	"frost_wing": 0
+	"frost_wing": 0,
+	"goblin_ear": 0
 }
 
 var potions := {
@@ -43,6 +44,8 @@ var is_slow_active: bool = false
 var is_berserk_active: bool = false
 var is_ironskin_active: bool = false
 var ironskin_timer: float = 0.0
+var last_consumed_potion: String = ""
+var last_potion_timestamp: float = 0.0
 
 var lpf_effect: AudioEffectLowPassFilter = null
 var tinnitus_player: AudioStreamPlayer = null
@@ -199,6 +202,8 @@ func reset_safe_zone() -> void:
 	is_slow_active = false
 	is_ironskin_active = false
 	ironskin_timer = 0.0
+	last_consumed_potion = ""
+	last_potion_timestamp = 0.0
 	current_hp = max_hp
 	current_toxicity = 0.0
 	player_hp_changed.emit(current_hp, max_hp)
@@ -212,11 +217,11 @@ func add_material(item_name: String, amount: int = 1) -> void:
 
 func can_craft(potion_name: String) -> bool:
 	match potion_name:
-		"healing": return materials["slime_gel"] >= 1
-		"strength": return materials["fire_essence"] >= 1
-		"slow": return materials["frost_wing"] >= 1
-		"berserk": return materials["slime_gel"] >= 1 and materials["fire_essence"] >= 1
-		"ironskin": return materials["slime_gel"] >= 2
+		"healing": return materials.get("slime_gel", 0) >= 1
+		"strength": return materials.get("goblin_ear", 0) >= 1 or materials.get("fire_essence", 0) >= 1
+		"slow": return materials.get("frost_wing", 0) >= 1
+		"berserk": return materials.get("slime_gel", 0) >= 1 and (materials.get("goblin_ear", 0) >= 1 or materials.get("fire_essence", 0) >= 1)
+		"ironskin": return materials.get("slime_gel", 0) >= 2
 	return false
 
 func craft_potion(potion_name: String) -> bool:
@@ -228,14 +233,20 @@ func craft_potion(potion_name: String) -> bool:
 			materials["slime_gel"] -= 1
 			potions["healing"] += 1
 		"strength":
-			materials["fire_essence"] -= 1
+			if materials.get("goblin_ear", 0) >= 1:
+				materials["goblin_ear"] -= 1
+			else:
+				materials["fire_essence"] -= 1
 			potions["strength"] += 1
 		"slow":
 			materials["frost_wing"] -= 1
 			potions["slow"] += 1
 		"berserk":
 			materials["slime_gel"] -= 1
-			materials["fire_essence"] -= 1
+			if materials.get("goblin_ear", 0) >= 1:
+				materials["goblin_ear"] -= 1
+			else:
+				materials["fire_essence"] -= 1
 			potions["berserk"] += 1
 		"ironskin":
 			materials["slime_gel"] -= 2
@@ -249,6 +260,8 @@ func consume_potion(potion_name: String) -> bool:
 		return false
 
 	potions[potion_name] -= 1
+	last_consumed_potion = potion_name
+	last_potion_timestamp = Time.get_ticks_msec() / 1000.0
 	match potion_name:
 		"healing":
 			modify_hp(35.0)
@@ -270,6 +283,43 @@ func consume_potion(potion_name: String) -> bool:
 	potion_consumed.emit(potion_name)
 	inventory_updated.emit()
 	return true
+
+## Memeriksa apakah efek ramuan tertentu sedang aktif pada tubuh karakter.
+func is_potion_active(potion_name: String) -> bool:
+	var current_time: float = Time.get_ticks_msec() / 1000.0
+	match potion_name.to_lower():
+		"strength":
+			return is_strength_active
+		"berserk":
+			return is_berserk_active
+		"slow":
+			return is_slow_active
+		"ironskin":
+			return is_ironskin_active
+		"healing":
+			return last_consumed_potion == "healing" and (current_time - last_potion_timestamp) < 10.0
+		"any":
+			return is_strength_active or is_berserk_active or is_slow_active or is_ironskin_active or (current_time - last_potion_timestamp) < 10.0
+	return false
+
+## Menghapus status efek aktif dari ramuan tertentu.
+func clear_potion_buff(potion_name: String) -> void:
+	match potion_name.to_lower():
+		"strength":
+			is_strength_active = false
+		"berserk":
+			is_berserk_active = false
+		"slow":
+			is_slow_active = false
+		"ironskin":
+			is_ironskin_active = false
+			ironskin_timer = 0.0
+		"any":
+			is_strength_active = false
+			is_berserk_active = false
+			is_slow_active = false
+			is_ironskin_active = false
+			ironskin_timer = 0.0
 
 var _hit_stop_id: int = 0
 
@@ -297,6 +347,8 @@ func reset_game_state() -> void:
 	is_slow_active = false
 	is_ironskin_active = false
 	ironskin_timer = 0.0
+	last_consumed_potion = ""
+	last_potion_timestamp = 0.0
 	current_hp = max_hp
 	current_toxicity = 0.0
 	tolerance_level = 1
@@ -306,7 +358,8 @@ func reset_game_state() -> void:
 	materials = {
 		"slime_gel": 0,
 		"fire_essence": 0,
-		"frost_wing": 0
+		"frost_wing": 0,
+		"goblin_ear": 0
 	}
 	potions = {
 		"healing": 0,

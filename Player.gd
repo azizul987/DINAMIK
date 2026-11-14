@@ -448,8 +448,9 @@ func attack() -> void:
 	hitbox.monitoring = true
 	var bodies := hitbox.get_overlapping_bodies()
 	for b in bodies:
-		if b != self and b.has_method("take_damage"):
-			_apply_hit_to_target(b)
+		var target := _resolve_damage_target(b)
+		if target:
+			_apply_hit_to_target(target)
 
 	await get_tree().create_timer(attack_slash_duration).timeout
 	hitbox.monitoring = false
@@ -457,6 +458,15 @@ func attack() -> void:
 
 	await get_tree().create_timer(maxf(0.01, attack_cooldown - attack_slash_duration)).timeout
 	can_attack = true
+
+func _resolve_damage_target(node: Node) -> Node:
+	if not node or node == self:
+		return null
+	if node.has_method("take_damage"):
+		return node
+	if node.get_parent() and node.get_parent().has_method("take_damage"):
+		return node.get_parent()
+	return null
 
 func _apply_hit_to_target(target: Node) -> void:
 	if not target or target == self or not target.has_method("take_damage"):
@@ -495,7 +505,9 @@ func _apply_hit_to_target(target: Node) -> void:
 func _on_hitbox_body_entered(body: Node) -> void:
 	if not is_attacking or body == self:
 		return
-	_apply_hit_to_target(body)
+	var target := _resolve_damage_target(body)
+	if target:
+		_apply_hit_to_target(target)
 
 func _setup_flash_material() -> void:
 	flash_material = StandardMaterial3D.new()

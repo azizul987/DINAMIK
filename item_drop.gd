@@ -6,6 +6,7 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 enum State { POP, IDLE, MAGNET_PULL, COLLECTED }
 
 @export var item_type: String = "slime_gel"
+@export var item_name_display: String = ""
 @export var item_amount: int = 1
 @export var item_color: Color = Color(0.15, 0.85, 0.45, 0.95)
 
@@ -207,6 +208,20 @@ func _play_pickup_chime() -> void:
 		pickup_audio.play()
 		pickup_audio.finished.connect(pickup_audio.queue_free)
 
+func get_item_display_name() -> String:
+	if not item_name_display.is_empty():
+		return item_name_display
+	match item_type:
+		"goblin_ear", "telinga_goblin":
+			return "Telinga Goblin"
+		"slime_gel":
+			return "Slime Gel"
+		"fire_essence":
+			return "Fire Essence"
+		"frost_wing":
+			return "Frost Wing"
+	return item_type.capitalize()
+
 func _spawn_floating_toast() -> void:
 	if not FLOATING_TEXT_SCENE:
 		return
@@ -215,4 +230,4 @@ func _spawn_floating_toast() -> void:
 		return
 	get_tree().root.add_child(label)
 	label.global_position = global_position + Vector3(0.0, 0.3, 0.0)
-	label.pop("+%d Slime Gel" % item_amount, item_color.lightened(0.3), 28, 0.85, 0.55)
+	label.pop("+%d %s" % [item_amount, get_item_display_name()], item_color.lightened(0.3), 28, 0.85, 0.55)

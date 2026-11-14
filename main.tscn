@@ -182,11 +182,6 @@ margin = 0.2
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39254224, 1.4145684)
 use_collision = true
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1317791019]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0382943, 4.6949263)
-use_collision = true
-size = Vector3(1, 4.291504, 1)
-
 [node name="DummySlime" parent="." unique_id=711 instance=ExtResource("13_dummy_slime")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.728136, 0.74075574, 5.923851)
 
@@ -681,7 +676,7 @@ text = "Strength Potion"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
 theme_override_font_sizes/font_size = 11
-text = "Butuh: 1 Fire Essence"
+text = "Butuh: 1 Telinga Goblin"
 
 [node name="BtnStrength" type="Button" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=1806135789]
 unique_name_in_owner = true
@@ -803,6 +798,48 @@ max_distance = 40.0
 [node name="StaticBody3D" type="StaticBody3D" parent="door" unique_id=1140452395]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="door/StaticBody3D" unique_id=1938245530]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017082691, 0, -0.0018706322)
+shape = SubResource("ConcavePolygonShape3D_6dlmt")
+
+[node name="door2" type="MeshInstance3D" parent="." unique_id=239836024]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -9.020089, 0.33593762, 10.992659)
+mesh = SubResource("ArrayMesh_4caia")
+script = ExtResource("15_door")
+open_mode = 2
+
+[node name="DoorAudio" type="AudioStreamPlayer3D" parent="door2" unique_id=1758182394]
+max_distance = 40.0
+
+[node name="SealLight" type="OmniLight3D" parent="door2" unique_id=2100000015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+light_color = Color(1, 0.72, 0.15, 1)
+light_energy = 1.2
+omni_range = 3.5
+
+[node name="StaticBody3D" type="StaticBody3D" parent="door2" unique_id=567153666]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="door2/StaticBody3D" unique_id=403698645]
+shape = SubResource("ConcavePolygonShape3D_6dlmt")
+
+[node name="door3" type="MeshInstance3D" parent="." unique_id=2010428319]
+transform = Transform3D(1, 0, 0, 0, 1.215, 0, 0, 0, 1, 0.9517832, 0.31893432, 12.978861)
+mesh = SubResource("ArrayMesh_4caia")
+script = ExtResource("15_door")
+open_mode = 1
+required_potion = 1
+
+[node name="DoorAudio" type="AudioStreamPlayer3D" parent="door3" unique_id=1674898872]
+max_distance = 40.0
+
+[node name="SealLight" type="OmniLight3D" parent="door3" unique_id=2100000016]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+light_color = Color(1, 0.22, 0.25, 1)
+light_energy = 1.2
+omni_range = 3.5
+
+[node name="StaticBody3D" type="StaticBody3D" parent="door3" unique_id=2044767300]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="door3/StaticBody3D" unique_id=329780893]
 shape = SubResource("ConcavePolygonShape3D_6dlmt")
 
 [node name="LevelExitPortal" parent="." unique_id=2100000010 instance=ExtResource("18_portal")]
