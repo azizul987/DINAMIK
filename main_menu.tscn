@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://crlybwl7fmu2k"]
 
-[ext_resource type="Script" path="res://main_menu.gd" id="1_menu"]
+[ext_resource type="Script" uid="uid://7lsteedlrwxd" path="res://main_menu.gd" id="1_menu"]
 [ext_resource type="Theme" uid="uid://b4jllf78fk441" path="res://resources/ui/alchemy_theme.tres" id="2_theme"]
 [ext_resource type="StyleBox" uid="uid://df72836abc101" path="res://resources/ui/panel_box.tres" id="3_panel"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1113003882]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +14,7 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_menu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=722157224]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.04, 0.05, 0.07, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=279391698]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,42 +31,42 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MainVBox" type="VBoxContainer" parent="CenterContainer"]
+[node name="MainVBox" type="VBoxContainer" parent="CenterContainer" unique_id=866459707]
 layout_mode = 2
 theme_override_constants/separation = 36
 alignment = 1
 
-[node name="LogoTitle" type="Label" parent="CenterContainer/MainVBox"]
+[node name="LogoTitle" type="Label" parent="CenterContainer/MainVBox" unique_id=1910640676]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.94, 0.97, 1)
 theme_override_font_sizes/font_size = 52
 text = "TOXEMIA"
 horizontal_alignment = 1
 
-[node name="Buttons" type="VBoxContainer" parent="CenterContainer/MainVBox"]
+[node name="Buttons" type="VBoxContainer" parent="CenterContainer/MainVBox" unique_id=712401905]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="BtnPlay" type="Button" parent="CenterContainer/MainVBox/Buttons"]
+[node name="BtnPlay" type="Button" parent="CenterContainer/MainVBox/Buttons" unique_id=1019285297]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 44)
 layout_mode = 2
 text = "Mulai"
 
-[node name="BtnGuide" type="Button" parent="CenterContainer/MainVBox/Buttons"]
+[node name="BtnGuide" type="Button" parent="CenterContainer/MainVBox/Buttons" unique_id=266788390]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 44)
 layout_mode = 2
 text = "Panduan"
 
-[node name="BtnQuit" type="Button" parent="CenterContainer/MainVBox/Buttons"]
+[node name="BtnQuit" type="Button" parent="CenterContainer/MainVBox/Buttons" unique_id=1817146150]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 44)
 layout_mode = 2
 text = "Keluar"
 
-[node name="GuideModal" type="Control" parent="."]
+[node name="GuideModal" type="Control" parent="." unique_id=2090342512]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -76,7 +76,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="DarkOverlay" type="ColorRect" parent="GuideModal"]
+[node name="DarkOverlay" type="ColorRect" parent="GuideModal" unique_id=374966552]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -85,7 +85,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.02, 0.03, 0.05, 0.85)
 
-[node name="Center" type="CenterContainer" parent="GuideModal"]
+[node name="Center" type="CenterContainer" parent="GuideModal" unique_id=2139969090]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -93,117 +93,117 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Card" type="PanelContainer" parent="GuideModal/Center"]
+[node name="Card" type="PanelContainer" parent="GuideModal/Center" unique_id=2028898130]
 custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_styles/panel = ExtResource("3_panel")
 
-[node name="Margin" type="MarginContainer" parent="GuideModal/Center/Card"]
+[node name="Margin" type="MarginContainer" parent="GuideModal/Center/Card" unique_id=1093902763]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 
-[node name="VBox" type="VBoxContainer" parent="GuideModal/Center/Card/Margin"]
+[node name="VBox" type="VBoxContainer" parent="GuideModal/Center/Card/Margin" unique_id=771616977]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="GuideModal/Center/Card/Margin/VBox"]
+[node name="Title" type="Label" parent="GuideModal/Center/Card/Margin/VBox" unique_id=912823541]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.93, 0.96, 1)
 theme_override_font_sizes/font_size = 18
 text = "PANDUAN KONTROL"
 horizontal_alignment = 1
 
-[node name="Grid" type="GridContainer" parent="GuideModal/Center/Card/Margin/VBox"]
+[node name="Grid" type="GridContainer" parent="GuideModal/Center/Card/Margin/VBox" unique_id=573332015]
 layout_mode = 2
 theme_override_constants/h_separation = 20
 theme_override_constants/v_separation = 10
 columns = 2
 
-[node name="Key1" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key1" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1376426921]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "W, A, S, D"
 
-[node name="Desc1" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc1" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1704199032]
 layout_mode = 2
 text = "Bergerak"
 
-[node name="Key2" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key2" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1083186916]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "Shift"
 
-[node name="Desc2" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc2" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1716912520]
 layout_mode = 2
 text = "Dash / Lari"
 
-[node name="Key3" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key3" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=726149216]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "Spasi"
 
-[node name="Desc3" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc3" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=545497574]
 layout_mode = 2
 text = "Lompat"
 
-[node name="Key4" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key4" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1051805360]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "Klik Kiri"
 
-[node name="Desc4" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc4" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1427679861]
 layout_mode = 2
 text = "Serang"
 
-[node name="Key5" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key5" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=890414287]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "Klik Kanan"
 
-[node name="Desc5" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc5" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=800493859]
 layout_mode = 2
 text = "Kunci Target"
 
-[node name="Key6" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key6" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1563598932]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "E"
 
-[node name="Desc6" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc6" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=402135323]
 layout_mode = 2
 text = "Ambil / Interaksi"
 
-[node name="Key7" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key7" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=2124933800]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "C"
 
-[node name="Desc7" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc7" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=339985405]
 layout_mode = 2
 text = "Meja Alkimia"
 
-[node name="Key8" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key8" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1725489896]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "1, 2, 3, 4, 5"
 
-[node name="Desc8" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc8" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=786691320]
 layout_mode = 2
 text = "Ramuan"
 
-[node name="Key9" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Key9" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=529821898]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
 text = "ESC"
 
-[node name="Desc9" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid"]
+[node name="Desc9" type="Label" parent="GuideModal/Center/Card/Margin/VBox/Grid" unique_id=1753907267]
 layout_mode = 2
 text = "Jeda"
 
-[node name="BtnCloseGuide" type="Button" parent="GuideModal/Center/Card/Margin/VBox"]
+[node name="BtnCloseGuide" type="Button" parent="GuideModal/Center/Card/Margin/VBox" unique_id=1617828212]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
