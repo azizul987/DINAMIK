@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://w1b3dsd5wche"
+path="res://.godot/imported/smokebomb.obj-80e80ca3a9874674c8dfe8474173446d.mesh"
+
+[deps]
+
+files=["res://.godot/imported/smokebomb.obj-80e80ca3a9874674c8dfe8474173446d.mesh"]
+
+source_file="res://char/Assets/obj/smokebomb.obj"
+dest_files=["res://.godot/imported/smokebomb.obj-80e80ca3a9874674c8dfe8474173446d.mesh", "res://.godot/imported/smokebomb.obj-80e80ca3a9874674c8dfe8474173446d.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

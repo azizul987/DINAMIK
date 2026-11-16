@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bemxpn385bref"
+path="res://.godot/imported/spellbook_open.obj-62246a40835c7820de51b267d01f9eee.mesh"
+
+[deps]
+
+files=["res://.godot/imported/spellbook_open.obj-62246a40835c7820de51b267d01f9eee.mesh"]
+
+source_file="res://char/Assets/obj/spellbook_open.obj"
+dest_files=["res://.godot/imported/spellbook_open.obj-62246a40835c7820de51b267d01f9eee.mesh", "res://.godot/imported/spellbook_open.obj-62246a40835c7820de51b267d01f9eee.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

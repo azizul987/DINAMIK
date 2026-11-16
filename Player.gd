@@ -1,3 +1,4 @@
+class_name Player
 extends CharacterBody3D
 
 const DASH_GHOST_SCENE: PackedScene = preload("res://dash_ghost.tscn")
@@ -78,10 +79,12 @@ var slash_arc_mat: StandardMaterial3D = null
 var flash_material: StandardMaterial3D = null
 var dash_material: StandardMaterial3D = null
 var _hit_blink_tween: Tween = null
+var _character_meshes: Array[MeshInstance3D] = []
 
 @onready var camera_pivot: Node3D = $CameraPivot
-@onready var mesh_instance: MeshInstance3D = $MeshInstance
-@onready var weapon_pivot: Node3D = $MeshInstance/WeaponPivot
+@onready var mesh_instance: Node3D = $Ranger if has_node("Ranger") else ($MeshInstance if has_node("MeshInstance") else self)
+@onready var animation_player: AnimationPlayer = $AnimationPlayer if has_node("AnimationPlayer") else null
+@onready var weapon_pivot: Node3D = %WeaponPivot if has_node("%WeaponPivot") else ($Ranger/WeaponPivot if has_node("Ranger/WeaponPivot") else ($MeshInstance/WeaponPivot if has_node("MeshInstance/WeaponPivot") else null))
 @onready var hitbox: Area3D = %Hitbox
 @onready var slash_arc: MeshInstance3D = %SlashArc if has_node("%SlashArc") else null
 @onready var deflect_audio: AudioStreamPlayer = $DeflectAudio if has_node("DeflectAudio") else null
@@ -92,10 +95,35 @@ func _ready() -> void:
 	GlobalLogic.player_died.connect(_on_player_died)
 	GlobalLogic.potion_consumed.connect(_on_potion_consumed)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
+	_cache_character_meshes()
 	_setup_slash_arc()
 	_setup_flash_material()
 	_setup_dash_material()
 	_setup_deflect_audio()
+	if animation_player:
+		animation_player.playback_default_blend_time = 0.2
+		if animation_player.has_animation("idle"):
+			animation_player.play("idle")
+
+func _cache_character_meshes() -> void:
+	_character_meshes.clear()
+	if mesh_instance is MeshInstance3D:
+		_character_meshes.append(mesh_instance as MeshInstance3D)
+	elif is_instance_valid(mesh_instance):
+		for child in mesh_instance.find_children("*", "MeshInstance3D", true, false):
+			var mi := child as MeshInstance3D
+			if mi and mi != slash_arc and not (weapon_pivot and weapon_pivot.is_ancestor_of(mi)):
+				_character_meshes.append(mi)
+
+func _set_model_material_override(mat: Material) -> void:
+	for m in _character_meshes:
+		if is_instance_valid(m):
+			m.material_override = mat
+
+func _get_model_material_override() -> Material:
+	if not _character_meshes.is_empty() and is_instance_valid(_character_meshes[0]):
+		return _character_meshes[0].material_override
+	return null
 
 func _setup_dash_material() -> void:
 	dash_material = StandardMaterial3D.new()
@@ -207,8 +235,8 @@ func _physics_process(delta: float) -> void:
 			is_invulnerable = false
 			mesh_instance.rotation.x = 0.0
 			mesh_instance.scale = Vector3.ONE
-			if mesh_instance.material_override == dash_material:
-				mesh_instance.material_override = null
+			if _get_model_material_override() == dash_material:
+				_set_model_material_override(null)
 	elif lunge_timer > 0.0:
 		lunge_timer -= delta
 		velocity.x = lunge_direction.x * attack_lunge_speed
@@ -250,6 +278,39 @@ func _physics_process(delta: float) -> void:
 		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_angle, 12.0 * delta)
 
 	move_and_slide()
+	_update_animation(direction, is_sprinting)
+
+func _update_animation(direction: Vector3, is_sprinting: bool) -> void:
+	if not animation_player or GlobalLogic.is_dead:
+		return
+
+	if not is_on_floor():
+		if velocity.y > 0.8:
+			if animation_player.has_animation("jump_start"):
+				_play_anim("jump_start")
+		elif velocity.y < -0.8:
+			if animation_player.has_animation("jump_idle"):
+				_play_anim("jump_idle")
+		return
+
+	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
+	var is_moving := horizontal_speed > 0.15 and direction.length_squared() > 0.01
+
+	if is_moving:
+		if is_sprinting and animation_player.has_animation("run"):
+			_play_anim("run", clampf(horizontal_speed / run_speed, 0.75, 1.4))
+		elif animation_player.has_animation("walk"):
+			_play_anim("walk", clampf(horizontal_speed / walk_speed, 0.75, 1.5))
+		elif animation_player.has_animation("walk_a"):
+			_play_anim("walk_a", clampf(horizontal_speed / walk_speed, 0.75, 1.5))
+	else:
+		if animation_player.has_animation("idle"):
+			_play_anim("idle", 1.0)
+
+func _play_anim(anim_name: StringName, speed_scale: float = 1.0) -> void:
+	if animation_player.current_animation != anim_name:
+		animation_player.play(anim_name)
+	animation_player.speed_scale = speed_scale
 
 func _get_camera_relative_direction(input: Vector2) -> Vector3:
 	var cam_basis := camera_pivot.global_transform.basis
@@ -297,7 +358,7 @@ func dash() -> void:
 	if not dash_material:
 		_setup_dash_material()
 	dash_material.albedo_color = Color(dash_ghost_color.r, dash_ghost_color.g, dash_ghost_color.b, 0.85)
-	mesh_instance.material_override = dash_material
+	_set_model_material_override(dash_material)
 
 	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var move_dir := _get_camera_relative_direction(input_dir)
@@ -350,7 +411,7 @@ func _spawn_ghost_trail() -> void:
 		return
 
 	parent_node.add_child(ghost)
-	ghost.global_position = mesh_instance.global_position
+	ghost.global_position = mesh_instance.global_position + Vector3(0.0, 1.0, 0.0)
 	ghost.global_rotation = mesh_instance.global_rotation
 	ghost.scale = mesh_instance.scale
 	ghost.start_fade(dash_ghost_color)
@@ -555,8 +616,10 @@ func _on_player_died() -> void:
 	if _hit_blink_tween:
 		_hit_blink_tween.kill()
 	if is_instance_valid(mesh_instance):
-		mesh_instance.material_override = null
+		_set_model_material_override(null)
 		mesh_instance.visible = true
+	if animation_player and animation_player.has_animation("death"):
+		animation_player.play("death")
 
 func _trigger_hit_feedback() -> void:
 	if not mesh_instance or not flash_material:
@@ -566,14 +629,14 @@ func _trigger_hit_feedback() -> void:
 		_hit_blink_tween.kill()
 
 	flash_material.albedo_color = Color(1.0, 0.2, 0.2, 0.95)
-	mesh_instance.material_override = flash_material
+	_set_model_material_override(flash_material)
 	mesh_instance.visible = true
 
 	_hit_blink_tween = create_tween()
 	_hit_blink_tween.tween_interval(hit_flash_duration)
 	_hit_blink_tween.tween_callback(func():
 		if is_instance_valid(mesh_instance):
-			mesh_instance.material_override = null
+			_set_model_material_override(null)
 	)
 
 	var remaining_time: float = maxf(0.0, invulnerability_duration - hit_flash_duration)
@@ -593,7 +656,7 @@ func _trigger_hit_feedback() -> void:
 	_hit_blink_tween.tween_callback(func():
 		if is_instance_valid(mesh_instance):
 			mesh_instance.visible = true
-			mesh_instance.material_override = null
+			_set_model_material_override(null)
 		is_invulnerable = false
 	)
 
@@ -624,6 +687,9 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 			camera_pivot.fov_punch(2.0)
 
 	_trigger_hit_feedback()
+	if animation_player and animation_player.has_animation("hit") and not GlobalLogic.is_dead:
+		animation_player.play("hit")
+		animation_player.queue("idle")
 
 func _on_potion_consumed(potion_name: String) -> void:
 	match potion_name:
@@ -645,12 +711,12 @@ func _trigger_potion_mesh_flash() -> void:
 	if not mesh_instance or not flash_material:
 		return
 	flash_material.albedo_color = Color(0.25, 1.0, 0.5, 0.85)
-	mesh_instance.material_override = flash_material
+	_set_model_material_override(flash_material)
 	var tw := create_tween()
 	tw.tween_interval(0.12)
 	tw.tween_callback(func():
 		if is_instance_valid(mesh_instance) and not is_invulnerable:
-			mesh_instance.material_override = null
+			_set_model_material_override(null)
 	)
 
 func _spawn_player_floating_text(display_text: String, text_color: Color, size: int = 32, rise: float = 0.85, duration: float = 0.6) -> void:
