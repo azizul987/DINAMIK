@@ -116,6 +116,8 @@ data = PackedVector3Array(0.9405, 2.6899, 0.0688, -0.9405, 2.6899, -0.0688, 0.94
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=331676642]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+light_color = Color(0.26438904, 0.264389, 0.264389, 1)
+light_energy = 0.937
 shadow_enabled = true
 
 [node name="Lantai" type="CSGBox3D" parent="." unique_id=6454236]
