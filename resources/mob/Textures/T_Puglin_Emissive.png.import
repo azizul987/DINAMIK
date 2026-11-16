@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cecptdjxggowb"
-path.s3tc="res://.godot/imported/T_Puglin_Emissive.png-06883e5c47989ce4e1e16d6ae8621eaf.s3tc.ctex"
+path.s3tc="res://.godot/imported/T_Puglin_Emissive.png-4b3c423f0ab2080905c3dff0fc5cd6ac.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://resources/mob/textures/T_Puglin_Emissive.png"
-dest_files=["res://.godot/imported/T_Puglin_Emissive.png-06883e5c47989ce4e1e16d6ae8621eaf.s3tc.ctex"]
+source_file="res://resources/mob/Textures/T_Puglin_Emissive.png"
+dest_files=["res://.godot/imported/T_Puglin_Emissive.png-4b3c423f0ab2080905c3dff0fc5cd6ac.s3tc.ctex"]
 
 [params]
 
