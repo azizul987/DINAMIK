@@ -35,7 +35,6 @@ shadow_enabled = true
 omni_range = 16.573
 
 [node name="Candle" type="Node3D" parent="Lights" unique_id=978762656]
-visible = false
 
 [node name="PropSet_2_Candle" parent="Lights/Candle" unique_id=1163702846 instance=ExtResource("1_ac28i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8078, 1.40496, -2.04042)
@@ -47,7 +46,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.08652, 1.42802, 40.0993)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.18503, 1.42803, 29.6592)
 
 [node name="Torches" type="Node3D" parent="Lights" unique_id=561524000]
-visible = false
 
 [node name="PropSet_5_TorchWall_29" parent="Lights/Torches" unique_id=59378967 instance=ExtResource("3_fk2dp")]
 transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 0.888871, 1, -0.287891)
