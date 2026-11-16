@@ -19,6 +19,11 @@
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
 [ext_resource type="PackedScene" path="res://portal.tscn" id="18_portal"]
 [ext_resource type="PackedScene" path="res://archer_enemy.tscn" id="19_archer"]
+[ext_resource type="ArrayMesh" uid="uid://fltpsydjryp5" path="res://resources/weapon/OBJ/Axe.obj" id="20_ryguw"]
+[ext_resource type="PackedScene" uid="uid://b4rkeubtkyc3w" path="res://resources/mob/Exports/GLB (Godot-Unreal)/Imp.glb" id="21_d13ii"]
+[ext_resource type="PackedScene" uid="uid://cvbvecj2enuy6" path="res://resources/mob/Exports/GLB (Godot-Unreal)/Puglin.glb" id="22_1u8w0"]
+[ext_resource type="Script" path="res://procedural_biped_animator.gd" id="23_d13ii"]
+[ext_resource type="AnimationLibrary" path="res://resources/mob/mob_anim_library.tres" id="24_mob_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -117,11 +122,6 @@ data = PackedVector3Array(0.9405, 2.6899, 0.0688, -0.9405, 2.6899, -0.0688, 0.94
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=331676642]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 shadow_enabled = true
-
-[node name="Lantai" type="CSGBox3D" parent="." unique_id=6454236]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.074295, -4.791828, -2.5207825)
-use_collision = true
-size = Vector3(800, 10.075, 800)
 
 [node name="Players" type="CharacterBody3D" parent="." unique_id=1728051542]
 unique_name_in_owner = true
@@ -846,3 +846,27 @@ shape = SubResource("ConcavePolygonShape3D_6dlmt")
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.685307, 0.33593762, 14.931508)
 portal_id = "dungeon_exit_portal"
+
+[node name="Axe" type="MeshInstance3D" parent="." unique_id=310211272]
+transform = Transform3D(-0.99695826, -0.077937074, 0, 0.077937074, -0.99695826, 0, 0, 0, 1, -23.183065, 2.071207, 15.5386715)
+mesh = ExtResource("20_ryguw")
+
+[node name="Imp" parent="." unique_id=148355656 instance=ExtResource("21_d13ii")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.117804, 0.35331944, 15.355704)
+script = ExtResource("23_d13ii")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Imp"]
+libraries = {
+&"": ExtResource("24_mob_anim")
+}
+autoplay = "idle"
+
+[node name="Puglin" parent="." unique_id=1673851444 instance=ExtResource("22_1u8w0")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5047836, 0.355032, -0.3249588)
+script = ExtResource("23_d13ii")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Puglin"]
+libraries = {
+&"": ExtResource("24_mob_anim")
+}
+autoplay = "idle"

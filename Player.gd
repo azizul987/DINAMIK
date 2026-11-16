@@ -45,6 +45,10 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 @export var lock_on_max_distance: float = 18.0
 @export var lock_on_turn_speed: float = 15.0
 
+@export_group("Zelda Movement & Camera")
+@export var body_turn_with_camera: bool = true
+@export var body_turn_speed: float = 14.0
+
 @export_group("Targeting - Auto Aim Assist")
 @export var auto_target_enabled: bool = true
 @export var auto_target_radius: float = 4.2
@@ -56,6 +60,7 @@ var coyote_timer: float = 0.0
 var is_attacking: bool = false
 var can_attack: bool = true
 var locked_target: Node3D = null
+var is_holding_z_target: bool = false
 
 var is_invulnerable: bool = false
 var knockback_timer: float = 0.0
@@ -225,12 +230,21 @@ func _physics_process(delta: float) -> void:
 		velocity.x = lerpf(velocity.x, target_vel_x, air_control)
 		velocity.z = lerpf(velocity.z, target_vel_z, air_control)
 
+	var is_strafe_active: bool = (locked_target != null and is_instance_valid(locked_target)) or is_holding_z_target
+	var cam_yaw: float = camera_pivot.global_rotation.y if camera_pivot else 0.0
+
 	if locked_target and is_instance_valid(locked_target):
 		var to_enemy: Vector3 = locked_target.global_position - global_position
 		to_enemy.y = 0.0
 		if to_enemy.length_squared() > 0.01:
 			var target_yaw := atan2(to_enemy.x, to_enemy.z)
 			mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_yaw, lock_on_turn_speed * delta)
+	elif is_strafe_active:
+		# Mode Z-Targeting (RMB ditahan): Badan selalu sinkron dengan arah hadap kamera (Strafe ala Zelda)
+		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_yaw, body_turn_speed * delta)
+	elif body_turn_with_camera and direction.length() < 0.1:
+		# Saat kamera diputar dengan mouse saat diam, badan karakter ikut berputar menghadap arah kamera!
+		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_yaw, body_turn_speed * delta)
 	elif direction.length() > 0.1:
 		var target_angle := atan2(direction.x, direction.z)
 		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_angle, 12.0 * delta)
@@ -250,14 +264,23 @@ func _get_camera_relative_direction(input: Vector2) -> Vector3:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_Q or event.keycode == KEY_TAB:
-			toggle_lock_on()
+			handle_z_target_input()
 		elif event.keycode == KEY_SHIFT:
 			dash()
 
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_MIDDLE:
-			toggle_lock_on()
-		elif event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			if event.pressed:
+				is_holding_z_target = true
+				handle_z_target_input()
+			else:
+				is_holding_z_target = false
+				# Jika dilepas dan tidak ada musuh yang dikunci, keluar dari mode strafe
+				if locked_target == null and camera_pivot and camera_pivot.has_method("snap_behind_player"):
+					pass
+		elif event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
+			handle_z_target_input()
+		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and can_attack and not GlobalLogic.is_dead:
 				attack()
 
@@ -332,11 +355,24 @@ func _spawn_ghost_trail() -> void:
 	ghost.scale = mesh_instance.scale
 	ghost.start_fade(dash_ghost_color)
 
-func toggle_lock_on() -> void:
+## Memproses input tombol Z-Targeting (RMB / Q / Tab / MMB) ala The Legend of Zelda:
+## - Jika ada target musuh terdekat: Kunci musuh (Lock-on).
+## - Jika sedang mengunci musuh: Lepaskan kunci (Unlock).
+## - Jika tidak ada musuh di sekitar: Reset/snap kamera ke belakang punggung karakter (Z-Snap).
+func handle_z_target_input() -> void:
 	if locked_target != null:
 		locked_target = null
 		return
-	locked_target = _find_best_target()
+
+	var candidate := _find_best_target()
+	if candidate:
+		locked_target = candidate
+	else:
+		if camera_pivot and camera_pivot.has_method("snap_behind_player"):
+			camera_pivot.snap_behind_player(mesh_instance.global_rotation.y)
+
+func toggle_lock_on() -> void:
+	handle_z_target_input()
 
 func _find_best_target() -> Node3D:
 	var enemies := get_tree().get_nodes_in_group("enemies")

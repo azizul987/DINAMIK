@@ -153,22 +153,22 @@ data = {
 [node name="Props" type="Node3D" parent="." unique_id=741816078]
 
 [node name="PropSet_1_Barrel" parent="Props" unique_id=354913937 instance=ExtResource("10_lxo6f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.19561, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.969, 1.675, 6.011)
 
 [node name="PropSet_1_Barrel3" parent="Props" unique_id=154791729 instance=ExtResource("10_lxo6f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5782602, 2.19561, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.547, 1.675, 6.011)
 
 [node name="PropSet_1_Barrel2" parent="Props" unique_id=558500461 instance=ExtResource("10_lxo6f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.7854, 2.19561, 2.30294)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.785, 1.696, 2.303)
 
 [node name="PropSet_1_Box" parent="Props" unique_id=1683291395 instance=ExtResource("11_ehxbl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02796, 2.01667, 15.7913)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.028, 1.675, 15.791)
 
 [node name="PropSet_1_Box2" parent="Props" unique_id=231761533 instance=ExtResource("11_ehxbl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.54594, 2.01667, -2.0215)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.546, 1.675, -2.022)
 
 [node name="PropSet_1_Box3" parent="Props" unique_id=366896841 instance=ExtResource("11_ehxbl")]
-transform = Transform3D(-0.0198606, 0, 0.999803, 0, 1, 0, -0.999803, 0, -0.0198606, -0.250915, 2.01667, -2.00773)
+transform = Transform3D(-0.0198606, 0, 0.999803, 0, 1, 0, -0.999803, 0, -0.0198606, -0.251, 1.675, -2.008)
 
 [node name="PropSet_1_Jar" parent="Props" unique_id=225489760 instance=ExtResource("13_sb10u")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.42222, 1.48624, 12.3328)
@@ -198,7 +198,7 @@ transform = Transform3D(-1.49581e-08, 0.3422, -0.939627, -1, -4.37114e-08, 0, -4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8587, 1.1, 1.21365)
 
 [node name="PropSet_2_Shelf" parent="Props" unique_id=1671632970 instance=ExtResource("19_s2axl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69845, 3.01282, 12.3304)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.698, 2.525, 12.33)
 
 [node name="PropSet_2_Shelf001" parent="Props" unique_id=157808734 instance=ExtResource("20_1f31e")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.59447, 1.1, -2.44913)
