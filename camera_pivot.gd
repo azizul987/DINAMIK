@@ -46,7 +46,7 @@ func fov_punch(amount: float = 1.6, duration: float = 0.12) -> void:
 ## Memicu snap kamera instan/halus ke belakang punggung karakter (Zelda Z-Reset / Center Camera).
 func snap_behind_player(player_yaw: float) -> void:
 	_is_snapping = true
-	_snap_target_yaw = player_yaw
+	_snap_target_yaw = wrapf(player_yaw - PI, -PI, PI)
 	if spring_arm:
 		var tw := create_tween()
 		tw.tween_property(spring_arm, "rotation:x", deg_to_rad(default_pitch), 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)

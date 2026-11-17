@@ -249,7 +249,7 @@ func _trigger_slash_arc(step: int, duration: float) -> void:
 	slash_arc_mat.albedo_color = arc_color
 
 	var mesh_yaw := mesh_instance.global_rotation.y
-	slash_arc.global_position = global_position + Vector3(0.0, 0.92, 0.0) + (-mesh_instance.global_transform.basis.z * 0.72)
+	slash_arc.global_position = global_position + Vector3(0.0, 0.92, 0.0) + (mesh_instance.global_transform.basis.z * 0.72)
 
 	var start_rot := Vector3.ZERO
 	var target_rot_y := mesh_yaw
@@ -292,7 +292,7 @@ func _trigger_slash_arc(step: int, duration: float) -> void:
 func _perform_attack_lunge(step: int) -> void:
 	if not is_on_floor() or not mesh_instance:
 		return
-	var forward := -mesh_instance.global_transform.basis.z
+	var forward := mesh_instance.global_transform.basis.z
 	forward.y = 0.0
 	forward = forward.normalized()
 	var lunge_speed: float = attack_lunge_speed * (1.35 if step == 2 else 1.0)
@@ -385,7 +385,10 @@ func _physics_process(delta: float) -> void:
 		velocity.z = lerpf(velocity.z, target_vel_z, air_control)
 
 	var is_strafe_active: bool = (locked_target != null and is_instance_valid(locked_target)) or is_holding_z_target
-	var cam_yaw: float = camera_pivot.global_rotation.y if camera_pivot else 0.0
+	var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
+	var cam_forward: Vector3 = -cam_basis.z
+	cam_forward.y = 0.0
+	var cam_look_yaw: float = atan2(cam_forward.x, cam_forward.z)
 
 	if locked_target and is_instance_valid(locked_target):
 		var to_enemy: Vector3 = locked_target.global_position - global_position
@@ -394,11 +397,11 @@ func _physics_process(delta: float) -> void:
 			var target_yaw := atan2(to_enemy.x, to_enemy.z)
 			mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_yaw, lock_on_turn_speed * delta)
 	elif is_strafe_active:
-		# Mode Z-Targeting (RMB ditahan): Badan selalu sinkron dengan arah hadap kamera (Strafe ala Zelda)
-		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_yaw, body_turn_speed * delta)
+		# Mode Z-Targeting (RMB ditahan): Badan selalu menghadap ke arah pandangan kamera (ke depan menjauhi kamera)
+		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_look_yaw, body_turn_speed * delta)
 	elif body_turn_with_camera and direction.length() < 0.1:
-		# Saat kamera diputar dengan mouse saat diam, badan karakter ikut berputar menghadap arah kamera!
-		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_yaw, body_turn_speed * delta)
+		# Saat kamera diputar dengan mouse saat diam, badan karakter ikut berputar menghadap arah pandangan kamera ke depan!
+		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_look_yaw, body_turn_speed * delta)
 	elif direction.length() > 0.1:
 		var target_angle := atan2(direction.x, direction.z)
 		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_angle, 12.0 * delta)
