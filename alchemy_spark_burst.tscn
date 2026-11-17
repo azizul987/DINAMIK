@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://c7m8q4v1e2w9k"]
+
+[ext_resource type="Script" path="res://alchemy_spark_burst.gd" id="1_spark"]
+
+[sub_resource type="Curve" id="Curve_scale"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.7, 0.8), -0.5, -0.5, 0, 0, Vector2(1, 0), -2.2, 0.0, 0, 0]
+point_count = 3
+
+[node name="AlchemySparkBurst" type="CPUParticles2D"]
+emitting = false
+amount = 16
+lifetime = 0.42
+one_shot = true
+explosiveness = 0.92
+spread = 180.0
+gravity = Vector2(0, 95)
+initial_velocity_min = 70.0
+initial_velocity_max = 160.0
+damping_min = 25.0
+damping_max = 50.0
+scale_amount_min = 3.0
+scale_amount_max = 5.5
+scale_amount_curve = SubResource("Curve_scale")
+color = Color(1, 0.85, 0.3, 1)
+script = ExtResource("1_spark")

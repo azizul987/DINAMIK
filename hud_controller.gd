@@ -1,5 +1,8 @@
 extends Control
 
+const ALCHEMY_SPARK_SCENE: PackedScene = preload("res://alchemy_spark_burst.tscn")
+const ALCHEMY_TOAST_SCENE: PackedScene = preload("res://alchemy_toast.tscn")
+
 @onready var toxic_bar: ProgressBar = %Toxic
 @onready var hp_bar: ProgressBar = %Hp
 @onready var crafting_panel: PanelContainer = %CraftingPanel
@@ -33,6 +36,20 @@ extends Control
 @onready var slot_slow: PanelContainer = $QuickSlotsBar/SlotSlow
 @onready var slot_berserk: PanelContainer = $QuickSlotsBar/SlotBerserk
 @onready var toxic_overlay: ColorRect = %ToxicOverlay if has_node("%ToxicOverlay") else null
+
+@onready var potion_audio: AudioStreamPlayer = %PotionAudio if has_node("%PotionAudio") else null
+@onready var potion_flash_overlay: ColorRect = %PotionFlashOverlay if has_node("%PotionFlashOverlay") else null
+@onready var toast_container: Control = %ToastContainer if has_node("%ToastContainer") else null
+
+@onready var row_heal: PanelContainer = crafting_panel.find_child("RowHeal", true, false) as PanelContainer if crafting_panel else null
+@onready var row_strength: PanelContainer = crafting_panel.find_child("RowStrength", true, false) as PanelContainer if crafting_panel else null
+@onready var row_slow: PanelContainer = crafting_panel.find_child("RowSlow", true, false) as PanelContainer if crafting_panel else null
+@onready var row_berserk: PanelContainer = crafting_panel.find_child("RowBerserk", true, false) as PanelContainer if crafting_panel else null
+var row_ironskin: PanelContainer = null
+
+static var _cached_craft_wav: AudioStreamWAV = null
+static var _cached_drink_wav: AudioStreamWAV = null
+static var _cached_fail_wav: AudioStreamWAV = null
 
 var slot_ironskin: PanelContainer = null
 var count_ironskin: Label = null
@@ -84,10 +101,11 @@ func _ready() -> void:
 	GlobalLogic.inventory_updated.connect(_on_inventory_updated)
 
 	btn_craft_toggle.pressed.connect(toggle_crafting)
-	btn_heal.pressed.connect(func(): GlobalLogic.craft_potion("healing"))
-	btn_strength.pressed.connect(func(): GlobalLogic.craft_potion("strength"))
-	btn_slow.pressed.connect(func(): GlobalLogic.craft_potion("slow"))
-	btn_berserk.pressed.connect(func(): GlobalLogic.craft_potion("berserk"))
+	btn_heal.pressed.connect(func(): _on_craft_button_pressed("healing", btn_heal, row_heal))
+	btn_strength.pressed.connect(func(): _on_craft_button_pressed("strength", btn_strength, row_strength))
+	btn_slow.pressed.connect(func(): _on_craft_button_pressed("slow", btn_slow, row_slow))
+	btn_berserk.pressed.connect(func(): _on_craft_button_pressed("berserk", btn_berserk, row_berserk))
+	GlobalLogic.potion_consumed.connect(_on_potion_consumed_juice)
 
 	_on_toxicity_changed(GlobalLogic.current_toxicity, GlobalLogic.max_toxicity)
 	_on_hp_changed(GlobalLogic.current_hp, GlobalLogic.max_hp)
@@ -138,7 +156,7 @@ func _setup_ironskin_ui() -> void:
 		btn_ironskin = row_ironskin.find_child("BtnBerserk", true, false)
 		if btn_ironskin:
 			btn_ironskin.name = "BtnIronskin"
-			btn_ironskin.pressed.connect(func(): GlobalLogic.craft_potion("ironskin"))
+			btn_ironskin.pressed.connect(func(): _on_craft_button_pressed("ironskin", btn_ironskin, row_ironskin))
 
 func _on_toxicity_changed(current: float, max_val: float) -> void:
 	if toxic_mat:
@@ -225,6 +243,10 @@ func toggle_crafting() -> void:
 	crafting_panel.visible = not crafting_panel.visible
 	if crafting_panel.visible:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		crafting_panel.pivot_offset = crafting_panel.size * 0.5
+		crafting_panel.scale = Vector2(0.85, 0.85)
+		var tw := crafting_panel.create_tween()
+		tw.tween_property(crafting_panel, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		_on_inventory_updated()
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -264,3 +286,249 @@ func _unhandled_input(event: InputEvent) -> void:
 			GlobalLogic.add_toxicity(15.0)
 		elif event.keycode == KEY_R:
 			GlobalLogic.reduce_toxicity(15.0)
+
+func _on_craft_button_pressed(potion_name: String, btn: Button, row: Control) -> void:
+	if not btn:
+		return
+	if GlobalLogic.can_craft(potion_name):
+		GlobalLogic.craft_potion(potion_name)
+		_play_potion_sfx("craft")
+
+		# 1. Button squash & stretch with overshoot
+		btn.pivot_offset = btn.size * 0.5
+		btn.scale = Vector2(1.28, 0.72)
+		var tw_btn := btn.create_tween()
+		tw_btn.tween_property(btn, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+		# 2. Row flash in signature potion color
+		var tint: Color = _get_potion_color(potion_name)
+		if row:
+			row.modulate = tint * 1.5
+			var tw_row := row.create_tween()
+			tw_row.tween_property(row, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+		# 3. Particle burst of alchemical sparks
+		_spawn_alchemy_spark_burst(btn.global_position + (btn.size * 0.5), tint)
+
+		# 4. Floating juicy Toast
+		_show_alchemy_toast(potion_name, tint)
+
+		# 5. QuickSlot bar celebration bounce & glow
+		var slot := _get_potion_slot(potion_name)
+		_juice_slot_crafted(slot, tint)
+
+		# 6. Micro camera shake
+		if player and "camera_pivot" in player and player.camera_pivot and player.camera_pivot.has_method("add_trauma"):
+			player.camera_pivot.add_trauma(0.08)
+	else:
+		_play_potion_sfx("fail")
+		# 7. Button wobble / shake on insufficient materials
+		var orig_pos_x := btn.position.x
+		var tw_fail := btn.create_tween()
+		tw_fail.tween_property(btn, "position:x", orig_pos_x - 7.0, 0.04)
+		tw_fail.tween_property(btn, "position:x", orig_pos_x + 7.0, 0.04)
+		tw_fail.tween_property(btn, "position:x", orig_pos_x - 3.5, 0.04)
+		tw_fail.tween_property(btn, "position:x", orig_pos_x, 0.04)
+
+func _get_potion_color(potion_name: String) -> Color:
+	match potion_name:
+		"healing":
+			return Color(0.25, 1.0, 0.5, 1.0)
+		"strength":
+			return Color(1.0, 0.75, 0.2, 1.0)
+		"slow":
+			return Color(0.3, 0.85, 1.0, 1.0)
+		"berserk":
+			return Color(1.0, 0.25, 0.35, 1.0)
+		"ironskin":
+			return Color(0.85, 0.92, 1.0, 1.0)
+	return Color.WHITE
+
+func _get_potion_slot(potion_name: String) -> Control:
+	match potion_name:
+		"healing": return slot_heal
+		"strength": return slot_strength
+		"slow": return slot_slow
+		"berserk": return slot_berserk
+		"ironskin": return slot_ironskin
+	return null
+
+func _juice_slot_crafted(slot: Control, tint: Color) -> void:
+	if not slot or not slot.is_inside_tree():
+		return
+	slot.visible = true
+	slot.pivot_offset = slot.size * 0.5
+	slot.scale = Vector2(1.45, 1.45)
+	slot.modulate = tint * 1.5
+	var tw := slot.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(slot, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(slot, "modulate", Color.WHITE, 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _juice_slot_consumed(slot: Control, tint: Color) -> void:
+	if not slot or not slot.is_inside_tree():
+		return
+	slot.pivot_offset = slot.size * 0.5
+	slot.scale = Vector2(0.72, 0.72)
+	slot.modulate = tint * 1.8
+	var tw := slot.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(slot, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(slot, "modulate", Color.WHITE, 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _pulse_potion_vignette(tint: Color) -> void:
+	if not potion_flash_overlay:
+		return
+	potion_flash_overlay.visible = true
+	potion_flash_overlay.color = Color(tint.r, tint.g, tint.b, 0.35)
+	var tw := potion_flash_overlay.create_tween()
+	tw.tween_property(potion_flash_overlay, "color:a", 0.0, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func():
+		if is_instance_valid(potion_flash_overlay):
+			potion_flash_overlay.visible = false
+	)
+
+func _spawn_alchemy_spark_burst(pos: Vector2, tint: Color) -> void:
+	if not ALCHEMY_SPARK_SCENE:
+		return
+	var spark := ALCHEMY_SPARK_SCENE.instantiate() as AlchemySparkBurst
+	if not spark:
+		return
+	add_child(spark)
+	spark.pop(pos, tint)
+
+func _show_alchemy_toast(potion_name: String, tint: Color) -> void:
+	if not ALCHEMY_TOAST_SCENE or not toast_container:
+		return
+	var toast := ALCHEMY_TOAST_SCENE.instantiate() as AlchemyToast
+	if not toast:
+		return
+	toast_container.add_child(toast)
+	var screen_size := get_viewport_rect().size
+	var start_pos := Vector2(screen_size.x * 0.5 - 90.0, screen_size.y * 0.5 - 215.0)
+	toast.pop(potion_name, tint, start_pos)
+
+func _on_potion_consumed_juice(potion_name: String) -> void:
+	_play_potion_sfx("drink")
+	var tint := _get_potion_color(potion_name)
+	_pulse_potion_vignette(tint)
+	var slot := _get_potion_slot(potion_name)
+	_juice_slot_consumed(slot, tint)
+
+	if player and "camera_pivot" in player and player.camera_pivot:
+		var cam = player.camera_pivot
+		match potion_name:
+			"healing":
+				if cam.has_method("fov_punch"):
+					cam.fov_punch(-1.8, 0.22)
+			"strength":
+				if cam.has_method("add_trauma"):
+					cam.add_trauma(0.18)
+				if cam.has_method("fov_punch"):
+					cam.fov_punch(2.4, 0.18)
+			"slow":
+				if cam.has_method("fov_punch"):
+					cam.fov_punch(1.6, 0.25)
+			"berserk":
+				if cam.has_method("add_trauma"):
+					cam.add_trauma(0.38)
+				if cam.has_method("fov_punch"):
+					cam.fov_punch(3.8, 0.25)
+			"ironskin":
+				if cam.has_method("add_trauma"):
+					cam.add_trauma(0.20)
+
+func _play_potion_sfx(type: String) -> void:
+	if not potion_audio:
+		return
+	match type:
+		"craft":
+			if not _cached_craft_wav:
+				_cached_craft_wav = _generate_craft_wav()
+			potion_audio.stream = _cached_craft_wav
+			potion_audio.pitch_scale = randf_range(0.96, 1.04)
+		"drink":
+			if not _cached_drink_wav:
+				_cached_drink_wav = _generate_drink_wav()
+			potion_audio.stream = _cached_drink_wav
+			potion_audio.pitch_scale = randf_range(0.96, 1.04)
+		"fail":
+			if not _cached_fail_wav:
+				_cached_fail_wav = _generate_fail_wav()
+			potion_audio.stream = _cached_fail_wav
+			potion_audio.pitch_scale = randf_range(0.92, 1.08)
+	potion_audio.play()
+
+static func _generate_craft_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var dur := 0.38
+	var total := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total * 2)
+
+	for i in range(total):
+		var t := float(i) / sample_hz
+		var t_glass := maxf(0.0, t - 0.04)
+		var glass_env := exp(-t_glass * 28.0) if t >= 0.04 else 0.0
+		var glass := (sin(t_glass * 2400.0 * TAU) * 0.5 + sin(t_glass * 3600.0 * TAU) * 0.3) * glass_env
+		var bubble_env := exp(-t * 8.0) * (1.0 - exp(-t * 60.0))
+		var bubble_freq := 320.0 + sin(t * 45.0 * TAU) * 140.0
+		var bubble := sin(t * bubble_freq * TAU) * bubble_env * 0.4
+		var fizz := (randf() * 2.0 - 1.0) * exp(-t * 12.0) * 0.15
+		var t_chime := maxf(0.0, t - 0.10)
+		var chime_env := exp(-t_chime * 10.0) if t >= 0.10 else 0.0
+		var chime_freq := lerpf(880.0, 1760.0, clampf(t_chime / 0.25, 0.0, 1.0))
+		var chime := sin(t_chime * chime_freq * TAU) * chime_env * 0.35
+
+		var sample := int(clampf((glass * 0.5 + bubble + fizz + chime) * 0.75, -1.0, 1.0) * 32767.0)
+		buffer.encode_s16(i * 2, sample)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
+
+static func _generate_drink_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var dur := 0.32
+	var total := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total * 2)
+
+	for i in range(total):
+		var t := float(i) / sample_hz
+		var cork_env := exp(-t * 45.0)
+		var cork_freq := lerpf(220.0, 680.0, clampf(t / 0.04, 0.0, 1.0))
+		var cork := sin(t * cork_freq * TAU) * cork_env * 0.65
+		var t_gulp := maxf(0.0, t - 0.08)
+		var gulp_env := exp(-t_gulp * 16.0) if t >= 0.08 else 0.0
+		var gulp_freq := lerpf(240.0, 130.0, clampf(t_gulp / 0.18, 0.0, 1.0))
+		var gulp := sin(t_gulp * gulp_freq * TAU) * gulp_env * 0.55
+		var sample := int(clampf((cork + gulp) * 0.8, -1.0, 1.0) * 32767.0)
+		buffer.encode_s16(i * 2, sample)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
+
+static func _generate_fail_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var dur := 0.14
+	var total := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total * 2)
+
+	for i in range(total):
+		var t := float(i) / sample_hz
+		var env := exp(-t * 35.0)
+		var val := int((sin(t * 120.0 * TAU) * 0.7 + (randf() * 2.0 - 1.0) * 0.2) * env * 0.45 * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
