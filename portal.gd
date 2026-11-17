@@ -199,7 +199,8 @@ func trigger_teleport(_player_node: Node3D = null) -> void:
 		if label:
 			get_tree().root.add_child(label)
 			label.global_position = global_position + Vector3(0.0, 1.8, 0.0)
-			label.pop("PORTAL AKTIF", portal_color.lightened(0.2), 34, 0.9, 0.8)
+			var popup_text := "SAFE ROOM" if portal_id == "portal_no_tutor" else "PORTAL AKTIF"
+			label.pop(popup_text, portal_color.lightened(0.2), 34, 0.9, 0.8)
 
 	# Surge visual animation
 	var tw := create_tween()
@@ -214,6 +215,9 @@ func trigger_teleport(_player_node: Node3D = null) -> void:
 
 	tw.chain().tween_callback(func():
 		_is_surging = false
+		player_entered.emit(self, target_scene_path)
+		if not target_scene_path.is_empty() and ResourceLoader.exists(target_scene_path):
+			if portal_id == "portal_no_tutor":
+				GlobalLogic.complete_tutorial()
+			get_tree().change_scene_to_file(target_scene_path)
 	)
-
-	player_entered.emit(self, target_scene_path)

@@ -57,9 +57,18 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 
 @export_group("Targeting - Auto Aim Assist")
 @export var auto_target_enabled: bool = true
-@export var auto_target_radius: float = 4.2
-@export var auto_target_cone_deg: float = 130.0
-@export var auto_target_point_blank_radius: float = 1.8
+@export var auto_target_radius: float = 6.5
+@export var auto_target_cone_deg: float = 150.0
+@export var auto_target_point_blank_radius: float = 2.2
+
+@export_group("Equipped Weapon")
+@export var weapon_mesh: Mesh = preload("res://resources/weapon/OBJ/Sword.obj")
+@export var weapon_scale: Vector3 = Vector3(0.22, 0.22, 0.22)
+@export var weapon_rotation_degrees: Vector3 = Vector3.ZERO
+@export var weapon_position_offset: Vector3 = Vector3.ZERO
+
+var equipped_weapon_node: MeshInstance3D = null
+var weapon_hand_attachment: BoneAttachment3D = null
 
 var speed_multiplier: float = 1.0
 var coyote_timer: float = 0.0
@@ -108,6 +117,7 @@ func _ready() -> void:
 	GlobalLogic.player_died.connect(_on_player_died)
 	GlobalLogic.potion_consumed.connect(_on_potion_consumed)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
+	_setup_weapon_attachment()
 	_cache_character_meshes()
 	_setup_slash_arc()
 	_setup_flash_material()
@@ -120,6 +130,46 @@ func _ready() -> void:
 		if animation_player.has_animation("idle"):
 			animation_player.play("idle")
 
+func _setup_weapon_attachment() -> void:
+	if not mesh_instance:
+		return
+	var skel := mesh_instance.find_child("Skeleton3D", true, false) as Skeleton3D
+	if not skel:
+		return
+
+	var hand_idx := skel.find_bone("handslot.r")
+	if hand_idx == -1:
+		hand_idx = skel.find_bone("hand.r")
+	if hand_idx == -1:
+		return
+
+	weapon_hand_attachment = skel.get_node_or_null("RightHandAttachment") as BoneAttachment3D
+	if not weapon_hand_attachment:
+		weapon_hand_attachment = BoneAttachment3D.new()
+		weapon_hand_attachment.name = "RightHandAttachment"
+		skel.add_child(weapon_hand_attachment)
+		weapon_hand_attachment.bone_name = skel.get_bone_name(hand_idx)
+		weapon_hand_attachment.bone_idx = hand_idx
+
+	equipped_weapon_node = weapon_hand_attachment.get_node_or_null("EquippedWeapon") as MeshInstance3D
+	if not equipped_weapon_node and weapon_mesh:
+		equipped_weapon_node = MeshInstance3D.new()
+		equipped_weapon_node.name = "EquippedWeapon"
+		equipped_weapon_node.mesh = weapon_mesh
+		equipped_weapon_node.scale = weapon_scale
+		equipped_weapon_node.rotation_degrees = weapon_rotation_degrees
+		equipped_weapon_node.position = weapon_position_offset
+		weapon_hand_attachment.add_child(equipped_weapon_node)
+
+	# Sembunyikan balok kubus CSGBox Blade dan Handle bawaan
+	if weapon_pivot:
+		var blade := weapon_pivot.get_node_or_null("Blade") as VisualInstance3D
+		if blade:
+			blade.visible = false
+		var handle := weapon_pivot.get_node_or_null("Handle") as VisualInstance3D
+		if handle:
+			handle.visible = false
+
 func _cache_character_meshes() -> void:
 	_character_meshes.clear()
 	if mesh_instance is MeshInstance3D:
@@ -127,7 +177,7 @@ func _cache_character_meshes() -> void:
 	elif is_instance_valid(mesh_instance):
 		for child in mesh_instance.find_children("*", "MeshInstance3D", true, false):
 			var mi := child as MeshInstance3D
-			if mi and mi != slash_arc and not (weapon_pivot and weapon_pivot.is_ancestor_of(mi)):
+			if mi and mi != slash_arc and mi != equipped_weapon_node and not (weapon_pivot and weapon_pivot.is_ancestor_of(mi)):
 				_character_meshes.append(mi)
 
 func _set_model_material_override(mat: Material) -> void:
@@ -172,35 +222,84 @@ func _setup_slash_arc() -> void:
 	if not slash_arc and weapon_pivot:
 		slash_arc = weapon_pivot.get_node_or_null("SlashArc") as MeshInstance3D
 	if slash_arc:
-		if slash_arc.material_override:
-			slash_arc_mat = slash_arc.material_override as StandardMaterial3D
-		elif slash_arc.mesh and slash_arc.mesh.material:
-			slash_arc_mat = slash_arc.mesh.material as StandardMaterial3D
-		else:
-			slash_arc_mat = StandardMaterial3D.new()
-			slash_arc_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			slash_arc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			slash_arc.material_override = slash_arc_mat
+		var crescent_mesh := load("res://resources/weapon/slash_arc_mesh.tres") as Mesh
+		if crescent_mesh:
+			slash_arc.mesh = crescent_mesh
 
-func _trigger_slash_arc() -> void:
-	if not slash_arc or not slash_arc_mat:
+		slash_arc_mat = StandardMaterial3D.new()
+		slash_arc_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		slash_arc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		slash_arc_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		slash_arc_mat.vertex_color_use_as_albedo = true
+		slash_arc.material_override = slash_arc_mat
+		slash_arc.visible = false
+
+func _trigger_slash_arc(step: int, duration: float) -> void:
+	if not slash_arc or not slash_arc_mat or not mesh_instance:
 		return
-	slash_arc.visible = true
-	var arc_color := Color(1.0, 0.25, 0.2, 0.85) if GlobalLogic.is_berserk_active else (Color(1.0, 0.8, 0.2, 0.85) if GlobalLogic.is_strength_active else Color(1.0, 1.0, 1.0, 0.85))
-	if combo_index == 2:
-		arc_color = Color(1.0, 0.55, 0.15, 0.95)
+
+	var arc_color := Color(0.85, 0.95, 1.0, 0.95)
+	if GlobalLogic.is_berserk_active:
+		arc_color = Color(1.0, 0.15, 0.15, 0.98)
+	elif GlobalLogic.is_strength_active:
+		arc_color = Color(1.0, 0.85, 0.2, 0.98)
+	elif step == 2:
+		arc_color = Color(1.0, 0.65, 0.2, 0.98)
+
 	slash_arc_mat.albedo_color = arc_color
-	var initial_scale := Vector3(1.0, 0.04, 1.0) if combo_index == 2 else Vector3(0.8, 0.04, 0.8)
-	var target_scale := Vector3(1.6, 0.04, 1.6) if combo_index == 2 else Vector3(1.3, 0.04, 1.3)
-	slash_arc.scale = initial_scale
+
+	var mesh_yaw := mesh_instance.global_rotation.y
+	slash_arc.global_position = global_position + Vector3(0.0, 0.92, 0.0) + (-mesh_instance.global_transform.basis.z * 0.72)
+
+	var start_rot := Vector3.ZERO
+	var target_rot_y := mesh_yaw
+	var start_scale := Vector3(0.7, 0.7, 0.7)
+	var target_scale := Vector3(1.35, 1.35, 1.35)
+
+	match step:
+		0:
+			start_rot = Vector3(deg_to_rad(-8.0), mesh_yaw + deg_to_rad(40.0), deg_to_rad(6.0))
+			target_rot_y = mesh_yaw - deg_to_rad(50.0)
+			start_scale = Vector3(0.75, 0.75, 0.75)
+			target_scale = Vector3(1.35, 1.35, 1.35)
+		1:
+			start_rot = Vector3(deg_to_rad(24.0), mesh_yaw - deg_to_rad(45.0), deg_to_rad(-22.0))
+			target_rot_y = mesh_yaw + deg_to_rad(45.0)
+			start_scale = Vector3(0.8, 0.8, 0.8)
+			target_scale = Vector3(1.45, 1.45, 1.45)
+		2:
+			start_rot = Vector3(deg_to_rad(-4.0), mesh_yaw, 0.0)
+			target_rot_y = mesh_yaw
+			start_scale = Vector3(1.0, 1.0, 1.0)
+			target_scale = Vector3(1.95, 1.95, 1.95)
+
+	slash_arc.global_rotation = start_rot
+	slash_arc.scale = start_scale
+	slash_arc.visible = true
 
 	var tw := create_tween()
-	tw.tween_property(slash_arc, "scale", target_scale, attack_slash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.parallel().tween_property(slash_arc_mat, "albedo_color:a", 0.0, attack_slash_duration).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func():
+	tw.set_parallel(true)
+	tw.tween_property(slash_arc, "scale", target_scale, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if step != 2:
+		tw.tween_property(slash_arc, "global_rotation:y", target_rot_y, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(slash_arc_mat, "albedo_color:a", 0.0, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	tw.chain().tween_callback(func():
 		if is_instance_valid(slash_arc):
 			slash_arc.visible = false
 	)
+
+func _perform_attack_lunge(step: int) -> void:
+	if not is_on_floor() or not mesh_instance:
+		return
+	var forward := -mesh_instance.global_transform.basis.z
+	forward.y = 0.0
+	forward = forward.normalized()
+	var lunge_speed: float = attack_lunge_speed * (1.35 if step == 2 else 1.0)
+	velocity.x = forward.x * lunge_speed
+	velocity.z = forward.z * lunge_speed
+	lunge_timer = attack_lunge_duration
+	lunge_direction = forward
 
 func _on_toxicity_stage_changed(stage: GlobalLogic.ToxicityStage) -> void:
 	match stage:
@@ -466,9 +565,9 @@ func toggle_lock_on() -> void:
 func _find_best_target() -> Node3D:
 	var enemies := get_tree().get_nodes_in_group("enemies")
 	var best_target: Node3D = null
-	var best_dist: float = lock_on_max_distance
+	var best_score: float = -99999.0
 
-	var cam_basis: Basis = camera_pivot.global_transform.basis
+	var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
 	var cam_forward: Vector3 = -cam_basis.z
 	cam_forward.y = 0.0
 	cam_forward = cam_forward.normalized()
@@ -481,17 +580,20 @@ func _find_best_target() -> Node3D:
 			continue
 
 		var to_enemy: Vector3 = enemy_node.global_position - global_position
+		to_enemy.y = 0.0
 		var dist: float = to_enemy.length()
-		if dist > lock_on_max_distance:
+		if dist > lock_on_max_distance or dist < 0.1:
 			continue
 
-		to_enemy.y = 0.0
 		var dir: Vector3 = to_enemy.normalized()
 		var dot: float = cam_forward.dot(dir)
-		if dot > 0.0:
-			if dist < best_dist:
-				best_dist = dist
-				best_target = enemy_node
+		if dot < 0.2:
+			continue
+
+		var score: float = (dot * 24.0) - dist
+		if score > best_score:
+			best_score = score
+			best_target = enemy_node
 
 	return best_target
 
@@ -501,12 +603,15 @@ func _find_soft_target() -> Node3D:
 
 	var enemies := get_tree().get_nodes_in_group("enemies")
 	var best_target: Node3D = null
-	var best_score: float = -9999.0
+	var best_score: float = -99999.0
 
 	var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
 	var forward: Vector3 = -cam_basis.z
 	forward.y = 0.0
 	forward = forward.normalized()
+
+	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var desire_dir: Vector3 = _get_camera_relative_direction(input_dir) if input_dir.length_squared() > 0.05 else forward
 
 	for enemy in enemies:
 		var enemy_node := enemy as Node3D
@@ -522,15 +627,15 @@ func _find_soft_target() -> Node3D:
 			continue
 
 		var dir: Vector3 = to_enemy.normalized()
-		var dot: float = forward.dot(dir)
+		var dot: float = desire_dir.dot(dir)
 
 		if dist <= auto_target_point_blank_radius:
-			var score: float = 100.0 - dist * 10.0
+			var score: float = 100.0 - dist * 8.0
 			if score > best_score:
 				best_score = score
 				best_target = enemy_node
 		elif dot >= cos(deg_to_rad(auto_target_cone_deg * 0.5)):
-			var score: float = (dot * 2.0) - (dist / auto_target_radius)
+			var score: float = (dot * 16.0) - (dist / auto_target_radius * 8.0)
 			if score > best_score:
 				best_score = score
 				best_target = enemy_node
@@ -577,16 +682,17 @@ func attack() -> void:
 		animation_player.stop()
 		animation_player.play(anim_name, -1.0, anim_speed)
 
-	# Efek visual tebasan
-	_trigger_slash_arc()
-
-	# Aktifkan hitbox saat fase tebasan aktif
-	var hit_start_time: float = attack_dur * 0.20
-	var hit_active_duration: float = attack_dur * 0.45
+	# Fase ayunan aktif (wind-up selesai, pedang menyapu maju ke arah musuh)
+	var hit_start_time: float = attack_dur * 0.16
+	var hit_active_duration: float = attack_dur * 0.38
 
 	await get_tree().create_timer(hit_start_time).timeout
 	if not is_inside_tree() or GlobalLogic.is_dead:
 		return
+
+	# TEPAT saat pedang mengayun maju: pemicu efek visual tebasan & dorongan lunge!
+	_trigger_slash_arc(current_step, hit_active_duration)
+	_perform_attack_lunge(current_step)
 
 	hitbox.monitoring = true
 	var bodies := hitbox.get_overlapping_bodies()
