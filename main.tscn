@@ -23,9 +23,9 @@
 [ext_resource type="PackedScene" uid="uid://b4rkeubtkyc3w" path="res://resources/mob/Exports/GLB (Godot-Unreal)/Imp.glb" id="21_d13ii"]
 [ext_resource type="PackedScene" uid="uid://cvbvecj2enuy6" path="res://resources/mob/Exports/GLB (Godot-Unreal)/Puglin.glb" id="22_1u8w0"]
 [ext_resource type="Script" uid="uid://da38wfbux3u3e" path="res://procedural_biped_animator.gd" id="23_d13ii"]
-[ext_resource type="AnimationLibrary" path="res://resources/mob/mob_anim_library.tres" id="24_mob_anim"]
+[ext_resource type="AnimationLibrary" uid="uid://bj4iqs5q6xj66" path="res://resources/mob/mob_anim_library.tres" id="24_mob_anim"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
-[ext_resource type="AnimationLibrary" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
+[ext_resource type="AnimationLibrary" uid="uid://uyrmce8vk617" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 

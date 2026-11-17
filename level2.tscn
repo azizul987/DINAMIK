@@ -7,6 +7,10 @@
 [ext_resource type="Material" uid="uid://dbtk0ncyclvyf" path="res://DungeonTiles/material/PropSet_5_Mat.tres" id="5_8i3m3"]
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="6_rmy57"]
 [ext_resource type="PackedScene" uid="uid://r0o3ggd3njgg" path="res://DungeonTiles/scenes/Props/set_5/prop_set_5_torch_wall_1.tscn" id="7_qulpo"]
+[ext_resource type="ArrayMesh" uid="uid://fltpsydjryp5" path="res://resources/weapon/OBJ/Axe.obj" id="8_3opl0"]
+[ext_resource type="PackedScene" uid="uid://b4hildib8tibc" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_shelf_001.tscn" id="9_dc5vx"]
+[ext_resource type="PackedScene" uid="uid://co5g1aq33h6i3" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_barrel.tscn" id="10_s8oj7"]
+[ext_resource type="PackedScene" uid="uid://dan7pnvdxbfdk" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_book_2.tscn" id="11_mw4xc"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_v0ej8"]
 _surfaces = [{
@@ -53,7 +57,7 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 [node name="Decor" type="GridMap" parent="." unique_id=675706486]
 mesh_library = ExtResource("3_6q4t8")
 data = {
-"cells": PackedInt32Array(65509, 11, 1441814, 65509, 13, 1441814)
+"cells": PackedInt32Array(65509, 11, 1441814, 65509, 13, 1441814, 65509, 3, 25, 65507, 3, 25, 65505, 3, 25, 65519, 8, 19)
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
@@ -127,3 +131,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.858932, 1.2369804, 7.0232
 
 [node name="PropSet_5_TorchWall_5" parent="." unique_id=1248347562 instance=ExtResource("7_qulpo")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -60.951878, 0.3283341, 11.966199)
+
+[node name="Axe" type="MeshInstance3D" parent="." unique_id=780596464]
+transform = Transform3D(0.99999994, 0, 0, 0, -4.3711385e-08, -1, 0, 0.99999994, -4.371139e-08, -62.432762, 1.213207, 14.915319)
+mesh = ExtResource("8_3opl0")
+
+[node name="PropSet_2_Shelf002" parent="." unique_id=2050058892 instance=ExtResource("9_dc5vx")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -46.66419, 1.1147106, 15.429327)
+
+[node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf002" unique_id=802841570 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
+
+[node name="PropSet_2_Book_4" parent="." unique_id=97420339 instance=ExtResource("11_mw4xc")]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -50.231915, 2.27723, 5.6861877)
