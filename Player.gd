@@ -3,6 +3,8 @@ extends CharacterBody3D
 
 const DASH_GHOST_SCENE: PackedScene = preload("res://dash_ghost.tscn")
 const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
+const FOOTSTEP_DUST_SCENE: PackedScene = preload("res://footstep_dust.tscn")
+const GROUND_SLAM_SCENE: PackedScene = preload("res://ground_slam_shockwave.tscn")
 
 @export_group("Movement")
 @export var walk_speed: float = 4.5
@@ -67,8 +69,19 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 @export var weapon_rotation_degrees: Vector3 = Vector3.ZERO
 @export var weapon_position_offset: Vector3 = Vector3.ZERO
 
+@export_group("Effects - Footsteps & Impacts")
+@export var footstep_interval_walk: float = 0.38
+@export var footstep_interval_run: float = 0.24
+@export var footstep_dust_offset_lateral: float = 0.18
+@export var landing_impact_threshold: float = -4.0
+
 var equipped_weapon_node: MeshInstance3D = null
 var weapon_hand_attachment: BoneAttachment3D = null
+
+var _footstep_timer: float = 0.0
+var _foot_alternator: bool = false
+var _prev_vertical_velocity: float = 0.0
+var _was_on_floor_prev: bool = true
 
 var speed_multiplier: float = 1.0
 var coyote_timer: float = 0.0
@@ -110,6 +123,7 @@ var _character_meshes: Array[MeshInstance3D] = []
 @onready var hitbox: Area3D = %Hitbox
 @onready var slash_arc: MeshInstance3D = %SlashArc if has_node("%SlashArc") else null
 @onready var deflect_audio: AudioStreamPlayer = $DeflectAudio if has_node("DeflectAudio") else null
+@onready var footstep_audio: AudioStreamPlayer3D = %FootstepAudio if has_node("%FootstepAudio") else ($FootstepAudio if has_node("FootstepAudio") else null)
 
 func _ready() -> void:
 	add_to_group("player")
@@ -334,6 +348,8 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("ui_accept") and coyote_timer > 0.0 and not is_attacking:
 		velocity.y = jump_force
 		coyote_timer = 0.0
+		_spawn_footstep_dust()
+		_play_footstep_sound()
 
 	var is_sprinting := Input.is_key_pressed(KEY_SHIFT)
 	var base_speed := run_speed if is_sprinting else walk_speed
@@ -406,7 +422,36 @@ func _physics_process(delta: float) -> void:
 		var target_angle := atan2(direction.x, direction.z)
 		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_angle, 12.0 * delta)
 
+	_prev_vertical_velocity = velocity.y
+	_was_on_floor_prev = is_on_floor()
+
 	move_and_slide()
+
+	# Deteksi pendaratan tanah (Landing impact dust & subtle thud)
+	if not _was_on_floor_prev and is_on_floor() and _prev_vertical_velocity < landing_impact_threshold:
+		_spawn_footstep_dust()
+		_play_footstep_sound()
+		if _prev_vertical_velocity < -7.0:
+			_spawn_ground_slam_shockwave(global_position + Vector3(0.0, 0.03, 0.0), 0.85)
+			if camera_pivot and camera_pivot.has_method("add_trauma"):
+				camera_pivot.add_trauma(0.35)
+
+	# Langkah kaki saat bergerak di atas lantai
+	if is_on_floor() and not is_dashing:
+		var horiz_vel := Vector2(velocity.x, velocity.z).length()
+		if horiz_vel > 0.4:
+			var step_interval := footstep_interval_run if is_sprinting else footstep_interval_walk
+			step_interval = step_interval / clampf(speed_multiplier, 0.4, 1.2)
+			_footstep_timer -= delta
+			if _footstep_timer <= 0.0:
+				_footstep_timer = step_interval
+				_spawn_footstep_dust()
+				_play_footstep_sound()
+		else:
+			_footstep_timer = 0.08
+	else:
+		_footstep_timer = 0.08
+
 	_update_animation(direction, is_sprinting)
 
 func _update_animation(direction: Vector3, is_sprinting: bool) -> void:
@@ -697,6 +742,19 @@ func attack() -> void:
 	_trigger_slash_arc(current_step, hit_active_duration)
 	_perform_attack_lunge(current_step)
 
+	if current_step == 2:
+		var slam_forward := mesh_instance.global_transform.basis.z if mesh_instance else global_transform.basis.z
+		slam_forward.y = 0.0
+		slam_forward = slam_forward.normalized()
+		var slam_pos := global_position + (slam_forward * 1.35)
+		slam_pos.y = global_position.y + 0.03
+		_spawn_ground_slam_shockwave(slam_pos, 1.45)
+		if camera_pivot:
+			if camera_pivot.has_method("add_trauma"):
+				camera_pivot.add_trauma(0.65)
+			if camera_pivot.has_method("fov_punch"):
+				camera_pivot.fov_punch(2.8, 0.22)
+
 	hitbox.monitoring = true
 	var bodies := hitbox.get_overlapping_bodies()
 	for b in bodies:
@@ -926,3 +984,72 @@ func _trigger_ironskin_deflection() -> void:
 
 	if camera_pivot and camera_pivot.has_method("add_trauma"):
 		camera_pivot.add_trauma(0.18)
+
+static var _cached_footstep_wav: AudioStreamWAV = null
+
+func _play_footstep_sound() -> void:
+	if not footstep_audio:
+		return
+	if not _cached_footstep_wav:
+		_cached_footstep_wav = _generate_footstep_wav()
+	footstep_audio.stream = _cached_footstep_wav
+	footstep_audio.pitch_scale = randf_range(0.88, 1.12)
+	footstep_audio.play()
+
+static func _generate_footstep_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var dur := 0.055
+	var total_samples := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total_samples * 2)
+
+	for i in range(total_samples):
+		var t := float(i) / sample_hz
+		var env := exp(-t * 70.0)
+		var freq := lerpf(160.0, 50.0, t / dur)
+		var noise := (randf() * 2.0 - 1.0) * 0.35
+		var tone := sin(t * freq * TAU) * 0.65
+		var val := int((tone + noise) * env * 0.32 * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
+
+func _spawn_footstep_dust() -> void:
+	if not FOOTSTEP_DUST_SCENE or not is_inside_tree():
+		return
+	var dust := FOOTSTEP_DUST_SCENE.instantiate() as Node3D
+	if not dust:
+		return
+	var parent_node := get_parent()
+	if not parent_node:
+		parent_node = get_tree().current_scene
+	if not parent_node:
+		return
+	parent_node.add_child(dust)
+
+	_foot_alternator = not _foot_alternator
+	var lateral_sign := 1.0 if _foot_alternator else -1.0
+	var side_dir := mesh_instance.global_transform.basis.x if mesh_instance else global_transform.basis.x
+	var backward_dir := -(mesh_instance.global_transform.basis.z if mesh_instance else global_transform.basis.z)
+	var dust_pos := global_position + (side_dir * footstep_dust_offset_lateral * lateral_sign) + (backward_dir * 0.12)
+	dust_pos.y = global_position.y + 0.04
+	dust.global_position = dust_pos
+
+func _spawn_ground_slam_shockwave(pos: Vector3, scale_mult: float = 1.0) -> void:
+	if not GROUND_SLAM_SCENE or not is_inside_tree():
+		return
+	var shockwave := GROUND_SLAM_SCENE.instantiate() as Node3D
+	if not shockwave:
+		return
+	var parent_node := get_parent()
+	if not parent_node:
+		parent_node = get_tree().current_scene
+	if not parent_node:
+		return
+	parent_node.add_child(shockwave)
+	shockwave.global_position = pos
+	shockwave.scale = Vector3.ONE * scale_mult
