@@ -31,8 +31,10 @@ const GROUND_SLAM_SCENE: PackedScene = preload("res://ground_slam_shockwave.tscn
 @export var combo_window: float = 0.95
 @export var combo_damage_multipliers: Array[float] = [1.0, 1.3, 1.8]
 @export var combo_knockback_multipliers: Array[float] = [1.0, 1.25, 1.7]
-@export var combo_speed_scales: Array[float] = [1.8, 1.8, 2.0]
-@export var combo_durations: Array[float] = [0.42, 0.45, 0.65]
+@export var combo_speed_scales: Array[float] = [1.8, 1.8, 2.2]
+@export var combo_durations: Array[float] = [0.42, 0.45, 1.05]
+@export var combo_hit_delays: Array[float] = [0.10, 0.10, 0.68]
+@export var combo_hit_durations: Array[float] = [0.18, 0.18, 0.22]
 
 @export_group("Combat - Defense & Recoil")
 @export var invulnerability_duration: float = 0.6
@@ -375,14 +377,14 @@ func _physics_process(delta: float) -> void:
 			mesh_instance.scale = Vector3.ONE
 			if _get_model_material_override() == dash_material:
 				_set_model_material_override(null)
-	elif is_attacking:
-		# Selama combo attack, redam velocity gerak agar animasi serangan memimpin pergerakan
-		velocity.x = move_toward(velocity.x, 0.0, target_speed * 3.0 * delta)
-		velocity.z = move_toward(velocity.z, 0.0, target_speed * 3.0 * delta)
 	elif lunge_timer > 0.0:
 		lunge_timer -= delta
 		velocity.x = lunge_direction.x * attack_lunge_speed
 		velocity.z = lunge_direction.z * attack_lunge_speed
+	elif is_attacking:
+		# Selama combo attack, redam velocity gerak agar animasi serangan memimpin pergerakan
+		velocity.x = move_toward(velocity.x, 0.0, target_speed * 3.0 * delta)
+		velocity.z = move_toward(velocity.z, 0.0, target_speed * 3.0 * delta)
 	elif knockback_timer > 0.0:
 		knockback_timer -= delta
 		velocity.x = move_toward(velocity.x, direction.x * target_speed, received_knockback_damping * delta)
@@ -412,6 +414,9 @@ func _physics_process(delta: float) -> void:
 		if to_enemy.length_squared() > 0.01:
 			var target_yaw := atan2(to_enemy.x, to_enemy.z)
 			mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, target_yaw, lock_on_turn_speed * delta)
+	elif is_attacking:
+		# Selama serangan combo berlangsung, kunci arah hadap karakter agar tidak terpelintir
+		pass
 	elif is_strafe_active:
 		# Mode Z-Targeting (RMB ditahan): Badan selalu menghadap ke arah pandangan kamera (ke depan menjauhi kamera)
 		mesh_instance.rotation.y = lerp_angle(mesh_instance.rotation.y, cam_look_yaw, body_turn_speed * delta)
@@ -731,14 +736,18 @@ func attack() -> void:
 		animation_player.play(anim_name, -1.0, anim_speed)
 
 	# Fase ayunan aktif (wind-up selesai, pedang menyapu maju ke arah musuh)
-	var hit_start_time: float = attack_dur * 0.16
-	var hit_active_duration: float = attack_dur * 0.38
+	var hit_start_time: float = combo_hit_delays[current_step] if current_step < combo_hit_delays.size() else (attack_dur * 0.16)
+	var hit_active_duration: float = combo_hit_durations[current_step] if current_step < combo_hit_durations.size() else (attack_dur * 0.38)
+
+	# Untuk combo finisher #3 (slash_3), timing hit tepat saat pedang mendarat dan menghantam tanah (keyframe 1.50s pada klip animasi)
+	if current_step == 2:
+		hit_start_time = 1.50 / anim_speed
 
 	await get_tree().create_timer(hit_start_time).timeout
 	if not is_inside_tree() or GlobalLogic.is_dead:
 		return
 
-	# TEPAT saat pedang mengayun maju: pemicu efek visual tebasan & dorongan lunge!
+	# TEPAT saat pedang mengayun maju atau menghantam tanah: pemicu efek visual tebasan & dorongan lunge!
 	_trigger_slash_arc(current_step, hit_active_duration)
 	_perform_attack_lunge(current_step)
 
@@ -746,9 +755,9 @@ func attack() -> void:
 		var slam_forward := mesh_instance.global_transform.basis.z if mesh_instance else global_transform.basis.z
 		slam_forward.y = 0.0
 		slam_forward = slam_forward.normalized()
-		var slam_pos := global_position + (slam_forward * 1.35)
+		var slam_pos := global_position + (slam_forward * 1.45)
 		slam_pos.y = global_position.y + 0.03
-		_spawn_ground_slam_shockwave(slam_pos, 1.45)
+		_spawn_ground_slam_shockwave(slam_pos, 1.5)
 		if camera_pivot:
 			if camera_pivot.has_method("add_trauma"):
 				camera_pivot.add_trauma(0.65)

@@ -44,9 +44,12 @@ func _animate_shockwave() -> void:
 		dust_debris.emitting = true
 
 	if shockwave_ring and shockwave_ring.material_override:
-		var mat := shockwave_ring.material_override as StandardMaterial3D
-		if mat:
+		var base_mat := shockwave_ring.material_override as StandardMaterial3D
+		if base_mat:
+			var mat := base_mat.duplicate() as StandardMaterial3D
+			shockwave_ring.material_override = mat
 			mat.albedo_color = Color(1.0, 0.82, 0.45, 0.85)
+			shockwave_ring.scale = Vector3(0.3, 0.04, 0.3)
 			var tw := create_tween()
 			tw.set_parallel(true)
 			tw.tween_property(shockwave_ring, "scale", Vector3(3.2, 0.04, 3.2), 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
