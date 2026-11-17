@@ -12,7 +12,7 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 @export var air_control: float = 0.3
 @export var coyote_time: float = 0.12
 
-@export_group("Combat - Attack")
+@export_group("Combat - Attack & Combo")
 @export var base_damage: float = 15.0
 @export var attack_cooldown: float = 0.35
 @export var base_knockback_force: float = 9.0
@@ -26,6 +26,11 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 @export var attack_recovery_duration: float = 0.15
 @export var attack_lunge_speed: float = 4.2
 @export var attack_lunge_duration: float = 0.08
+@export var combo_window: float = 0.95
+@export var combo_damage_multipliers: Array[float] = [1.0, 1.3, 1.8]
+@export var combo_knockback_multipliers: Array[float] = [1.0, 1.25, 1.7]
+@export var combo_speed_scales: Array[float] = [1.8, 1.8, 2.0]
+@export var combo_durations: Array[float] = [0.42, 0.45, 0.65]
 
 @export_group("Combat - Defense & Recoil")
 @export var invulnerability_duration: float = 0.6
@@ -63,6 +68,13 @@ var can_attack: bool = true
 var locked_target: Node3D = null
 var is_holding_z_target: bool = false
 
+var combo_index: int = 0
+var combo_timer: float = 0.0
+var _attack_start_rig_pos: Vector3 = Vector3.ZERO
+var _idle_rig_pos: Vector3 = Vector3.ZERO
+var _current_combo_damage_mult: float = 1.0
+var _current_combo_kb_mult: float = 1.0
+
 var is_invulnerable: bool = false
 var knockback_timer: float = 0.0
 var _hit_targets_this_swing: Array[Node] = []
@@ -83,6 +95,7 @@ var _character_meshes: Array[MeshInstance3D] = []
 
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var mesh_instance: Node3D = $Ranger if has_node("Ranger") else ($MeshInstance if has_node("MeshInstance") else self)
+@onready var character_rig: Node3D = mesh_instance.find_child("Rig_Medium", true, false) as Node3D if mesh_instance else null
 @onready var animation_player: AnimationPlayer = $AnimationPlayer if has_node("AnimationPlayer") else null
 @onready var weapon_pivot: Node3D = %WeaponPivot if has_node("%WeaponPivot") else ($Ranger/WeaponPivot if has_node("Ranger/WeaponPivot") else ($MeshInstance/WeaponPivot if has_node("MeshInstance/WeaponPivot") else null))
 @onready var hitbox: Area3D = %Hitbox
@@ -100,8 +113,10 @@ func _ready() -> void:
 	_setup_flash_material()
 	_setup_dash_material()
 	_setup_deflect_audio()
+	if character_rig:
+		_idle_rig_pos = character_rig.position
 	if animation_player:
-		animation_player.playback_default_blend_time = 0.2
+		animation_player.playback_default_blend_time = 0.15
 		if animation_player.has_animation("idle"):
 			animation_player.play("idle")
 
@@ -172,11 +187,15 @@ func _trigger_slash_arc() -> void:
 		return
 	slash_arc.visible = true
 	var arc_color := Color(1.0, 0.25, 0.2, 0.85) if GlobalLogic.is_berserk_active else (Color(1.0, 0.8, 0.2, 0.85) if GlobalLogic.is_strength_active else Color(1.0, 1.0, 1.0, 0.85))
+	if combo_index == 2:
+		arc_color = Color(1.0, 0.55, 0.15, 0.95)
 	slash_arc_mat.albedo_color = arc_color
-	slash_arc.scale = Vector3(0.8, 0.04, 0.8)
+	var initial_scale := Vector3(1.0, 0.04, 1.0) if combo_index == 2 else Vector3(0.8, 0.04, 0.8)
+	var target_scale := Vector3(1.6, 0.04, 1.6) if combo_index == 2 else Vector3(1.3, 0.04, 1.3)
+	slash_arc.scale = initial_scale
 
 	var tw := create_tween()
-	tw.tween_property(slash_arc, "scale", Vector3(1.3, 0.04, 1.3), attack_slash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(slash_arc, "scale", target_scale, attack_slash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tw.parallel().tween_property(slash_arc_mat, "albedo_color:a", 0.0, attack_slash_duration).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func():
 		if is_instance_valid(slash_arc):
@@ -199,6 +218,10 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
+	combo_timer = maxf(0.0, combo_timer - delta)
+	if combo_timer <= 0.0 and not is_attacking:
+		combo_index = 0
+
 	if locked_target != null:
 		if not is_instance_valid(locked_target) or locked_target.get("is_dead") == true or global_position.distance_to(locked_target.global_position) > 22.0:
 			locked_target = null
@@ -209,7 +232,7 @@ func _physics_process(delta: float) -> void:
 		coyote_timer -= delta
 		velocity.y -= gravity * delta
 
-	if Input.is_action_just_pressed("ui_accept") and coyote_timer > 0.0:
+	if Input.is_action_just_pressed("ui_accept") and coyote_timer > 0.0 and not is_attacking:
 		velocity.y = jump_force
 		coyote_timer = 0.0
 
@@ -237,6 +260,10 @@ func _physics_process(delta: float) -> void:
 			mesh_instance.scale = Vector3.ONE
 			if _get_model_material_override() == dash_material:
 				_set_model_material_override(null)
+	elif is_attacking:
+		# Selama combo attack, redam velocity gerak agar animasi serangan memimpin pergerakan
+		velocity.x = move_toward(velocity.x, 0.0, target_speed * 3.0 * delta)
+		velocity.z = move_toward(velocity.z, 0.0, target_speed * 3.0 * delta)
 	elif lunge_timer > 0.0:
 		lunge_timer -= delta
 		velocity.x = lunge_direction.x * attack_lunge_speed
@@ -284,13 +311,14 @@ func _update_animation(direction: Vector3, is_sprinting: bool) -> void:
 	if not animation_player or GlobalLogic.is_dead:
 		return
 
+	if is_attacking:
+		return
+
 	if not is_on_floor():
-		if velocity.y > 0.8:
-			if animation_player.has_animation("jump_start"):
-				_play_anim("jump_start")
-		elif velocity.y < -0.8:
-			if animation_player.has_animation("jump_idle"):
-				_play_anim("jump_idle")
+		if animation_player.has_animation("jump"):
+			_play_anim("jump")
+		elif animation_player.has_animation("jump_idle"):
+			_play_anim("jump_idle")
 		return
 
 	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
@@ -509,13 +537,29 @@ func _find_soft_target() -> Node3D:
 
 	return best_target
 
+const COMBO_ANIMATIONS: Array[StringName] = [&"slash_1", &"slash_2", &"slash_3"]
+
 func attack() -> void:
+	if not can_attack or GlobalLogic.is_dead:
+		return
+
 	can_attack = false
 	is_attacking = true
 	_hit_targets_this_swing.clear()
 
-	var target_to_face: Node3D = locked_target if (locked_target and is_instance_valid(locked_target)) else _find_soft_target()
+	var current_step: int = combo_index % COMBO_ANIMATIONS.size()
+	var anim_name: StringName = COMBO_ANIMATIONS[current_step]
+	var anim_speed: float = combo_speed_scales[current_step] if current_step < combo_speed_scales.size() else 1.8
+	var attack_dur: float = combo_durations[current_step] if current_step < combo_durations.size() else 0.45
+	_current_combo_damage_mult = combo_damage_multipliers[current_step] if current_step < combo_damage_multipliers.size() else 1.0
+	_current_combo_kb_mult = combo_knockback_multipliers[current_step] if current_step < combo_knockback_multipliers.size() else 1.0
 
+	# Catat posisi awal rig sebelum animasi diputar
+	if character_rig:
+		_attack_start_rig_pos = character_rig.position
+
+	# Hadapkan karakter ke target (Z-targeting / auto-target / arah kamera)
+	var target_to_face: Node3D = locked_target if (locked_target and is_instance_valid(locked_target)) else _find_soft_target()
 	if target_to_face and is_instance_valid(target_to_face):
 		var to_enemy: Vector3 = target_to_face.global_position - global_position
 		to_enemy.y = 0.0
@@ -528,19 +572,21 @@ func attack() -> void:
 		if forward.length_squared() > 0.01:
 			mesh_instance.rotation.y = atan2(forward.x, forward.z)
 
-	var damage := base_damage
-	if GlobalLogic.is_berserk_active:
-		damage *= berserk_damage_multiplier
-	elif GlobalLogic.is_strength_active:
-		damage *= strength_damage_multiplier
+	# Mainkan animasi serangan di AnimationPlayer
+	if animation_player and animation_player.has_animation(anim_name):
+		animation_player.stop()
+		animation_player.play(anim_name, -1.0, anim_speed)
 
-	lunge_direction = Vector3(sin(mesh_instance.rotation.y), 0.0, cos(mesh_instance.rotation.y)).normalized()
-	lunge_timer = attack_lunge_duration
+	# Efek visual tebasan
 	_trigger_slash_arc()
 
-	var tween := create_tween()
-	tween.tween_property(weapon_pivot, "rotation:y", deg_to_rad(attack_slash_angle_deg), attack_slash_duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(weapon_pivot, "rotation:y", 0.0, attack_recovery_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	# Aktifkan hitbox saat fase tebasan aktif
+	var hit_start_time: float = attack_dur * 0.20
+	var hit_active_duration: float = attack_dur * 0.45
+
+	await get_tree().create_timer(hit_start_time).timeout
+	if not is_inside_tree() or GlobalLogic.is_dead:
+		return
 
 	hitbox.monitoring = true
 	var bodies := hitbox.get_overlapping_bodies()
@@ -549,12 +595,38 @@ func attack() -> void:
 		if target:
 			_apply_hit_to_target(target)
 
-	await get_tree().create_timer(attack_slash_duration).timeout
+	await get_tree().create_timer(hit_active_duration).timeout
+	if not is_inside_tree():
+		return
 	hitbox.monitoring = false
-	is_attacking = false
 
-	await get_tree().create_timer(maxf(0.01, attack_cooldown - attack_slash_duration)).timeout
+	var remaining_time: float = maxf(0.01, attack_dur - (hit_start_time + hit_active_duration))
+	await get_tree().create_timer(remaining_time).timeout
+	if not is_inside_tree() or GlobalLogic.is_dead:
+		return
+
+	# Terapkan pergeseran root motion animasi ke posisi fisik karakter
+	_apply_animation_root_displacement()
+
+	# Selesaikan serangan dan perbarui urutan combo
+	is_attacking = false
+	combo_index = (combo_index + 1) % COMBO_ANIMATIONS.size()
+	combo_timer = combo_window
+
+	# Jeda cooldown kecil sebelum pukulan berikutnya bisa dimulai
+	await get_tree().create_timer(0.04).timeout
 	can_attack = true
+
+func _apply_animation_root_displacement() -> void:
+	if not character_rig or not mesh_instance:
+		return
+	var current_rig_pos: Vector3 = character_rig.position
+	var delta_local: Vector3 = current_rig_pos - _attack_start_rig_pos
+	delta_local.y = 0.0
+	if delta_local.length_squared() > 0.0004:
+		var world_displacement: Vector3 = mesh_instance.global_transform.basis * delta_local
+		move_and_collide(world_displacement)
+		character_rig.position -= delta_local
 
 func _resolve_damage_target(node: Node) -> Node:
 	if not node or node == self:
@@ -572,8 +644,8 @@ func _apply_hit_to_target(target: Node) -> void:
 		return
 	_hit_targets_this_swing.append(target)
 
-	var damage := base_damage
-	var kb_force: float = base_knockback_force
+	var damage := base_damage * _current_combo_damage_mult
+	var kb_force: float = base_knockback_force * _current_combo_kb_mult
 	if GlobalLogic.is_berserk_active:
 		damage *= berserk_damage_multiplier
 		kb_force *= berserk_knockback_multiplier
@@ -592,8 +664,10 @@ func _apply_hit_to_target(target: Node) -> void:
 	GlobalLogic.hit_stop(0.05, 0.05)
 	if camera_pivot:
 		var is_buffed: bool = GlobalLogic.is_berserk_active or GlobalLogic.is_strength_active
-		var trauma_val: float = 0.65 if is_buffed else 0.42
-		var punch_val: float = 2.4 if is_buffed else 1.5
+		var trauma_base: float = 0.75 if (combo_index == 2) else (0.50 if (combo_index == 1) else 0.38)
+		var punch_base: float = 3.0 if (combo_index == 2) else (2.0 if (combo_index == 1) else 1.4)
+		var trauma_val: float = trauma_base * (1.3 if is_buffed else 1.0)
+		var punch_val: float = punch_base * (1.4 if is_buffed else 1.0)
 		if camera_pivot.has_method("add_trauma"):
 			camera_pivot.add_trauma(trauma_val)
 		if camera_pivot.has_method("fov_punch"):
