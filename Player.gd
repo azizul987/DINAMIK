@@ -942,28 +942,39 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 		animation_player.queue("idle")
 
 func _on_potion_consumed(potion_name: String) -> void:
+	var flash_col := Color(0.25, 1.0, 0.5, 0.95)
 	match potion_name:
 		"healing":
+			flash_col = Color(0.25, 1.0, 0.5, 0.95)
 			_spawn_player_floating_text("+35 HP", Color(0.35, 1.0, 0.5, 1.0), 32, 0.75, 0.6)
 			await get_tree().create_timer(0.08).timeout
 			_spawn_player_floating_text("+15 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.95, 0.6)
 		"strength":
+			flash_col = Color(1.0, 0.75, 0.2, 0.95)
 			_spawn_player_floating_text("+20 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
 		"slow":
+			flash_col = Color(0.3, 0.85, 1.0, 0.95)
 			_spawn_player_floating_text("+15 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
 		"berserk":
+			flash_col = Color(1.0, 0.15, 0.25, 0.98)
 			_spawn_player_floating_text("+35 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
 		"ironskin":
+			flash_col = Color(0.9, 0.95, 1.0, 0.95)
 			_spawn_player_floating_text("+20 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
-	_trigger_potion_mesh_flash()
+	_trigger_potion_mesh_flash(flash_col)
 
-func _trigger_potion_mesh_flash() -> void:
+	if mesh_instance:
+		mesh_instance.scale = Vector3(1.15, 0.85, 1.15)
+		var tw := create_tween()
+		tw.tween_property(mesh_instance, "scale", Vector3.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func _trigger_potion_mesh_flash(col: Color = Color(0.25, 1.0, 0.5, 0.85)) -> void:
 	if not mesh_instance or not flash_material:
 		return
-	flash_material.albedo_color = Color(0.25, 1.0, 0.5, 0.85)
+	flash_material.albedo_color = col
 	_set_model_material_override(flash_material)
 	var tw := create_tween()
-	tw.tween_interval(0.12)
+	tw.tween_interval(0.14)
 	tw.tween_callback(func():
 		if is_instance_valid(mesh_instance) and not is_invulnerable:
 			_set_model_material_override(null)

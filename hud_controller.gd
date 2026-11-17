@@ -300,12 +300,21 @@ func _on_craft_button_pressed(potion_name: String, btn: Button, row: Control) ->
 		var tw_btn := btn.create_tween()
 		tw_btn.tween_property(btn, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-		# 2. Row flash in signature potion color
+		# 2. Row flash in signature potion color & icon pop
 		var tint: Color = _get_potion_color(potion_name)
 		if row:
 			row.modulate = tint * 1.5
 			var tw_row := row.create_tween()
 			tw_row.tween_property(row, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			var row_icon := row.find_child("Icon", true, false) as Control
+			if row_icon:
+				row_icon.pivot_offset = row_icon.size * 0.5
+				row_icon.scale = Vector2(1.5, 1.5)
+				row_icon.rotation = deg_to_rad(-16.0)
+				var tw_icon := row_icon.create_tween()
+				tw_icon.set_parallel(true)
+				tw_icon.tween_property(row_icon, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+				tw_icon.tween_property(row_icon, "rotation", 0.0, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 		# 3. Particle burst of alchemical sparks
 		_spawn_alchemy_spark_burst(btn.global_position + (btn.size * 0.5), tint)
