@@ -39,7 +39,7 @@ albedo_color = Color(0.25, 0.18, 0.12, 1)
 roughness = 0.8
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
-size = Vector3(2.4, 1.4, 2.0)
+size = Vector3(2.4, 1.4, 2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slash"]
 transparency = 1
@@ -58,7 +58,6 @@ transparency = 1
 blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(1, 1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_spark"]
 material = SubResource("StandardMaterial3D_spark")
@@ -216,20 +215,20 @@ unique_name_in_owner = true
 [node name="SlashAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=715]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-max_distance = 25.0
 unit_size = 2.5
+max_distance = 25.0
 
 [node name="SlashHitAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=716]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-max_distance = 25.0
 unit_size = 2.5
+max_distance = 25.0
 
 [node name="FootstepAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=709]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-max_distance = 18.0
 unit_size = 2.0
+max_distance = 18.0
 
 [node name="CameraPivot" type="Node3D" parent="Players" unique_id=1336900825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
