@@ -261,8 +261,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed and not event.echo):
 		return
 
-	if event.keycode == KEY_C:
+	if event.keycode == KEY_C or event.keycode == KEY_TAB:
 		toggle_crafting()
+		get_viewport().set_input_as_handled()
 		return
 
 	match event.keycode:

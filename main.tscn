@@ -892,14 +892,15 @@ shape = SubResource("ConcavePolygonShape3D_6dlmt")
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -9.020089, 0.33593762, 10.992659)
 mesh = SubResource("ArrayMesh_4caia")
 script = ExtResource("15_door")
-open_mode = 2
+open_mode = 1
+required_potion = 1
 
 [node name="DoorAudio" type="AudioStreamPlayer3D" parent="door2" unique_id=1758182394]
 max_distance = 40.0
 
 [node name="SealLight" type="OmniLight3D" parent="door2" unique_id=2100000015]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
-light_color = Color(1, 0.72, 0.15, 1)
+light_color = Color(1, 0.22, 0.25, 1)
 light_energy = 1.2
 omni_range = 3.5
 

@@ -217,7 +217,7 @@ func trigger_teleport(_player_node: Node3D = null) -> void:
 		_is_surging = false
 		player_entered.emit(self, target_scene_path)
 		if not target_scene_path.is_empty() and ResourceLoader.exists(target_scene_path):
-			if portal_id == "portal_no_tutor":
+			if portal_id == "portal_no_tutor" or target_scene_path == "res://safe_room.tscn":
 				GlobalLogic.complete_tutorial()
 			get_tree().change_scene_to_file(target_scene_path)
 	)

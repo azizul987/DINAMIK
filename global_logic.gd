@@ -14,6 +14,7 @@ enum ToxicityStage { SAFE, MODERATE, HIGH, OVERDOSE }
 
 var current_floor: int = 1
 var is_tutorial_active: bool = true
+var is_tutorial_completed: bool = false
 var current_tutorial_step: int = 0
 var max_hp: float = 100.0
 var current_hp: float = 100.0
@@ -337,7 +338,8 @@ func set_tutorial_step(step: int) -> void:
 
 func complete_tutorial() -> void:
 	is_tutorial_active = false
-	current_tutorial_step = 4
+	is_tutorial_completed = true
+	current_tutorial_step = 8
 	tutorial_completed.emit()
 
 func reset_game_state() -> void:
@@ -355,6 +357,7 @@ func reset_game_state() -> void:
 	max_toxicity = 100.0
 	current_tutorial_step = 0
 	is_tutorial_active = true
+	is_tutorial_completed = false
 	materials = {
 		"slime_gel": 0,
 		"fire_essence": 0,

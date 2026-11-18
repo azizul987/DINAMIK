@@ -60,6 +60,11 @@ func _ready() -> void:
 	_setup_visual_seal()
 
 	if GlobalLogic:
+		if GlobalLogic.is_tutorial_completed:
+			position = opened_position
+			is_open = true
+			if seal_light:
+				seal_light.visible = false
 		if not GlobalLogic.tutorial_completed.is_connected(_on_tutorial_completed):
 			GlobalLogic.tutorial_completed.connect(_on_tutorial_completed)
 		if not GlobalLogic.tutorial_step_changed.is_connected(_on_tutorial_step_changed):
