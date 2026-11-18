@@ -34,6 +34,10 @@ static var _cached_hit_stream: AudioStreamWAV = null
 @onready var hit_audio: AudioStreamPlayer3D = $HitAudio if has_node("HitAudio") else null
 
 func _ready() -> void:
+	set_process(false)
+	set_physics_process(false)
+	collision_layer = 1
+	collision_mask = 0
 	current_health = max_health
 	_initial_scale = scale
 	add_to_group("destructible_props")
@@ -97,6 +101,8 @@ func destroy_prop() -> void:
 	is_destroyed = true
 	prop_destroyed.emit()
 
+	collision_layer = 0
+	collision_mask = 0
 	if collision_shape:
 		collision_shape.set_deferred("disabled", true)
 

@@ -34,13 +34,17 @@ var current_magnet_speed: float = 0.0
 
 var drop_material: StandardMaterial3D = null
 var player_ref: Node3D = null
-var _pickup_stream: AudioStreamWAV = null
+static var _cached_pickup_stream: AudioStreamWAV = null
 
 func _ready() -> void:
 	add_to_group("item_drops")
 	_setup_nodes()
 	_setup_pickup_audio()
 	set_drop_color(item_color)
+
+	var players := get_tree().get_nodes_in_group("player")
+	if players.size() > 0:
+		player_ref = players[0] as Node3D
 
 	velocity = Vector3(
 		randf_range(-pop_spread_xz, pop_spread_xz),
@@ -81,6 +85,13 @@ func _setup_pickup_audio() -> void:
 	if not pickup_audio and has_node("PickupAudio"):
 		pickup_audio = $PickupAudio as AudioStreamPlayer
 
+	if _cached_pickup_stream == null:
+		_cached_pickup_stream = _generate_pickup_sound()
+
+	if pickup_audio:
+		pickup_audio.stream = _cached_pickup_stream
+
+static func _generate_pickup_sound() -> AudioStreamWAV:
 	var sample_hz := 22050.0
 	var dur := 0.22
 	var total_samples := int(sample_hz * dur)
@@ -95,13 +106,11 @@ func _setup_pickup_audio() -> void:
 		var val := int((sin(t * freq * TAU) + 0.3 * sin(t * freq * 2.0 * TAU)) * env * 0.45 * 32767.0)
 		buffer.encode_s16(i * 2, val)
 
-	_pickup_stream = AudioStreamWAV.new()
-	_pickup_stream.format = AudioStreamWAV.FORMAT_16_BITS
-	_pickup_stream.mix_rate = int(sample_hz)
-	_pickup_stream.data = buffer
-
-	if pickup_audio:
-		pickup_audio.stream = _pickup_stream
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_hz)
+	stream.data = buffer
+	return stream
 
 func _physics_process(delta: float) -> void:
 	if current_state == State.COLLECTED:
@@ -202,8 +211,8 @@ func _collect() -> void:
 
 func _play_pickup_chime() -> void:
 	if pickup_audio:
-		if not pickup_audio.stream and _pickup_stream:
-			pickup_audio.stream = _pickup_stream
+		if not pickup_audio.stream and _cached_pickup_stream:
+			pickup_audio.stream = _cached_pickup_stream
 		pickup_audio.reparent(get_tree().root)
 		pickup_audio.play()
 		pickup_audio.finished.connect(pickup_audio.queue_free)
