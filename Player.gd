@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody3D
 
 const DASH_GHOST_SCENE: PackedScene = preload("res://dash_ghost.tscn")
+const DASH_WIND_SCENE: PackedScene = preload("res://dash_wind_effect.tscn")
 const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 const FOOTSTEP_DUST_SCENE: PackedScene = preload("res://footstep_dust.tscn")
 const GROUND_SLAM_SCENE: PackedScene = preload("res://ground_slam_shockwave.tscn")
@@ -49,7 +50,7 @@ const GROUND_SLAM_SCENE: PackedScene = preload("res://ground_slam_shockwave.tscn
 @export var dash_duration: float = 0.18
 @export var dash_cooldown: float = 0.5
 @export var dash_ghost_interval: float = 0.045
-@export var dash_ghost_color: Color = Color(0.65, 0.08, 0.12, 0.55)
+@export var dash_ghost_color: Color = Color(0.85, 0.95, 1.0, 0.45)
 
 @export_group("Target Lock-On")
 @export var lock_on_max_distance: float = 18.0
@@ -715,7 +716,23 @@ func dash() -> void:
 	if camera_pivot and camera_pivot.has_method("fov_punch"):
 		camera_pivot.fov_punch(-4.5, dash_duration + 0.10)
 
+	_spawn_dash_wind_effect(dash_direction)
 	_spawn_ghost_trail()
+
+func _spawn_dash_wind_effect(dir: Vector3) -> void:
+	if not is_inside_tree() or not DASH_WIND_SCENE:
+		return
+	var parent_node := get_parent()
+	if not parent_node:
+		parent_node = get_tree().current_scene
+	if not parent_node:
+		return
+	var wind := DASH_WIND_SCENE.instantiate() as DashWindEffect
+	if not wind:
+		return
+	parent_node.add_child(wind)
+	wind.global_position = global_position + Vector3(0.0, 0.85, 0.0)
+	wind.setup(dir)
 
 func _spawn_ghost_trail() -> void:
 	if not is_inside_tree() or not DASH_GHOST_SCENE:

@@ -1,6 +1,6 @@
-[gd_resource type="ArrayMesh" format=4]
+[gd_resource type="ArrayMesh" format=4 uid="uid://cfkx7fyx3ifxh"]
 
-[ext_resource type="Material" path="res://DungeonTiles/material/PropSet_1_Mat.tres" id="1_ffxdw"]
+[ext_resource type="Material" uid="uid://c87df5igj8fvv" path="res://DungeonTiles/material/PropSet_1_Mat.tres" id="1_ffxdw"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_aw5p5"]
 _surfaces = [{

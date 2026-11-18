@@ -22,8 +22,8 @@
 [ext_resource type="ArrayMesh" uid="uid://fltpsydjryp5" path="res://resources/weapon/OBJ/Axe.obj" id="20_ryguw"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
 [ext_resource type="AnimationLibrary" uid="uid://uyrmce8vk617" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
-[ext_resource type="PackedScene" path="res://destructible_chest.tscn" id="27_chest"]
-[ext_resource type="PackedScene" path="res://destructible_box.tscn" id="28_box"]
+[ext_resource type="PackedScene" uid="uid://c8dstchest01" path="res://destructible_chest.tscn" id="27_chest"]
+[ext_resource type="PackedScene" uid="uid://b6dstbox0001" path="res://destructible_box.tscn" id="28_box"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -941,7 +941,7 @@ mesh = ExtResource("20_ryguw")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0.35, 12.5)
 
 [node name="Box_1" parent="." unique_id=2100000031 instance=ExtResource("28_box")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.0, 0.35, 13.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.35, 13.5)
 
 [node name="Box_2" parent="." unique_id=2100000032 instance=ExtResource("28_box")]
-transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -12.0, 0.35, 11.2)
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -12, 0.35, 11.2)

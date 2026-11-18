@@ -347,10 +347,6 @@ func _advance_from_craft_healing() -> void:
 		_show_step_done("✓ Healing Potion diracik")
 		step_completed.emit(Step.CRAFT_HEALING)
 
-		var d1 := _get_door()
-		if d1 and not d1.is_open:
-			d1.open_door()
-
 		await get_tree().create_timer(1.2).timeout
 		start_step(Step.USE_HEALING)
 
@@ -369,6 +365,10 @@ func _on_potion_consumed(potion_name: String) -> void:
 			_play_chime()
 			_show_step_done("✓ Ramuan diminum")
 			step_completed.emit(Step.USE_HEALING)
+
+			var d1 := _get_door()
+			if d1 and not d1.is_open:
+				d1.open_door()
 
 			await get_tree().create_timer(1.2).timeout
 			start_step(Step.COMBAT)
