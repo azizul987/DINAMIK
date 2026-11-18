@@ -41,6 +41,17 @@ outer_radius = 0.65
 rings = 24
 ring_segments = 6
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spark"]
+transparency = 1
+blend_mode = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_spark"]
+material = SubResource("StandardMaterial3D_spark")
+size = Vector3(0.04, 0.04, 0.16)
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_toxic"]
 shader = ExtResource("12_toxic_shader")
 shader_parameter/toxicity_ratio = 0.0
@@ -137,6 +148,35 @@ transform = Transform3D(1, 0, 0, 0, 0.05, 0, 0, 0, 1, 0, 0, 0.3)
 visible = false
 mesh = SubResource("TorusMesh_slash")
 
+[node name="SlashArcCore" type="MeshInstance3D" parent="Players/Ranger/WeaponPivot" unique_id=712]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 0.05, 0, 0, 0, 1, 0, 0, 0.3)
+visible = false
+mesh = SubResource("TorusMesh_slash")
+
+[node name="SlashArcTrail" type="MeshInstance3D" parent="Players/Ranger/WeaponPivot" unique_id=714]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 0.05, 0, 0, 0, 1, 0, 0, 0.3)
+visible = false
+mesh = SubResource("TorusMesh_slash")
+
+[node name="SlashSparks" type="CPUParticles3D" parent="Players/Ranger/WeaponPivot" unique_id=713]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
+emitting = false
+amount = 24
+lifetime = 0.22
+one_shot = true
+explosiveness = 0.92
+mesh = SubResource("BoxMesh_spark")
+direction = Vector3(0, 0, 1)
+spread = 60.0
+gravity = Vector3(0, -4, 0)
+initial_velocity_min = 5.0
+initial_velocity_max = 10.0
+scale_amount_min = 0.8
+scale_amount_max = 1.6
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Players" unique_id=110357959]
 root_node = NodePath("../Ranger")
 libraries/ = ExtResource("26_player_anim")
@@ -144,6 +184,18 @@ autoplay = &"idle"
 
 [node name="DeflectAudio" type="AudioStreamPlayer" parent="Players" unique_id=708]
 unique_name_in_owner = true
+
+[node name="SlashAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=715]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+max_distance = 25.0
+unit_size = 2.5
+
+[node name="SlashHitAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=716]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+max_distance = 25.0
+unit_size = 2.5
 
 [node name="FootstepAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=709]
 unique_name_in_owner = true

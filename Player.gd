@@ -111,11 +111,18 @@ var dash_cooldown_timer: float = 0.0
 var dash_direction: Vector3 = Vector3.ZERO
 var dash_ghost_timer: float = 0.0
 
+const HIT_SPARK_PREFAB: PackedScene = preload("res://hit_spark.tscn")
+
 var slash_arc_mat: StandardMaterial3D = null
+var slash_arc_core_mat: StandardMaterial3D = null
+var slash_arc_trail_mat: StandardMaterial3D = null
 var flash_material: StandardMaterial3D = null
 var dash_material: StandardMaterial3D = null
 var _hit_blink_tween: Tween = null
 var _character_meshes: Array[MeshInstance3D] = []
+
+static var _cached_slash_whoosh_wav: AudioStreamWAV = null
+static var _cached_slash_hit_wav: AudioStreamWAV = null
 
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var mesh_instance: Node3D = $Ranger if has_node("Ranger") else ($MeshInstance if has_node("MeshInstance") else self)
@@ -124,7 +131,12 @@ var _character_meshes: Array[MeshInstance3D] = []
 @onready var weapon_pivot: Node3D = %WeaponPivot if has_node("%WeaponPivot") else ($Ranger/WeaponPivot if has_node("Ranger/WeaponPivot") else ($MeshInstance/WeaponPivot if has_node("MeshInstance/WeaponPivot") else null))
 @onready var hitbox: Area3D = %Hitbox
 @onready var slash_arc: MeshInstance3D = %SlashArc if has_node("%SlashArc") else null
+@onready var slash_arc_core: MeshInstance3D = %SlashArcCore if has_node("%SlashArcCore") else null
+@onready var slash_arc_trail: MeshInstance3D = %SlashArcTrail if has_node("%SlashArcTrail") else null
+@onready var slash_sparks: CPUParticles3D = %SlashSparks if has_node("%SlashSparks") else null
 @onready var deflect_audio: AudioStreamPlayer = $DeflectAudio if has_node("DeflectAudio") else null
+@onready var slash_audio: AudioStreamPlayer3D = %SlashAudio if has_node("%SlashAudio") else ($SlashAudio if has_node("SlashAudio") else null)
+@onready var slash_hit_audio: AudioStreamPlayer3D = %SlashHitAudio if has_node("%SlashHitAudio") else ($SlashHitAudio if has_node("SlashHitAudio") else null)
 @onready var footstep_audio: AudioStreamPlayer3D = %FootstepAudio if has_node("%FootstepAudio") else ($FootstepAudio if has_node("FootstepAudio") else null)
 
 func _ready() -> void:
@@ -136,6 +148,7 @@ func _ready() -> void:
 	_setup_weapon_attachment()
 	_cache_character_meshes()
 	_setup_slash_arc()
+	_setup_slash_audio()
 	_setup_flash_material()
 	_setup_dash_material()
 	_setup_deflect_audio()
@@ -237,11 +250,18 @@ func _setup_deflect_audio() -> void:
 func _setup_slash_arc() -> void:
 	if not slash_arc and weapon_pivot:
 		slash_arc = weapon_pivot.get_node_or_null("SlashArc") as MeshInstance3D
+	if not slash_arc_core and weapon_pivot:
+		slash_arc_core = weapon_pivot.get_node_or_null("SlashArcCore") as MeshInstance3D
+	if not slash_arc_trail and weapon_pivot:
+		slash_arc_trail = weapon_pivot.get_node_or_null("SlashArcTrail") as MeshInstance3D
+	if not slash_sparks and weapon_pivot:
+		slash_sparks = weapon_pivot.get_node_or_null("SlashSparks") as CPUParticles3D
+
+	var crescent_mesh := load("res://resources/weapon/slash_arc_mesh.tres") as Mesh
+
 	if slash_arc:
-		var crescent_mesh := load("res://resources/weapon/slash_arc_mesh.tres") as Mesh
 		if crescent_mesh:
 			slash_arc.mesh = crescent_mesh
-
 		slash_arc_mat = StandardMaterial3D.new()
 		slash_arc_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		slash_arc_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -250,60 +270,176 @@ func _setup_slash_arc() -> void:
 		slash_arc.material_override = slash_arc_mat
 		slash_arc.visible = false
 
+	if slash_arc_core:
+		if crescent_mesh:
+			slash_arc_core.mesh = crescent_mesh
+		slash_arc_core_mat = StandardMaterial3D.new()
+		slash_arc_core_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		slash_arc_core_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		slash_arc_core_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		slash_arc_core_mat.vertex_color_use_as_albedo = true
+		slash_arc_core_mat.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+		slash_arc_core.material_override = slash_arc_core_mat
+		slash_arc_core.visible = false
+
+	if slash_arc_trail:
+		if crescent_mesh:
+			slash_arc_trail.mesh = crescent_mesh
+		slash_arc_trail_mat = StandardMaterial3D.new()
+		slash_arc_trail_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		slash_arc_trail_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		slash_arc_trail_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		slash_arc_trail_mat.vertex_color_use_as_albedo = true
+		slash_arc_trail.material_override = slash_arc_trail_mat
+		slash_arc_trail.visible = false
+
+func _setup_slash_audio() -> void:
+	if not slash_audio and has_node("%SlashAudio"):
+		slash_audio = %SlashAudio as AudioStreamPlayer3D
+	elif not slash_audio and has_node("SlashAudio"):
+		slash_audio = $SlashAudio as AudioStreamPlayer3D
+
+	if not slash_hit_audio and has_node("%SlashHitAudio"):
+		slash_hit_audio = %SlashHitAudio as AudioStreamPlayer3D
+	elif not slash_hit_audio and has_node("SlashHitAudio"):
+		slash_hit_audio = $SlashHitAudio as AudioStreamPlayer3D
+
+	if not _cached_slash_whoosh_wav:
+		_cached_slash_whoosh_wav = _generate_slash_whoosh_wav()
+	if not _cached_slash_hit_wav:
+		_cached_slash_hit_wav = _generate_slash_hit_wav()
+
+	if slash_audio and not slash_audio.stream:
+		slash_audio.stream = _cached_slash_whoosh_wav
+	if slash_hit_audio and not slash_hit_audio.stream:
+		slash_hit_audio.stream = _cached_slash_hit_wav
+
 func _trigger_slash_arc(step: int, duration: float) -> void:
 	if not slash_arc or not slash_arc_mat or not mesh_instance:
 		return
 
-	var arc_color := Color(0.85, 0.95, 1.0, 0.95)
+	var arc_color := Color(0.25, 0.88, 1.0, 0.95)
+	var spark_color := Color(0.45, 0.92, 1.0, 1.0)
 	if GlobalLogic.is_berserk_active:
-		arc_color = Color(1.0, 0.15, 0.15, 0.98)
+		arc_color = Color(1.0, 0.20, 0.08, 0.98)
+		spark_color = Color(1.0, 0.35, 0.10, 1.0)
 	elif GlobalLogic.is_strength_active:
-		arc_color = Color(1.0, 0.85, 0.2, 0.98)
+		arc_color = Color(1.0, 0.88, 0.22, 0.98)
+		spark_color = Color(1.0, 0.95, 0.40, 1.0)
 	elif step == 2:
-		arc_color = Color(1.0, 0.65, 0.2, 0.98)
+		arc_color = Color(1.0, 0.65, 0.18, 0.98)
+		spark_color = Color(1.0, 0.75, 0.30, 1.0)
 
 	slash_arc_mat.albedo_color = arc_color
+	if slash_arc_core_mat:
+		slash_arc_core_mat.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
+	if slash_arc_trail_mat:
+		slash_arc_trail_mat.albedo_color = Color(arc_color.r, arc_color.g, arc_color.b, 0.45)
 
 	var mesh_yaw := mesh_instance.global_rotation.y
-	slash_arc.global_position = global_position + Vector3(0.0, 0.92, 0.0) + (mesh_instance.global_transform.basis.z * 0.72)
+	var base_pos := global_position + Vector3(0.0, 0.92, 0.0) + (mesh_instance.global_transform.basis.z * 0.75)
+	slash_arc.global_position = base_pos
+	if slash_arc_core:
+		slash_arc_core.global_position = base_pos
+	if slash_arc_trail:
+		slash_arc_trail.global_position = base_pos - (mesh_instance.global_transform.basis.z * 0.08)
 
 	var start_rot := Vector3.ZERO
 	var target_rot_y := mesh_yaw
-	var start_scale := Vector3(0.7, 0.7, 0.7)
-	var target_scale := Vector3(1.35, 1.35, 1.35)
+	var start_scale := Vector3(0.75, 0.75, 0.75)
+	var target_scale := Vector3(1.4, 1.4, 1.4)
 
 	match step:
 		0:
-			start_rot = Vector3(deg_to_rad(-8.0), mesh_yaw + deg_to_rad(40.0), deg_to_rad(6.0))
-			target_rot_y = mesh_yaw - deg_to_rad(50.0)
+			start_rot = Vector3(deg_to_rad(-8.0), mesh_yaw + deg_to_rad(55.0), deg_to_rad(6.0))
+			target_rot_y = mesh_yaw - deg_to_rad(60.0)
 			start_scale = Vector3(0.75, 0.75, 0.75)
-			target_scale = Vector3(1.35, 1.35, 1.35)
-		1:
-			start_rot = Vector3(deg_to_rad(24.0), mesh_yaw - deg_to_rad(45.0), deg_to_rad(-22.0))
-			target_rot_y = mesh_yaw + deg_to_rad(45.0)
-			start_scale = Vector3(0.8, 0.8, 0.8)
 			target_scale = Vector3(1.45, 1.45, 1.45)
+		1:
+			start_rot = Vector3(deg_to_rad(32.0), mesh_yaw - deg_to_rad(55.0), deg_to_rad(-25.0))
+			target_rot_y = mesh_yaw + deg_to_rad(55.0)
+			start_scale = Vector3(0.8, 0.8, 0.8)
+			target_scale = Vector3(1.55, 1.55, 1.55)
 		2:
-			start_rot = Vector3(deg_to_rad(-4.0), mesh_yaw, 0.0)
+			start_rot = Vector3(deg_to_rad(75.0), mesh_yaw, deg_to_rad(-8.0))
 			target_rot_y = mesh_yaw
-			start_scale = Vector3(1.0, 1.0, 1.0)
-			target_scale = Vector3(1.95, 1.95, 1.95)
+			start_scale = Vector3(1.1, 1.1, 1.1)
+			target_scale = Vector3(2.2, 2.2, 2.2)
 
 	slash_arc.global_rotation = start_rot
 	slash_arc.scale = start_scale
 	slash_arc.visible = true
+
+	if slash_arc_core:
+		slash_arc_core.global_rotation = start_rot
+		slash_arc_core.scale = start_scale * 0.88
+		slash_arc_core.visible = true
+
+	if slash_arc_trail:
+		slash_arc_trail.global_rotation = start_rot + Vector3(0.0, deg_to_rad(12.0 if step == 0 else -12.0), 0.0)
+		slash_arc_trail.scale = start_scale * 1.12
+		slash_arc_trail.visible = true
 
 	var tw := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(slash_arc, "scale", target_scale, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	if step != 2:
 		tw.tween_property(slash_arc, "global_rotation:y", target_rot_y, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	else:
+		tw.tween_property(slash_arc, "global_rotation:x", deg_to_rad(5.0), duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	tw.tween_property(slash_arc_mat, "albedo_color:a", 0.0, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	if slash_arc_core and slash_arc_core_mat:
+		tw.tween_property(slash_arc_core, "scale", target_scale * 0.90, duration * 0.85).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		if step != 2:
+			tw.tween_property(slash_arc_core, "global_rotation:y", target_rot_y, duration * 0.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		else:
+			tw.tween_property(slash_arc_core, "global_rotation:x", deg_to_rad(5.0), duration * 0.85).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+		tw.tween_property(slash_arc_core_mat, "albedo_color:a", 0.0, duration * 0.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	if slash_arc_trail and slash_arc_trail_mat:
+		tw.tween_property(slash_arc_trail, "scale", target_scale * 1.18, duration * 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		if step != 2:
+			tw.tween_property(slash_arc_trail, "global_rotation:y", target_rot_y + deg_to_rad(10.0 if step == 0 else -10.0), duration * 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_property(slash_arc_trail_mat, "albedo_color:a", 0.0, duration * 1.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 	tw.chain().tween_callback(func():
 		if is_instance_valid(slash_arc):
 			slash_arc.visible = false
+		if is_instance_valid(slash_arc_core):
+			slash_arc_core.visible = false
+		if is_instance_valid(slash_arc_trail):
+			slash_arc_trail.visible = false
 	)
+
+	if slash_sparks:
+		slash_sparks.color = spark_color
+		slash_sparks.global_position = base_pos
+		var fwd := mesh_instance.global_transform.basis.z
+		fwd.y = 0.0
+		fwd = fwd.normalized()
+		if step == 0:
+			slash_sparks.direction = (fwd + mesh_instance.global_transform.basis.x * -0.6).normalized()
+			slash_sparks.amount = 24
+		elif step == 1:
+			slash_sparks.direction = (fwd + mesh_instance.global_transform.basis.x * 0.6 + Vector3(0.0, 0.4, 0.0)).normalized()
+			slash_sparks.amount = 26
+		else:
+			slash_sparks.direction = (fwd + Vector3(0.0, 0.35, 0.0)).normalized()
+			slash_sparks.amount = 38
+		slash_sparks.restart()
+		slash_sparks.emitting = true
+
+	if slash_audio:
+		var pitch := 1.15
+		match step:
+			0: pitch = 1.18
+			1: pitch = 1.34
+			2: pitch = 0.76
+		if GlobalLogic.is_berserk_active:
+			pitch *= 1.12
+		slash_audio.pitch_scale = pitch * randf_range(0.96, 1.04)
+		slash_audio.play()
 
 func _perform_attack_lunge(step: int) -> void:
 	if not is_on_floor() or not mesh_instance:
@@ -758,6 +894,16 @@ func attack() -> void:
 		var slam_pos := global_position + (slam_forward * 1.45)
 		slam_pos.y = global_position.y + 0.03
 		_spawn_ground_slam_shockwave(slam_pos, 1.5)
+
+		# Pemicu letupan percikan tanah pada titik impak hantaman
+		var ground_spark: Node3D = HIT_SPARK_PREFAB.instantiate() as Node3D
+		if ground_spark:
+			var p_node := get_parent() if get_parent() else get_tree().current_scene
+			if p_node:
+				p_node.add_child(ground_spark)
+				ground_spark.global_position = slam_pos
+				ground_spark.setup(Color(1.0, 0.70, 0.25, 1.0), Vector3.UP)
+
 		if camera_pivot:
 			if camera_pivot.has_method("add_trauma"):
 				camera_pivot.add_trauma(0.65)
@@ -836,6 +982,28 @@ func _apply_hit_to_target(target: Node) -> void:
 	knockback_dir = knockback_dir.normalized()
 
 	target.take_damage(damage, knockback_dir * kb_force)
+
+	# 1. Pemicu efek visual percikan benturan tebasan (Hit Spark)
+	var spark_inst: Node3D = HIT_SPARK_PREFAB.instantiate() as Node3D
+	if spark_inst:
+		var p_node := get_parent() if get_parent() else get_tree().current_scene
+		if p_node:
+			p_node.add_child(spark_inst)
+			var spark_pos: Vector3 = (target.global_position as Vector3) + Vector3(0.0, 0.95, 0.0) if target is Node3D else global_position
+			spark_inst.global_position = spark_pos
+			var hit_spark_color := Color(0.35, 0.90, 1.0, 1.0)
+			if GlobalLogic.is_berserk_active:
+				hit_spark_color = Color(1.0, 0.25, 0.08, 1.0)
+			elif GlobalLogic.is_strength_active:
+				hit_spark_color = Color(1.0, 0.88, 0.20, 1.0)
+			elif combo_index == 2:
+				hit_spark_color = Color(1.0, 0.65, 0.15, 1.0)
+			spark_inst.setup(hit_spark_color, knockback_dir)
+
+	# 2. Audio hantaman tebasan pedang ke musuh (Slash Hit SFX)
+	if slash_hit_audio:
+		slash_hit_audio.pitch_scale = randf_range(0.92, 1.08)
+		slash_hit_audio.play()
 
 	GlobalLogic.hit_stop(0.05, 0.05)
 	if camera_pivot:
@@ -1030,6 +1198,54 @@ static func _generate_footstep_wav() -> AudioStreamWAV:
 		var noise := (randf() * 2.0 - 1.0) * 0.35
 		var tone := sin(t * freq * TAU) * 0.65
 		var val := int((tone + noise) * env * 0.32 * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
+
+static func _generate_slash_whoosh_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var duration := 0.22
+	var total_frames := int(sample_hz * duration)
+	var buffer := PackedByteArray()
+	buffer.resize(total_frames * 2)
+
+	for i in range(total_frames):
+		var t := float(i) / sample_hz
+		var progress := t / duration
+		var env := pow(sin(progress * PI), 1.6)
+		var sweep := lerpf(400.0, 1800.0, sin(progress * PI))
+		var tone := sin(t * sweep * TAU) * 0.4
+		var noise := (randf() * 2.0 - 1.0) * 0.6
+		var sample := (tone + noise) * env * 0.85
+		var val := int(clampf(sample, -1.0, 1.0) * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
+
+static func _generate_slash_hit_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var duration := 0.16
+	var total_frames := int(sample_hz * duration)
+	var buffer := PackedByteArray()
+	buffer.resize(total_frames * 2)
+
+	for i in range(total_frames):
+		var t := float(i) / sample_hz
+		var progress := t / duration
+		var env := exp(-progress * 14.0)
+		var ping := sin(t * 1250.0 * TAU) * 0.5 + sin(t * 2600.0 * TAU) * 0.3
+		var crunch := (randf() * 2.0 - 1.0) * 0.5 * exp(-progress * 22.0)
+		var thump := sin(t * 110.0 * TAU) * 0.6 * exp(-progress * 18.0)
+		var sample := (ping + crunch + thump) * env * 0.95
+		var val := int(clampf(sample, -1.0, 1.0) * 32767.0)
 		buffer.encode_s16(i * 2, val)
 
 	var wav := AudioStreamWAV.new()

@@ -400,22 +400,24 @@ func _pulse_potion_vignette(tint: Color) -> void:
 func _spawn_alchemy_spark_burst(pos: Vector2, tint: Color) -> void:
 	if not ALCHEMY_SPARK_SCENE:
 		return
-	var spark := ALCHEMY_SPARK_SCENE.instantiate() as AlchemySparkBurst
+	var spark := ALCHEMY_SPARK_SCENE.instantiate()
 	if not spark:
 		return
 	add_child(spark)
-	spark.pop(pos, tint)
+	if spark.has_method("pop"):
+		spark.pop(pos, tint)
 
 func _show_alchemy_toast(potion_name: String, tint: Color) -> void:
 	if not ALCHEMY_TOAST_SCENE or not toast_container:
 		return
-	var toast := ALCHEMY_TOAST_SCENE.instantiate() as AlchemyToast
+	var toast := ALCHEMY_TOAST_SCENE.instantiate()
 	if not toast:
 		return
 	toast_container.add_child(toast)
 	var screen_size := get_viewport_rect().size
 	var start_pos := Vector2(screen_size.x * 0.5 - 90.0, screen_size.y * 0.5 - 215.0)
-	toast.pop(potion_name, tint, start_pos)
+	if toast.has_method("pop"):
+		toast.pop(potion_name, tint, start_pos)
 
 func _on_potion_consumed_juice(potion_name: String) -> void:
 	_play_potion_sfx("drink")
