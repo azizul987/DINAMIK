@@ -254,9 +254,27 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -46.
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
 
 [node name="PropSet_2_Shelf006" parent="." unique_id=1724515432 instance=ExtResource("9_dc5vx")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -26.329102, 1.1147106, -4.0578537)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -26.329102, 1.1147106, 3.5053473)
 
 [node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf006" unique_id=1057694713 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
+
+[node name="PropSet_2_Shelf007" parent="." unique_id=1918256679 instance=ExtResource("9_dc5vx")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -26.329102, 1.1147106, -4.0578537)
+
+[node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf007" unique_id=909984417 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
+
+[node name="PropSet_2_Shelf008" parent="." unique_id=905318268 instance=ExtResource("9_dc5vx")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -26.329102, 1.1147106, -11.341238)
+
+[node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf008" unique_id=159361938 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
+
+[node name="PropSet_2_Shelf009" parent="." unique_id=544348669 instance=ExtResource("9_dc5vx")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -26.329102, 1.1147106, -18.95509)
+
+[node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf009" unique_id=543266592 instance=ExtResource("10_s8oj7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
 
 [node name="PropSet_2_Shelf004" parent="." unique_id=1478696616 instance=ExtResource("9_dc5vx")]
@@ -277,11 +295,17 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -46.
 [node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf003" unique_id=932665313 instance=ExtResource("10_s8oj7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
 
+[node name="PropSet_1_Barrel6" parent="PropSet_2_Shelf003" unique_id=486207665 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.848414, 0.5552089, 0.9849396)
+
 [node name="PropSet_1_Barrel4" parent="PropSet_2_Shelf003" unique_id=306360647 instance=ExtResource("10_s8oj7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, 11.302467)
 
 [node name="PropSet_1_Barrel5" parent="PropSet_2_Shelf003" unique_id=1743990759 instance=ExtResource("10_s8oj7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.910152, 0.5552089, 11.302467)
+
+[node name="PropSet_1_Barrel5" parent="PropSet_2_Shelf003/PropSet_1_Barrel5" unique_id=1998944439 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.910152, -0.17548013, 35.147366)
 
 [node name="PropSet_2_Book_4" parent="." unique_id=97420339 instance=ExtResource("11_mw4xc")]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -50.231915, 2.27723, 5.6861877)
@@ -354,6 +378,70 @@ mesh = SubResource("PlaneMesh_lh3ue")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -7.2877765)
 mesh = SubResource("PlaneMesh_lh3ue")
 
+[node name="Darah69" type="MeshInstance3D" parent="." unique_id=516423825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah76" type="MeshInstance3D" parent="." unique_id=2018647765]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.93781, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah77" type="MeshInstance3D" parent="." unique_id=570955036]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.93781, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah78" type="MeshInstance3D" parent="." unique_id=1211453859]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.503627, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah79" type="MeshInstance3D" parent="." unique_id=2100180556]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.615737, 1.1191313, -8.034342)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah80" type="MeshInstance3D" parent="." unique_id=1902122850]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.421892, 1.3266702, -7.7894716)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah81" type="MeshInstance3D" parent="." unique_id=349562175]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.421892, 1.3266702, -4.8558083)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah82" type="MeshInstance3D" parent="." unique_id=40736184]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.421892, 1.3266702, -4.8558083)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah83" type="MeshInstance3D" parent="." unique_id=484509476]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.4727745, 1.3266702, -4.8558083)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah84" type="MeshInstance3D" parent="." unique_id=1331331607]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah70" type="MeshInstance3D" parent="." unique_id=1396216369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -7.2877765)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah71" type="MeshInstance3D" parent="." unique_id=1957204111]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -7.2877765)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah72" type="MeshInstance3D" parent="." unique_id=1014948457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -7.2877765)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah73" type="MeshInstance3D" parent="." unique_id=1857859128]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -7.2877765)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah74" type="MeshInstance3D" parent="." unique_id=1079622468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -7.2877765)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah75" type="MeshInstance3D" parent="." unique_id=2074974512]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.476257, 1.1101274, -9.161997)
+mesh = SubResource("PlaneMesh_lh3ue")
+
 [node name="Darah6" type="MeshInstance3D" parent="." unique_id=215031851]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.457215, 1.1101274, -0.99074364)
 mesh = SubResource("PlaneMesh_lh3ue")
@@ -372,6 +460,50 @@ mesh = SubResource("PlaneMesh_lh3ue")
 
 [node name="Darah10" type="MeshInstance3D" parent="." unique_id=1865801810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.711822, 1.1101274, -5.2539024)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah85" type="MeshInstance3D" parent="." unique_id=945515846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.351704, 1.1101274, -0.52735233)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah86" type="MeshInstance3D" parent="." unique_id=1414827944]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.351704, 1.1101274, 0)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah87" type="MeshInstance3D" parent="." unique_id=2002991183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.57769, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah88" type="MeshInstance3D" parent="." unique_id=1266874121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.57769, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah89" type="MeshInstance3D" parent="." unique_id=1200101496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.143509, 1.1101274, -8.329313)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah90" type="MeshInstance3D" parent="." unique_id=2050390278]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.25562, 1.1191313, -8.034342)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah91" type="MeshInstance3D" parent="." unique_id=86598416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.061773, 1.3266702, -7.7894716)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah92" type="MeshInstance3D" parent="." unique_id=1559022638]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.061773, 1.3266702, -4.8558083)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah93" type="MeshInstance3D" parent="." unique_id=75057828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.061773, 1.3266702, -4.8558083)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah94" type="MeshInstance3D" parent="." unique_id=491087463]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.112656, 1.3266702, -4.8558083)
+mesh = SubResource("PlaneMesh_lh3ue")
+
+[node name="Darah95" type="MeshInstance3D" parent="." unique_id=2096193883]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.351704, 1.1101274, -5.2539024)
 mesh = SubResource("PlaneMesh_lh3ue")
 
 [node name="Darah11" type="MeshInstance3D" parent="." unique_id=116380351]
@@ -617,3 +749,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.967646, 1.7192839, 26.430
 
 [node name="p2_04_bone_lectern2" parent="." unique_id=540466256 instance=ExtResource("26_545ku")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.90557, 1.719284, -7.105428)
+
+[node name="PropSet_1_Box5" parent="." unique_id=474906037 instance=ExtResource("17_iakae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.488471, 1.6358144, 3.4635992)
+
+[node name="PropSet_1_Box6" parent="." unique_id=477714173 instance=ExtResource("17_iakae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.439922, 1.6358135, 4.201316)
