@@ -11,6 +11,20 @@
 [ext_resource type="PackedScene" uid="uid://csienx0lltfyi" path="res://DungeonTiles/scenes/Props/Set_2/prop_set_2_shelf.tscn" id="9_5j5gb"]
 [ext_resource type="MeshLibrary" uid="uid://cja1xmiipdihy" path="res://DungeonTiles/scenes/MeshLibrary/decors.tres" id="10_mx85b"]
 [ext_resource type="MeshLibrary" uid="uid://vcg31mrtc2pk" path="res://DungeonTiles/scenes/MeshLibrary/Platforms.tres" id="11_hx44q"]
+[ext_resource type="PackedScene" uid="uid://djqbm2umf76d7" path="res://resources/Medieval Torture Devices-zip/Torture Device/torture_device_008.fbx" id="12_beq0j"]
+[ext_resource type="PackedScene" uid="uid://bxysqy3idcd3u" path="res://resources/Medieval Torture Devices-zip/Pilory/torture_device_012.fbx" id="13_nauge"]
+[ext_resource type="PackedScene" uid="uid://ffb0q8ic1snp" path="res://resources/Medieval Torture Devices-zip/Iron Maiden/torture_device_007.fbx" id="14_ycv2e"]
+[ext_resource type="PackedScene" uid="uid://da731dh6dgel" path="res://resources/Medieval Torture Devices-zip/Iron chair/torture_device_006.fbx" id="15_c5gc3"]
+[ext_resource type="Texture2D" uid="uid://cd6o8oxhpn8da" path="res://resources/Horror_Stain_03-128x128.png" id="16_6e4cv"]
+[ext_resource type="PackedScene" uid="uid://dtksv05hbm7qv" path="res://resources/Medieval Torture Devices-zip/Cage/torture_device_011.fbx" id="17_uuy0h"]
+[ext_resource type="PackedScene" uid="uid://cd6nx7yph80lv" path="res://resources/Medieval Torture Devices-zip/Cage-TAqDCvxcxd/torture_device_013.fbx" id="18_52iny"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fug78"]
+transparency = 1
+albedo_texture = ExtResource("16_6e4cv")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_nxqqj"]
+material = SubResource("StandardMaterial3D_fug78")
 
 [node name="Node3D" type="GridMap" unique_id=1022231393]
 mesh_library = ExtResource("1_jwv3a")
@@ -96,7 +110,7 @@ transform = Transform3D(0.020942593, 0, -0.9997804, 0, 1, 0, 0.9997804, 0, 0.020
 [node name="Decors" type="GridMap" parent="." unique_id=1013051993]
 mesh_library = ExtResource("10_mx85b")
 data = {
-"cells": PackedInt32Array(65533, 4, 655367, 65535, 4, 655367, 65534, 1, 655386, 65532, 65535, 655369, 65535, 7, 655373, 65532, 7, 655371, 65526, 7, 655369, 65527, 7, 1048588, 65524, 7, 1048588, 65530, 7, 16, 65521, 14, 1048594, 65512, 14, 1441810, 65513, 11, 17, 65512, 11, 17, 65513, 13, 17, 65514, 13, 655377, 65520, 13, 17, 65521, 13, 17, 65518, 11, 17, 65514, 16, 917524, 65513, 16, 917524, 65512, 10, 1441810, 65519, 16, 917524, 65517, 11, 17, 65519, 13, 17, 65512, 13, 17, 65517, 16, 917524, 65516, 16, 917524, 65515, 14, 1048594, 65515, 13, 655377, 65514, 11, 17, 65516, 13, 655377, 65516, 11, 17, 65518, 13, 655377, 65520, 16, 917524, 65518, 14, 1048594, 65517, 13, 655377, 65515, 11, 655377, 65515, 10, 1048594, 65518, 10, 1441810, 65519, 9, 655360, 65517, 9, 655360, 65515, 9, 655360, 65513, 9, 655360, 65512, 8, 1048576, 65512, 7, 1048576, 65512, 3, 1048576, 65513, 2, 0, 65515, 2, 0, 65517, 2, 0, 65519, 2, 0, 65521, 2, 0, 65522, 3, 1441792, 65522, 5, 1441792, 65523, 4, 262144, 65526, 1, 1376256, 65527, 1, 1376256, 65528, 1, 1376256, 65529, 1, 1376256, 65530, 1, 1376256, 65531, 1, 1376256, 65528, 65535, 1376256, 65527, 65535, 1376256, 65526, 65535, 1376256, 65528, 65533, 1376256, 65527, 65533, 1376256, 65526, 65533, 1376256, 65528, 65531, 1376256, 65527, 65531, 1376256, 65526, 65531, 1376256, 65529, 65535, 1376256, 65530, 65535, 1376256, 65529, 65533, 1376256, 65530, 65533, 1376256, 65529, 65532, 1376256, 65530, 65531, 1376256)
+"cells": PackedInt32Array(65533, 4, 655367, 65535, 4, 655367, 65534, 1, 655386, 65532, 65535, 655369, 65535, 7, 655373, 65532, 7, 655371, 65526, 7, 655369, 65527, 7, 1048588, 65524, 7, 1048588, 65530, 7, 16, 65521, 14, 1048594, 65512, 14, 1441810, 65513, 11, 17, 65512, 11, 17, 65513, 13, 17, 65514, 13, 655377, 65520, 13, 17, 65521, 13, 17, 65518, 11, 17, 65514, 16, 917524, 65513, 16, 917524, 65512, 10, 1441810, 65519, 16, 917524, 65517, 11, 17, 65519, 13, 17, 65512, 13, 17, 65517, 16, 917524, 65516, 16, 917524, 65515, 14, 1048594, 65515, 13, 655377, 65514, 11, 17, 65516, 13, 655377, 65516, 11, 17, 65518, 13, 655377, 65520, 16, 917524, 65518, 14, 1048594, 65517, 13, 655377, 65515, 11, 655377, 65515, 10, 1048594, 65518, 10, 1441810, 65519, 9, 655360, 65517, 9, 655360, 65515, 9, 655360, 65513, 9, 655360, 65512, 8, 1048576, 65512, 7, 1048576, 65512, 3, 1048576, 65513, 2, 0, 65515, 2, 0, 65517, 2, 0, 65519, 2, 0, 65521, 2, 0, 65522, 3, 1441792, 65522, 5, 1441792, 65523, 4, 262144, 65526, 1, 1376256, 65527, 1, 1376256, 65528, 1, 1376256, 65529, 1, 1376256, 65530, 1, 1376256, 65531, 1, 1376256, 65528, 65535, 1376256, 65527, 65535, 1376256, 65526, 65535, 1376256, 65528, 65533, 1376256, 65527, 65533, 1376256, 65526, 65533, 1376256, 65528, 65531, 1376256, 65527, 65531, 1376256, 65526, 65531, 1376256, 65529, 65535, 1376256, 65530, 65535, 1376256, 65529, 65533, 1376256, 65530, 65533, 1376256, 65529, 65532, 1376256, 65530, 65531, 1376256, 65516, 10, 25, 65513, 10, 25, 65509, 8, 19, 65511, 7, 19)
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
@@ -313,3 +327,73 @@ transform = Transform3D(-4.3711385e-08, 0, -0.9999999, 0, 0.9999999, 0, 0.999999
 
 [node name="PropSet_5_TorchWall_35" parent="." unique_id=1445172320 instance=ExtResource("8_usj0q")]
 transform = Transform3D(-4.3711385e-08, 0, -0.9999999, 0, 0.9999999, 0, 0.9999999, 0, -4.3711385e-08, -29.39977, 1.6243815, 16.929926)
+
+[node name="torture_device_008" parent="." unique_id=954253914 instance=ExtResource("12_beq0j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.178204, 1.7447939, 20.318262)
+
+[node name="torture_device_012" parent="." unique_id=1235784880 instance=ExtResource("13_nauge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43.644863, 1.0999999, 21.040573)
+
+[node name="torture_device_007" parent="." unique_id=452693658 instance=ExtResource("14_ycv2e")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -43.754898, 1.1000004, 30.605679)
+
+[node name="torture_device_006" parent="." unique_id=1077946349 instance=ExtResource("15_c5gc3")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -39.736866, 1.1000004, 29.284445)
+
+[node name="Darah75" type="MeshInstance3D" parent="torture_device_006" unique_id=338234236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 0.338974)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah76" type="MeshInstance3D" parent="torture_device_006" unique_id=1392161676]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 0.338974)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah77" type="MeshInstance3D" parent="torture_device_006" unique_id=1454386272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 7.3666496)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah82" type="MeshInstance3D" parent="torture_device_006" unique_id=1351286715]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 7.3666496)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah83" type="MeshInstance3D" parent="torture_device_006" unique_id=1770896012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 7.3666496)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah84" type="MeshInstance3D" parent="torture_device_006" unique_id=1246010526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 8.885622)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah85" type="MeshInstance3D" parent="torture_device_006" unique_id=1460670997]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 8.885622)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah86" type="MeshInstance3D" parent="torture_device_006" unique_id=1200472588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 8.885622)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah87" type="MeshInstance3D" parent="torture_device_006" unique_id=1361514762]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35029793, 0.03604436, 8.885622)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah78" type="MeshInstance3D" parent="torture_device_006" unique_id=1426184054]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86553574, 0.03604436, -4.0496407)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah79" type="MeshInstance3D" parent="torture_device_006" unique_id=1340542012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86553574, 0.03604436, -4.0496407)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah80" type="MeshInstance3D" parent="torture_device_006" unique_id=909593670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86553574, 0.03604436, -4.0496407)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Darah81" type="MeshInstance3D" parent="torture_device_006" unique_id=311112672]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.86553574, 0.03604436, -4.0496407)
+mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="torture_device_011" parent="." unique_id=1650995784 instance=ExtResource("17_uuy0h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.21392, 1.1, 13.3845415)
+
+[node name="torture_device_013" parent="." unique_id=10806123 instance=ExtResource("18_52iny")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.469238, 1.1000004, 29.058098)
