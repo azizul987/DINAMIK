@@ -18,6 +18,10 @@
 [ext_resource type="PackedScene" uid="uid://djqbm2umf76d7" path="res://resources/Medieval Torture Devices-zip/Torture Device/torture_device_008.fbx" id="16_f8ci1"]
 [ext_resource type="PackedScene" uid="uid://b6wqhomqcbctf" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_box.tscn" id="17_iakae"]
 [ext_resource type="PackedScene" path="res://spike_trap.tscn" id="18_7mylh"]
+[ext_resource type="PackedScene" uid="uid://d1msiynse4qh3" path="res://DungeonTiles/textures/PropSet_2/prop_set_1_chest.tscn" id="19_f8ci1"]
+[ext_resource type="PackedScene" uid="uid://ihiwlxdx7x7w" path="res://char/Assets/fbx/dagger.fbx" id="20_iakae"]
+[ext_resource type="PackedScene" uid="uid://dhg33q86h17ir" path="res://resources/Medieval Torture Devices-zip/Gallows/torture_device_005.fbx" id="21_7mylh"]
+[ext_resource type="PackedScene" uid="uid://bxysqy3idcd3u" path="res://resources/Medieval Torture Devices-zip/Pilory/torture_device_012.fbx" id="22_3k4dh"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_v0ej8"]
 _surfaces = [{
@@ -136,6 +140,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.06538, 1.2592776, 21.0422
 [node name="PropSet_5_TorchWall_4" parent="." unique_id=629826594 instance=ExtResource("7_qulpo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -48.858932, 1.2369804, 7.023235)
 
+[node name="PropSet_5_TorchWall_6" parent="." unique_id=864141835 instance=ExtResource("7_qulpo")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -49.016388, 1.2355983, 20.716442)
+
+[node name="PropSet_5_TorchWall_7" parent="." unique_id=2142260936 instance=ExtResource("7_qulpo")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -49.016388, 1.2355983, 28.207445)
+
 [node name="PropSet_5_TorchWall_5" parent="." unique_id=1248347562 instance=ExtResource("7_qulpo")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -60.951878, 0.3283341, 11.966199)
 
@@ -149,11 +159,23 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -46.
 [node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf002" unique_id=802841570 instance=ExtResource("10_s8oj7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
 
+[node name="PropSet_2_Shelf003" parent="." unique_id=475250959 instance=ExtResource("9_dc5vx")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -46.66419, 1.1147106, 18.536873)
+
+[node name="PropSet_1_Barrel3" parent="PropSet_2_Shelf003" unique_id=932665313 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, -3.5032043)
+
+[node name="PropSet_1_Barrel4" parent="PropSet_2_Shelf003" unique_id=306360647 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.831705, 0.5552089, 11.302467)
+
+[node name="PropSet_1_Barrel5" parent="PropSet_2_Shelf003" unique_id=1743990759 instance=ExtResource("10_s8oj7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.910152, 0.5552089, 11.302467)
+
 [node name="PropSet_2_Book_4" parent="." unique_id=97420339 instance=ExtResource("11_mw4xc")]
 transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -50.231915, 2.27723, 5.6861877)
 
 [node name="skeleton" parent="." unique_id=442161970 instance=ExtResource("12_4k5bj")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -61.503304, 2.0796528, 9.668913)
+transform = Transform3D(-2.6226834e-08, 0, 0.6, 0, 0.6, 0, -0.6, 0, -2.6226834e-08, -62.394913, 2.5284622, 9.668913)
 
 [node name="torture_device_006" parent="." unique_id=1077946349 instance=ExtResource("13_hp87d")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -61.251778, 1.0999999, 13.986599)
@@ -175,3 +197,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.09387, 1.65, 19.721554)
 
 [node name="torture_device_004" parent="." unique_id=1670722306 instance=ExtResource("14_gxpff")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.026018, 1.1000004, 6.5170135)
+
+[node name="PropSet_1_Chest" parent="." unique_id=2088876469 instance=ExtResource("19_f8ci1")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -21.075592, 1.1, 26.900484)
+
+[node name="dagger" parent="." unique_id=1893330313 instance=ExtResource("20_iakae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.902393, 2.581047, 28.82413)
+
+[node name="dagger2" parent="." unique_id=229005300 instance=ExtResource("20_iakae")]
+transform = Transform3D(-4.371139e-08, 1, -4.371139e-08, 0, -4.371139e-08, -1, -1, -4.371139e-08, 1.9106855e-15, -28.668978, 1.1772966, 10.676123)
+
+[node name="PropSet_1_Box2" parent="." unique_id=1701703718 instance=ExtResource("17_iakae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.79337, 1.6358144, 29.624067)
+
+[node name="PropSet_1_Box3" parent="." unique_id=827229077 instance=ExtResource("17_iakae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.047894, 2.7074425, 29.764631)
+
+[node name="PropSet_1_Box4" parent="." unique_id=1294886220 instance=ExtResource("17_iakae")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.89821, 1.6358144, 29.645247)
+
+[node name="torture_device_005" parent="." unique_id=649155239 instance=ExtResource("21_7mylh")]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, -57.284077, 1.1391935, 11.36745)
+
+[node name="torture_device_012" parent="." unique_id=1235784880 instance=ExtResource("22_3k4dh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.28656, 1.1000004, 11.842876)
