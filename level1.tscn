@@ -91,7 +91,7 @@ transform = Transform3D(0.9999999, 0, 0, 0, 1, 0, 0, 0, 1, -40.971813, 1.388072,
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.844097, 2.277901, 18.960953)
 
 [node name="PropSet_5_TorchWall_16" parent="." unique_id=1854854003 instance=ExtResource("4_xy4tn")]
-transform = Transform3D(0.020942593, 0, -0.9997804, 0, 1, 0, 0.9997804, 0, 0.020942593, -33.048565, 1.0811219, 17.49152)
+transform = Transform3D(0.020942593, 0, -0.9997804, 0, 1, 0, 0.9997804, 0, 0.020942593, -33.194588, 0.9275758, 13.727859)
 
 [node name="Decors" type="GridMap" parent="." unique_id=1013051993]
 mesh_library = ExtResource("10_mx85b")
