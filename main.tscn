@@ -892,8 +892,6 @@ shape = SubResource("ConcavePolygonShape3D_6dlmt")
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -9.020089, 0.33593762, 10.992659)
 mesh = SubResource("ArrayMesh_4caia")
 script = ExtResource("15_door")
-open_mode = 1
-required_potion = 1
 
 [node name="DoorAudio" type="AudioStreamPlayer3D" parent="door2" unique_id=1758182394]
 max_distance = 40.0

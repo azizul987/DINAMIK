@@ -9,11 +9,11 @@ signal tutorial_finished()
 enum Step {
 	MOVEMENT = 0,
 	PICKUP = 1,
-	POTION = 2,
-	COMBAT = 3,
-	CRAFT_BERSERK = 4,
-	USE_BERSERK = 5,
-	BREAK_DOOR = 6,
+	CRAFT_HEALING = 2,
+	USE_HEALING = 3,
+	COMBAT = 4,
+	CRAFT_BERSERK = 5,
+	USE_BERSERK = 6,
 	EXIT_PORTAL = 7,
 	COMPLETED = 8
 }
@@ -53,8 +53,10 @@ var _chime_stream: AudioStreamWAV = null
 
 var tutorial_drop_node: Node3D = null
 var combat_dummy_ref: Node3D = null
+var door_ref: DungeonDoor = null
 var door2_ref: DungeonDoor = null
 var portal_ref: Portal = null
+var tracked_slimes: Array[Node3D] = []
 
 var ui_canvas: CanvasLayer = null
 var ui_container: PanelContainer = null
@@ -157,14 +159,9 @@ func _process(delta: float) -> void:
 		return
 
 	match current_step:
-		Step.BREAK_DOOR:
-			var door2 := _get_sealed_door()
-			if door2 and door2.is_open:
-				_on_sealed_door_opened()
-			elif not GlobalLogic.is_potion_active("berserk") and GlobalLogic.potions.get("berserk", 0) <= 0:
-				GlobalLogic.potions["berserk"] = 1
-				GlobalLogic.inventory_updated.emit()
-				_set_task("Efek Berserk habis! Tekan 4 untuk minum lagi lalu tebas pintu")
+		Step.COMBAT:
+			if _are_all_slimes_dead():
+				_on_all_slimes_defeated()
 		Step.EXIT_PORTAL:
 			var player := _get_player()
 			var portal := _get_level_exit_portal()
@@ -189,25 +186,25 @@ func start_step(step: Step) -> void:
 			_start_movement_step()
 		Step.PICKUP:
 			_start_pickup_step()
-		Step.POTION:
-			_start_potion_step()
+		Step.CRAFT_HEALING:
+			_start_craft_healing_step()
+		Step.USE_HEALING:
+			_start_use_healing_step()
 		Step.COMBAT:
 			_start_combat_step()
 		Step.CRAFT_BERSERK:
 			_start_craft_berserk_step()
 		Step.USE_BERSERK:
 			_start_use_berserk_step()
-		Step.BREAK_DOOR:
-			_start_break_door_step()
 		Step.EXIT_PORTAL:
 			_start_exit_portal_step()
 		Step.COMPLETED:
 			_start_completed_step()
 
 func _start_movement_step() -> void:
-	_set_task("Berjalan ke lingkaran target")
+	_set_task("Masuki lingkaran")
 	_spawn_ground_marker()
-	step_started.emit(Step.MOVEMENT, "Berjalan ke lingkaran target")
+	step_started.emit(Step.MOVEMENT, "Masuki lingkaran")
 
 func _spawn_ground_marker() -> void:
 	if not marker_area:
@@ -251,7 +248,7 @@ func _on_marker_body_entered(body: Node3D) -> void:
 						marker_area.monitoring = false
 				)
 
-		_show_step_done("✓ Lingkaran target tercapai")
+		_show_step_done("✓ Lingkaran tercapai")
 		step_completed.emit(Step.MOVEMENT)
 
 		await get_tree().create_timer(1.2).timeout
@@ -267,9 +264,9 @@ func _update_marker_visuals(delta: float) -> void:
 			marker_mat_ring.albedo_color = Color(marker_color.r, marker_color.g, marker_color.b, lerpf(0.55, 0.9, pulse))
 
 func _start_pickup_step() -> void:
-	_set_task("Ambil Slime Gel di depan")
+	_set_task("Ambil Slime Gel")
 	_spawn_slime_drop()
-	step_started.emit(Step.PICKUP, "Ambil Slime Gel di depan")
+	step_started.emit(Step.PICKUP, "Ambil Slime Gel")
 
 func _spawn_slime_drop() -> void:
 	if not tutorial_drop_node and has_node("TutorialSlimeDrop"):
@@ -318,71 +315,116 @@ func _on_inventory_updated() -> void:
 	if current_step == Step.PICKUP and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Slime Gel tersimpan di inventori")
+		_show_step_done("✓ Slime Gel tersimpan")
 		step_completed.emit(Step.PICKUP)
 
 		await get_tree().create_timer(1.2).timeout
-		start_step(Step.POTION)
+		start_step(Step.CRAFT_HEALING)
+	elif current_step == Step.CRAFT_HEALING and not is_transitioning:
+		if GlobalLogic.potions.get("healing", 0) >= 1:
+			_advance_from_craft_healing()
 	elif current_step == Step.CRAFT_BERSERK and not is_transitioning:
 		if GlobalLogic.potions.get("berserk", 0) >= 1:
 			_advance_from_craft_berserk()
 
-func _start_potion_step() -> void:
-	if GlobalLogic.potions.get("healing", 0) <= 0:
-		GlobalLogic.potions["healing"] = 1
+func _start_craft_healing_step() -> void:
+	if GlobalLogic.materials.get("slime_gel", 0) < 1 and GlobalLogic.potions.get("healing", 0) < 1:
+		GlobalLogic.materials["slime_gel"] = 1
 		GlobalLogic.inventory_updated.emit()
 
+	_set_task("Racik Healing Potion")
+	step_started.emit(Step.CRAFT_HEALING, "Racik Healing Potion")
+
+	if GlobalLogic.potions.get("healing", 0) >= 1:
+		_advance_from_craft_healing()
+
+func _advance_from_craft_healing() -> void:
+	if current_step == Step.CRAFT_HEALING and not is_transitioning:
+		is_transitioning = true
+		_play_chime()
+		_show_step_done("✓ Healing Potion diracik")
+		step_completed.emit(Step.CRAFT_HEALING)
+
+		await get_tree().create_timer(1.2).timeout
+		start_step(Step.USE_HEALING)
+
+func _start_use_healing_step() -> void:
 	if GlobalLogic.current_hp >= 95.0:
 		GlobalLogic.current_hp = starting_player_hp
 		GlobalLogic.player_hp_changed.emit(starting_player_hp, GlobalLogic.max_hp)
 
-	_set_task("Gunakan Healing Potion")
-	step_started.emit(Step.POTION, "Gunakan Healing Potion")
+	_set_task("Minum Healing Potion")
+	step_started.emit(Step.USE_HEALING, "Minum Healing Potion")
 
 func _on_potion_consumed(potion_name: String) -> void:
-	if current_step == Step.POTION and not is_transitioning:
+	if current_step == Step.USE_HEALING and not is_transitioning:
 		if potion_name == "healing":
 			is_transitioning = true
 			_play_chime()
 			_show_step_done("✓ Ramuan diminum")
-			step_completed.emit(Step.POTION)
+			step_completed.emit(Step.USE_HEALING)
 
-			await get_tree().create_timer(0.9).timeout
-			_set_task("Waspada peningkatan bar Toxicity di kiri atas")
-			if ui_task:
-				ui_task.add_theme_color_override("font_color", Color(0.2, 0.9, 0.5))
-
-			await get_tree().create_timer(2.2).timeout
+			await get_tree().create_timer(1.2).timeout
 			start_step(Step.COMBAT)
 	elif current_step == Step.USE_BERSERK and not is_transitioning:
 		if potion_name == "berserk":
 			_advance_from_use_berserk()
 
 func _start_combat_step() -> void:
-	_set_task("Serang boneka slime di depan")
-	combat_dummy_ref = _get_dummy_slime()
-	if not combat_dummy_ref or not is_instance_valid(combat_dummy_ref):
-		_on_dummy_damaged(0.0)
-		return
-	if combat_dummy_ref.has_signal("damaged") and not combat_dummy_ref.is_connected("damaged", _on_dummy_damaged):
-		combat_dummy_ref.connect("damaged", _on_dummy_damaged)
-	if combat_dummy_ref.has_signal("defeated") and not combat_dummy_ref.is_connected("defeated", _on_dummy_defeated):
-		combat_dummy_ref.connect("defeated", _on_dummy_defeated)
-	step_started.emit(Step.COMBAT, "Serang boneka slime di depan")
+	_set_task("Kalahkan Slime")
+	step_started.emit(Step.COMBAT, "Kalahkan Slime")
 
-func _on_dummy_damaged(_amount: float) -> void:
+	tracked_slimes.clear()
+	var dummy := _get_dummy_slime()
+	if dummy and is_instance_valid(dummy):
+		tracked_slimes.append(dummy)
+
+	var all_enemies := get_tree().get_nodes_in_group("enemies")
+	for enemy in all_enemies:
+		if enemy is CharacterBody3D and "Slime" in enemy.name and not tracked_slimes.has(enemy):
+			tracked_slimes.append(enemy)
+
+	if tracked_slimes.is_empty() or _are_all_slimes_dead():
+		_on_all_slimes_defeated()
+		return
+
+	for s in tracked_slimes:
+		if s.has_signal("defeated") and not s.is_connected("defeated", _check_slimes_status):
+			s.connect("defeated", _check_slimes_status)
+
+func _check_slimes_status() -> void:
+	if current_step != Step.COMBAT or is_transitioning:
+		return
+	if _are_all_slimes_dead():
+		_on_all_slimes_defeated()
+
+func _are_all_slimes_dead() -> bool:
+	if tracked_slimes.is_empty():
+		return true
+	for s in tracked_slimes:
+		if is_instance_valid(s):
+			if "is_dead" in s and not s.is_dead:
+				return false
+			if "current_health" in s and s.current_health > 0.0:
+				return false
+	return true
+
+func _on_all_slimes_defeated() -> void:
 	if current_step == Step.COMBAT and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Serangan berhasil! Pintu ruangan terbuka")
+		_show_step_done("✓ Slime dikalahkan! Pintu terbuka")
 		step_completed.emit(Step.COMBAT)
+
+		var d1 := _get_door()
+		if d1 and not d1.is_open:
+			d1.open_door()
+		var d2 := _get_sealed_door()
+		if d2 and not d2.is_open:
+			d2.open_door()
 
 		await get_tree().create_timer(1.4).timeout
 		start_step(Step.CRAFT_BERSERK)
-
-func _on_dummy_defeated() -> void:
-	if current_step == Step.COMBAT and not is_transitioning:
-		_on_dummy_damaged(0.0)
 
 func _start_craft_berserk_step() -> void:
 	if GlobalLogic.materials.get("slime_gel", 0) < 1:
@@ -391,8 +433,8 @@ func _start_craft_berserk_step() -> void:
 		GlobalLogic.materials["goblin_ear"] = 1
 	GlobalLogic.inventory_updated.emit()
 
-	_set_task("Tekan C atau TAB: Racik Ramuan Berserk di Menu Alkimia")
-	step_started.emit(Step.CRAFT_BERSERK, "Racik Ramuan Berserk di Menu Alkimia")
+	_set_task("Racik Berserk Potion")
+	step_started.emit(Step.CRAFT_BERSERK, "Racik Berserk Potion")
 
 	if GlobalLogic.potions.get("berserk", 0) >= 1:
 		_advance_from_craft_berserk()
@@ -401,7 +443,7 @@ func _advance_from_craft_berserk() -> void:
 	if current_step == Step.CRAFT_BERSERK and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Ramuan Berserk berhasil diracik!")
+		_show_step_done("✓ Berserk Potion diracik")
 		step_completed.emit(Step.CRAFT_BERSERK)
 
 		await get_tree().create_timer(1.2).timeout
@@ -412,8 +454,8 @@ func _start_use_berserk_step() -> void:
 		GlobalLogic.potions["berserk"] = 1
 		GlobalLogic.inventory_updated.emit()
 
-	_set_task("Tekan 4: Minum Ramuan Berserk")
-	step_started.emit(Step.USE_BERSERK, "Minum Ramuan Berserk")
+	_set_task("Minum Berserk Potion")
+	step_started.emit(Step.USE_BERSERK, "Minum Berserk Potion")
 
 	if GlobalLogic.is_potion_active("berserk"):
 		_advance_from_use_berserk()
@@ -422,36 +464,15 @@ func _advance_from_use_berserk() -> void:
 	if current_step == Step.USE_BERSERK and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Mode Berserk aktif! Tebas segel merah untuk memecahkannya")
+		_show_step_done("✓ Mode Berserk aktif")
 		step_completed.emit(Step.USE_BERSERK)
-
-		await get_tree().create_timer(1.4).timeout
-		start_step(Step.BREAK_DOOR)
-
-func _start_break_door_step() -> void:
-	_set_task("Tebas Pintu Segel Merah di lorong untuk memecahkannya")
-	step_started.emit(Step.BREAK_DOOR, "Tebas Pintu Segel Merah di lorong")
-
-	var door2 := _get_sealed_door()
-	if door2:
-		if not door2.door_opened.is_connected(_on_sealed_door_opened):
-			door2.door_opened.connect(_on_sealed_door_opened)
-		if door2.is_open:
-			_on_sealed_door_opened()
-
-func _on_sealed_door_opened() -> void:
-	if current_step == Step.BREAK_DOOR and not is_transitioning:
-		is_transitioning = true
-		_play_chime()
-		_show_step_done("✓ Segel merah hancur! Jalan terbuka")
-		step_completed.emit(Step.BREAK_DOOR)
 
 		await get_tree().create_timer(1.2).timeout
 		start_step(Step.EXIT_PORTAL)
 
 func _start_exit_portal_step() -> void:
-	_set_task("Masuki LevelExitPortal di ujung ruangan menuju Safe Room")
-	step_started.emit(Step.EXIT_PORTAL, "Masuki LevelExitPortal menuju Safe Room")
+	_set_task("Masuki Safe Room")
+	step_started.emit(Step.EXIT_PORTAL, "Masuki Safe Room")
 
 	var portal := _get_level_exit_portal()
 	if portal:
@@ -467,6 +488,15 @@ func _on_exit_portal_entered(_portal: Node3D = null, _target_scene: String = "")
 
 		await get_tree().create_timer(0.8).timeout
 		start_step(Step.COMPLETED)
+
+func _get_door() -> DungeonDoor:
+	if door_ref and is_instance_valid(door_ref):
+		return door_ref
+	var d := get_tree().root.find_child("door", true, false)
+	if d is DungeonDoor:
+		door_ref = d
+		return d
+	return null
 
 func _get_sealed_door() -> DungeonDoor:
 	if door2_ref and is_instance_valid(door2_ref):
@@ -487,7 +517,7 @@ func _get_level_exit_portal() -> Portal:
 	return null
 
 func _start_completed_step() -> void:
-	_set_task("Tutorial Selesai: Selamat datang di Safe Room!")
+	_set_task("Safe Room tercapai")
 	if ui_task:
 		ui_task.add_theme_color_override("font_color", UIPalette.EMERALD)
 
@@ -495,7 +525,7 @@ func _start_completed_step() -> void:
 	tutorial_finished.emit()
 	GlobalLogic.complete_tutorial()
 
-	await get_tree().create_timer(5.0).timeout
+	await get_tree().create_timer(4.0).timeout
 	if ui_container and is_instance_valid(ui_container):
 		var tw := create_tween()
 		tw.tween_property(ui_container, "modulate:a", 0.0, 0.6)

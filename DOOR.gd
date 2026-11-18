@@ -32,7 +32,7 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 
 @export_group("Mission Settings")
 @export var open_on_tutorial_complete: bool = true
-@export var open_on_tutorial_step: int = 3
+@export var open_on_tutorial_step: int = -1
 
 @export_group("Movement & Audio")
 @export var open_height: float = 3.5
