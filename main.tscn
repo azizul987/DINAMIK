@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bhg7k1cgksxt6" path="res://Player.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://bgo85e8kye2ny" path="res://camera_pivot.gd" id="2_0xm2m"]
+[ext_resource type="ArrayMesh" uid="uid://bn11ultlqgnp5" path="res://Cube_010.res" id="3_0odxb"]
 [ext_resource type="Script" uid="uid://bcveboefkhqd8" path="res://hud_controller.gd" id="3_hud"]
 [ext_resource type="Texture2D" uid="uid://dbfmrnvqnscpc" path="res://icon.svg" id="4_icon"]
 [ext_resource type="PackedScene" path="res://spike_trap.tscn" id="6_spike_trap"]
@@ -21,9 +22,10 @@
 [ext_resource type="PackedScene" path="res://archer_enemy.tscn" id="19_archer"]
 [ext_resource type="ArrayMesh" uid="uid://fltpsydjryp5" path="res://resources/weapon/OBJ/Axe.obj" id="20_ryguw"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
-[ext_resource type="AnimationLibrary" uid="uid://uyrmce8vk617" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
+[ext_resource type="AnimationLibrary" uid="uid://db67kswo0a6a5" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
 [ext_resource type="PackedScene" uid="uid://c8dstchest01" path="res://destructible_chest.tscn" id="27_chest"]
 [ext_resource type="PackedScene" uid="uid://b6dstbox0001" path="res://destructible_box.tscn" id="28_box"]
+[ext_resource type="PackedScene" uid="uid://4qvx41ap082f" path="res://resources/bottle/botol_model.tscn" id="29_botol_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -137,6 +139,7 @@ shadow_enabled = true
 unique_name_in_owner = true
 wall_min_slide_angle = 1.2391838
 script = ExtResource("1_ig7tw")
+potion_bottle = NodePath("Ranger/Rig_Medium/Skeleton3D/LeftHandAttachment/Botol")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Players" unique_id=1610283709]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.99901056, 0)
@@ -144,6 +147,37 @@ shape = SubResource("CapsuleShape3D_0xm2m")
 
 [node name="Ranger" parent="Players" unique_id=596401858 instance=ExtResource("25_ranger")]
 unique_name_in_owner = true
+
+[node name="Rig_Medium" parent="Players/Ranger" index="0" unique_id=129934480]
+transform = Transform3D(0.99495, 0.0029121938, -0.10032955, -0.0054693976, 0.9996669, -0.025222417, 0.10022267, 0.025643786, 0.99463457, -0.015607447, -0.023654819, -0.025892764)
+
+[node name="Skeleton3D" parent="Players/Ranger/Rig_Medium" index="0" unique_id=1035453675]
+bones/2/rotation = Quaternion(0.9901465, 0.12091988, -0.04032719, 0.05798393)
+bones/3/rotation = Quaternion(0.36022863, -0.039301876, -0.0047902935, 0.9320236)
+bones/4/rotation = Quaternion(-0.6257698, -0.05421131, 0.12728192, 0.7676409)
+bones/6/rotation = Quaternion(0.9810675, -0.12473987, 0.07609844, 0.12710534)
+bones/7/rotation = Quaternion(0.36887828, -0.09763178, -0.02336463, 0.9240406)
+bones/8/rotation = Quaternion(-0.60769135, 0.004689291, -0.080130525, 0.79010653)
+bones/10/rotation = Quaternion(0.00032148542, 0.0022715284, -0.00039405562, 0.9999973)
+bones/11/rotation = Quaternion(0.0006457816, 0.0039150612, -0.001895702, 0.99999034)
+bones/13/rotation = Quaternion(-0.538295, 0.011752676, 0.83326733, 0.12556246)
+bones/14/rotation = Quaternion(-1.6149656e-07, -1.2665905e-07, 0.23182791, 0.9727568)
+bones/15/rotation = Quaternion(0.26819226, 0.015001241, 0.043832064, 0.9622509)
+bones/18/rotation = Quaternion(-0.38217062, -0.122851096, -0.8916558, 0.20929183)
+bones/19/rotation = Quaternion(-4.7583686e-08, -2.3750435e-08, -0.82408226, 0.5664702)
+bones/20/rotation = Quaternion(0.37238514, 0.07472957, 0.01696815, 0.9249092)
+
+[node name="Ranger_Cape" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="3" unique_id=554239830]
+transform = Transform3D(-199.87816, 6.97989, 0, 3.0510068e-07, 8.736952e-06, 200, 6.97989, 199.87816, -8.742278e-06, 0, 0.9006995, -0.42661762)
+mesh = ExtResource("3_0odxb")
+
+[node name="LeftHandAttachment" type="BoneAttachment3D" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="4" unique_id=720]
+transform = Transform3D(0.095435046, -0.35573027, 0.9297025, -0.3230314, 0.8723532, 0.36694628, -0.9415632, -0.335343, -0.03165868, 0.063513145, 0.9405566, 0.34706563)
+bone_name = "handslot.l"
+bone_idx = 22
+
+[node name="Botol" parent="Players/Ranger/Rig_Medium/Skeleton3D/LeftHandAttachment" unique_id=721 instance=ExtResource("29_botol_model")]
+transform = Transform3D(0.009380758, -0.08585405, -0.21316914, -0.038862143, 0.20968136, -0.08615952, 0.22649887, 0.039532397, -0.0059543597, -0.0027021766, 0.039999995, -0.00999999)
 
 [node name="WeaponPivot" type="Node3D" parent="Players/Ranger" unique_id=701]
 unique_name_in_owner = true
@@ -237,10 +271,6 @@ spring_length = 3.5
 margin = 0.2
 
 [node name="Camera3D" type="Camera3D" parent="Players/CameraPivot/SpringArm3D" unique_id=523362783]
-
-[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1941817251]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39254224, 1.4145684)
-use_collision = true
 
 [node name="DummySlime" parent="." unique_id=711 instance=ExtResource("13_dummy_slime")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.728136, 0.74075574, 5.923851)
@@ -945,3 +975,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.35, 13.5)
 
 [node name="Box_2" parent="." unique_id=2100000032 instance=ExtResource("28_box")]
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -12, 0.35, 11.2)
+
+[editable path="Players/Ranger"]

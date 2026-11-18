@@ -72,6 +72,14 @@ const GROUND_SLAM_SCENE: PackedScene = preload("res://ground_slam_shockwave.tscn
 @export var weapon_rotation_degrees: Vector3 = Vector3.ZERO
 @export var weapon_position_offset: Vector3 = Vector3.ZERO
 
+@export_group("Equipped Bottle")
+@export var potion_bottle: Node3D = null
+@export var potion_bottle_scene: PackedScene = preload("res://resources/bottle/botol_model.tscn")
+@export var bottle_scale: Vector3 = Vector3(0.9, 0.9, 0.9)
+@export var bottle_rotation_degrees: Vector3 = Vector3(-10.0, 75.0, -90.0)
+@export var bottle_position_offset: Vector3 = Vector3(0.02, 0.04, -0.01)
+@export var drink_speed_multiplier: float = 0.5
+
 @export_group("Effects - Footsteps & Impacts")
 @export var footstep_interval_walk: float = 0.38
 @export var footstep_interval_run: float = 0.24
@@ -80,6 +88,10 @@ const GROUND_SLAM_SCENE: PackedScene = preload("res://ground_slam_shockwave.tscn
 
 var equipped_weapon_node: MeshInstance3D = null
 var weapon_hand_attachment: BoneAttachment3D = null
+var bottle_hand_attachment: BoneAttachment3D = null
+var potion_bottle_instance: Node3D = null
+var is_drinking: bool = false
+var _drink_tween: Tween = null
 
 var _footstep_timer: float = 0.0
 var _foot_alternator: bool = false
@@ -148,6 +160,7 @@ func _ready() -> void:
 	GlobalLogic.potion_consumed.connect(_on_potion_consumed)
 	hitbox.body_entered.connect(_on_hitbox_body_entered)
 	_setup_weapon_attachment()
+	_setup_bottle_attachment()
 	_cache_character_meshes()
 	_setup_slash_arc()
 	_setup_slash_audio()
@@ -201,6 +214,61 @@ func _setup_weapon_attachment() -> void:
 		if handle:
 			handle.visible = false
 
+func _setup_bottle_attachment() -> void:
+	if potion_bottle and is_instance_valid(potion_bottle):
+		potion_bottle_instance = potion_bottle
+		potion_bottle_instance.visible = false
+		return
+
+	if not mesh_instance:
+		return
+	var skel := mesh_instance.find_child("Skeleton3D", true, false) as Skeleton3D
+	if not skel:
+		return
+
+	var hand_idx := skel.find_bone("handslot.l")
+	if hand_idx == -1:
+		hand_idx = skel.find_bone("hand.l")
+	if hand_idx == -1:
+		return
+
+	bottle_hand_attachment = skel.get_node_or_null("LeftHandAttachment") as BoneAttachment3D
+
+	if bottle_hand_attachment:
+		var child_bottle := bottle_hand_attachment.get_node_or_null("Botol") as Node3D
+		if not child_bottle:
+			child_bottle = bottle_hand_attachment.get_node_or_null("PotionBottle") as Node3D
+		if not child_bottle and bottle_hand_attachment.get_child_count() > 0:
+			child_bottle = bottle_hand_attachment.get_child(0) as Node3D
+		if child_bottle:
+			potion_bottle_instance = child_bottle
+			potion_bottle = child_bottle
+			potion_bottle_instance.visible = false
+			return
+
+	if not bottle_hand_attachment:
+		bottle_hand_attachment = BoneAttachment3D.new()
+		bottle_hand_attachment.name = "LeftHandAttachment"
+		skel.add_child(bottle_hand_attachment)
+		bottle_hand_attachment.bone_name = skel.get_bone_name(hand_idx)
+		bottle_hand_attachment.bone_idx = hand_idx
+
+	var fallback_scene: PackedScene = potion_bottle_scene
+	if not fallback_scene:
+		fallback_scene = load("res://resources/bottle/botol_model.tscn") as PackedScene
+
+	if fallback_scene:
+		potion_bottle_instance = fallback_scene.instantiate() as Node3D
+		potion_bottle_instance.name = "Botol"
+		potion_bottle_instance.scale = bottle_scale
+		potion_bottle_instance.rotation_degrees = bottle_rotation_degrees
+		potion_bottle_instance.position = bottle_position_offset
+		bottle_hand_attachment.add_child(potion_bottle_instance)
+		potion_bottle = potion_bottle_instance
+
+	if potion_bottle_instance:
+		potion_bottle_instance.visible = false
+
 func _cache_character_meshes() -> void:
 	_character_meshes.clear()
 	if mesh_instance is MeshInstance3D:
@@ -208,8 +276,17 @@ func _cache_character_meshes() -> void:
 	elif is_instance_valid(mesh_instance):
 		for child in mesh_instance.find_children("*", "MeshInstance3D", true, false):
 			var mi := child as MeshInstance3D
-			if mi and mi != slash_arc and mi != equipped_weapon_node and not (weapon_pivot and weapon_pivot.is_ancestor_of(mi)):
-				_character_meshes.append(mi)
+			if not mi:
+				continue
+			if mi == slash_arc or mi == equipped_weapon_node:
+				continue
+			if weapon_pivot and weapon_pivot.is_ancestor_of(mi):
+				continue
+			if is_instance_valid(potion_bottle_instance) and (potion_bottle_instance == mi or potion_bottle_instance.is_ancestor_of(mi)):
+				continue
+			if is_instance_valid(potion_bottle) and (potion_bottle == mi or potion_bottle.is_ancestor_of(mi)):
+				continue
+			_character_meshes.append(mi)
 
 func _set_model_material_override(mat: Material) -> void:
 	for m in _character_meshes:
@@ -485,15 +562,17 @@ func _physics_process(delta: float) -> void:
 		coyote_timer -= delta
 		velocity.y -= gravity * delta
 
-	if Input.is_action_just_pressed("ui_accept") and coyote_timer > 0.0 and not is_attacking:
+	if Input.is_action_just_pressed("ui_accept") and coyote_timer > 0.0 and not is_attacking and not is_drinking:
 		velocity.y = jump_force
 		coyote_timer = 0.0
 		_spawn_footstep_dust()
 		_play_footstep_sound()
 
-	var is_sprinting := Input.is_key_pressed(KEY_SHIFT)
+	var is_sprinting := Input.is_key_pressed(KEY_SHIFT) and not is_drinking
 	var base_speed := run_speed if is_sprinting else walk_speed
 	var target_speed := base_speed * speed_multiplier
+	if is_drinking:
+		target_speed = walk_speed * drink_speed_multiplier
 
 	var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var direction := _get_camera_relative_direction(input_dir)
@@ -601,7 +680,7 @@ func _update_animation(direction: Vector3, is_sprinting: bool) -> void:
 	if not animation_player or GlobalLogic.is_dead:
 		return
 
-	if is_attacking:
+	if is_attacking or is_drinking:
 		return
 
 	if not is_on_floor():
@@ -668,7 +747,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				attack()
 
 func dash() -> void:
-	if is_dashing or dash_cooldown_timer > 0.0 or GlobalLogic.is_dead:
+	if is_dashing or dash_cooldown_timer > 0.0 or GlobalLogic.is_dead or is_drinking:
 		return
 
 	is_dashing = true
@@ -856,7 +935,7 @@ func _find_soft_target() -> Node3D:
 const COMBO_ANIMATIONS: Array[StringName] = [&"slash_1", &"slash_2", &"slash_3"]
 
 func attack() -> void:
-	if not can_attack or GlobalLogic.is_dead:
+	if not can_attack or GlobalLogic.is_dead or is_drinking:
 		return
 
 	can_attack = false
@@ -1061,6 +1140,11 @@ func _setup_flash_material() -> void:
 	flash_material.albedo_color = Color(1.0, 1.0, 1.0, 1.0)
 
 func _on_player_died() -> void:
+	if _drink_tween and _drink_tween.is_valid():
+		_drink_tween.kill()
+	is_drinking = false
+	if is_instance_valid(potion_bottle_instance):
+		potion_bottle_instance.visible = false
 	if _hit_blink_tween:
 		_hit_blink_tween.kill()
 	if is_instance_valid(mesh_instance):
@@ -1135,11 +1219,19 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 			camera_pivot.fov_punch(2.0)
 
 	_trigger_hit_feedback()
+	if is_drinking:
+		is_drinking = false
+		if _drink_tween and _drink_tween.is_valid():
+			_drink_tween.kill()
+		if is_instance_valid(potion_bottle_instance):
+			potion_bottle_instance.visible = false
 	if animation_player and animation_player.has_animation("hit") and not GlobalLogic.is_dead:
 		animation_player.play("hit")
 		animation_player.queue("idle")
 
 func _on_potion_consumed(potion_name: String) -> void:
+	_play_drink_sequence(potion_name)
+
 	var flash_col := Color(0.25, 1.0, 0.5, 0.95)
 	match potion_name:
 		"healing":
@@ -1166,6 +1258,34 @@ func _on_potion_consumed(potion_name: String) -> void:
 		var tw := create_tween()
 		tw.tween_property(mesh_instance, "scale", Vector3.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+## Memutar urutan visual minum ramuan, memunculkan botol dengan warna ramuan dan memainkan animasi drink.
+func _play_drink_sequence(potion_name: String) -> void:
+	if not potion_bottle_instance:
+		_setup_bottle_attachment()
+
+	if potion_bottle_instance:
+		if potion_bottle_instance.has_method("set_potion_type"):
+			potion_bottle_instance.set_potion_type(potion_name)
+		potion_bottle_instance.visible = true
+
+	is_drinking = true
+
+	if _drink_tween and _drink_tween.is_valid():
+		_drink_tween.kill()
+
+	if animation_player and animation_player.has_animation("drink"):
+		animation_player.play("drink", 0.12, 1.0)
+
+	_drink_tween = create_tween()
+	_drink_tween.tween_interval(1.58)
+	_drink_tween.tween_callback(func():
+		is_drinking = false
+		if is_instance_valid(potion_bottle_instance):
+			potion_bottle_instance.visible = false
+		if animation_player and animation_player.current_animation == "drink":
+			animation_player.play("idle", 0.15)
+	)
+
 func _trigger_potion_mesh_flash(col: Color = Color(0.25, 1.0, 0.5, 0.85)) -> void:
 	if not mesh_instance or not flash_material:
 		return
@@ -1184,8 +1304,11 @@ func _spawn_player_floating_text(display_text: String, text_color: Color, size: 
 	var label := FLOATING_TEXT_SCENE.instantiate() as FloatingText
 	if not label:
 		return
-	get_tree().root.add_child(label)
 	var spawn_pos := global_position + Vector3(randf_range(-0.15, 0.15), 1.2, randf_range(-0.15, 0.15))
+	if get_parent():
+		get_parent().add_child(label)
+	else:
+		get_tree().root.add_child(label)
 	label.global_position = spawn_pos
 	label.pop(display_text, text_color, size, rise, duration)
 

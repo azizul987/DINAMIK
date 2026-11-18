@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://4qvx41ap082f"]
+
+[ext_resource type="Script" uid="uid://xx6bxl5ruwvo" path="res://resources/bottle/potion_bottle.gd" id="1_potion_bottle"]
+[ext_resource type="PackedScene" uid="uid://b3dub5kanktgp" path="res://resources/bottle/botol.fbx" id="2_fhvco"]
+
+[node name="Botol" type="Node3D" unique_id=905509557]
+script = ExtResource("1_potion_bottle")
+
+[node name="botol" parent="." unique_id=1200279531 instance=ExtResource("2_fhvco")]

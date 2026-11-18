@@ -6,7 +6,6 @@
 [ext_resource type="MeshLibrary" uid="uid://cja1xmiipdihy" path="res://DungeonTiles/scenes/MeshLibrary/decors.tres" id="3_b5cms"]
 [ext_resource type="PackedScene" uid="uid://r0o3ggd3njgg" path="res://DungeonTiles/scenes/Props/set_5/prop_set_5_torch_wall_1.tscn" id="3_fk2dp"]
 [ext_resource type="MeshLibrary" uid="uid://dh3twsgivnq63" path="res://DungeonTiles/scenes/MeshLibrary/Pillars.tres" id="3_lv1e3"]
-[ext_resource type="MeshLibrary" uid="uid://vcg31mrtc2pk" path="res://DungeonTiles/scenes/MeshLibrary/Platforms.tres" id="4_0lig1"]
 [ext_resource type="PackedScene" uid="uid://bhiy2s68nbpmo" path="res://DungeonTiles/scenes/Props/set_5/prop_set_5_torch_wall_2.tscn" id="4_wjbr7"]
 [ext_resource type="PackedScene" uid="uid://co5g1aq33h6i3" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_barrel.tscn" id="10_lxo6f"]
 [ext_resource type="PackedScene" uid="uid://b6wqhomqcbctf" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_box.tscn" id="11_ehxbl"]
@@ -120,7 +119,7 @@ transform = Transform3D(1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, 1, 16.944, 
 [node name="Rooms" type="GridMap" parent="GridMaps" unique_id=1262979731]
 mesh_library = ExtResource("1_vvuyf")
 data = {
-"cells": PackedInt32Array(0, 65535, 655365, 0, 1, 1048582, 0, 3, 1048582, 65534, 65535, 655366, 65532, 65535, 655366, 65530, 65535, 655367, 65534, 1, 655364, 65532, 1, 655364, 65530, 1, 1441798, 65530, 3, 1441798, 65534, 5, 6, 65532, 5, 6, 65530, 5, 5, 65532, 3, 4, 65534, 3, 4, 0, 5, 1048582, 0, 7, 1048581, 65528, 7, 1441845, 65526, 7, 1048629, 65530, 7, 1441845, 65532, 7, 1441845, 65525, 2, 1048671, 65534, 7, 1048629, 65525, 10, 1048629, 65524, 14, 1048631, 65524, 7, 1048631)
+"cells": PackedInt32Array(0, 65535, 655365, 0, 1, 1048582, 0, 3, 1048582, 65534, 65535, 655366, 65532, 65535, 655366, 65530, 65535, 655367, 65534, 1, 655364, 65532, 1, 655364, 65530, 1, 1441798, 65530, 3, 1441798, 65534, 5, 6, 65532, 5, 6, 65530, 5, 5, 65532, 3, 4, 65534, 3, 4, 0, 5, 1048582, 0, 7, 1048581, 65528, 7, 1441845, 65526, 7, 1048629, 65530, 7, 1441845, 65532, 7, 1441845, 65534, 7, 1048629, 65524, 7, 1048631)
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
@@ -140,15 +139,9 @@ metadata/_editor_floor_ = Vector3(0, 1, 0)
 [node name="Pillars" type="GridMap" parent="GridMaps" unique_id=292628204]
 mesh_library = ExtResource("3_lv1e3")
 data = {
-"cells": PackedInt32Array(65527, 8, 1048576, 1, 8, 1048576, 65534, 8, 1048576, 65531, 8, 1048576, 65534, 6, 1048576, 65531, 6, 1048576, 1, 65534, 1048576, 65529, 65534, 1048576, 65529, 6, 1048576, 65529, 8, 1048576, 65531, 1, 655360, 65531, 65534, 655360, 1, 1, 655360, 65535, 6, 1048576, 65527, 6, 1048576, 65523, 8, 1048576, 65523, 6, 1048576, 65525, 5, 1048576, 65525, 6, 1048576, 65525, 8, 1048576, 65531, 3, 13, 65531, 4, 13)
+"cells": PackedInt32Array(65527, 8, 1048576, 1, 8, 1048576, 65534, 8, 1048576, 65531, 8, 1048576, 65534, 6, 1048576, 65531, 6, 1048576, 1, 65534, 1048576, 65529, 65534, 1048576, 65529, 6, 1048576, 65529, 8, 1048576, 65531, 1, 655360, 65531, 65534, 655360, 1, 1, 655360, 65535, 6, 1048576, 65527, 6, 1048576, 65523, 8, 1048576, 65523, 6, 1048576, 65525, 6, 1048576, 65525, 8, 1048576, 65531, 3, 13, 65531, 4, 13)
 }
 metadata/_editor_floor_ = Vector3(0, 0, 0)
-
-[node name="Platforms" type="GridMap" parent="GridMaps" unique_id=1262111252]
-mesh_library = ExtResource("4_0lig1")
-data = {
-"cells": PackedInt32Array(65508, 13, 9)
-}
 
 [node name="Props" type="Node3D" parent="." unique_id=741816078]
 

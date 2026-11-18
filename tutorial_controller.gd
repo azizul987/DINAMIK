@@ -276,6 +276,10 @@ func _spawn_slime_drop() -> void:
 		tutorial_drop_node.position = drop_position
 		tutorial_drop_node.visible = true
 		tutorial_drop_node.process_mode = Node.PROCESS_MODE_INHERIT
+		if "magnet_radius" in tutorial_drop_node:
+			tutorial_drop_node.magnet_radius = 2.0
+		if "pickup_distance" in tutorial_drop_node:
+			tutorial_drop_node.pickup_distance = 1.0
 		if tutorial_drop_node is CharacterBody3D:
 			tutorial_drop_node.velocity = Vector3(0.0, 2.0, 0.0)
 		return
@@ -292,8 +296,8 @@ func _spawn_slime_drop() -> void:
 	drop.item_color = Color(0.2, 0.9, 0.5, 0.95)
 	drop.pop_force_y = 1.0
 	drop.pop_spread_xz = 0.0
-	drop.magnet_radius = 2.5
-	drop.pickup_distance = 1.3
+	drop.magnet_radius = 2.0
+	drop.pickup_distance = 1.0
 
 	add_child(drop)
 	drop.position = drop_position
@@ -304,7 +308,7 @@ func _check_manual_pickup() -> void:
 	if not player or not tutorial_drop_node or not is_instance_valid(tutorial_drop_node):
 		return
 
-	if player.global_position.distance_to(tutorial_drop_node.global_position) <= 3.5:
+	if player.global_position.distance_to(tutorial_drop_node.global_position) <= 2.2:
 		if tutorial_drop_node.has_method("_collect"):
 			tutorial_drop_node.call("_collect")
 		else:

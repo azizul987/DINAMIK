@@ -15,14 +15,14 @@ enum State { POP, IDLE, MAGNET_PULL, COLLECTED }
 @export var gravity: float = 16.0
 @export var bounce_damping: float = 0.4
 
-@export var magnet_radius: float = 7.0
+@export var magnet_radius: float = 2.2
 @export var magnet_speed_initial: float = 6.5
 @export var magnet_speed_max: float = 24.0
 @export var magnet_acceleration: float = 36.0
-@export var pickup_distance: float = 1.25
+@export var pickup_distance: float = 1.0
 
 var current_state: State = State.POP
-var pop_grace_timer: float = 0.15
+var pop_grace_timer: float = 0.45
 var idle_timer: float = 0.0
 var base_floor_y: float = 0.0
 var current_magnet_speed: float = 0.0
