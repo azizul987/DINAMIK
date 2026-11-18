@@ -345,6 +345,10 @@ func _advance_from_craft_healing() -> void:
 		_show_step_done("✓ Healing Potion diracik")
 		step_completed.emit(Step.CRAFT_HEALING)
 
+		var d1 := _get_door()
+		if d1 and not d1.is_open:
+			d1.open_door()
+
 		await get_tree().create_timer(1.2).timeout
 		start_step(Step.USE_HEALING)
 
@@ -416,9 +420,6 @@ func _on_all_slimes_defeated() -> void:
 		_show_step_done("✓ Slime dikalahkan! Pintu terbuka")
 		step_completed.emit(Step.COMBAT)
 
-		var d1 := _get_door()
-		if d1 and not d1.is_open:
-			d1.open_door()
 		var d2 := _get_sealed_door()
 		if d2 and not d2.is_open:
 			d2.open_door()
