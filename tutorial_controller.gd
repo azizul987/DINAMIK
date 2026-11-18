@@ -326,6 +326,8 @@ func _on_inventory_updated() -> void:
 	elif current_step == Step.CRAFT_BERSERK and not is_transitioning:
 		if GlobalLogic.potions.get("berserk", 0) >= 1:
 			_advance_from_craft_berserk()
+		elif GlobalLogic.materials.get("goblin_ear", 0) >= 1 or GlobalLogic.materials.get("fire_essence", 0) >= 1:
+			_set_task("Racik Berserk Potion")
 
 func _start_craft_healing_step() -> void:
 	if GlobalLogic.materials.get("slime_gel", 0) < 1 and GlobalLogic.potions.get("healing", 0) < 1:
@@ -417,7 +419,7 @@ func _on_all_slimes_defeated() -> void:
 	if current_step == Step.COMBAT and not is_transitioning:
 		is_transitioning = true
 		_play_chime()
-		_show_step_done("✓ Slime dikalahkan! Pintu terbuka")
+		_show_step_done("✓ Slime dikalahkan")
 		step_completed.emit(Step.COMBAT)
 
 		var d2 := _get_sealed_door()
@@ -428,14 +430,11 @@ func _on_all_slimes_defeated() -> void:
 		start_step(Step.CRAFT_BERSERK)
 
 func _start_craft_berserk_step() -> void:
-	if GlobalLogic.materials.get("slime_gel", 0) < 1:
-		GlobalLogic.materials["slime_gel"] = 1
-	if GlobalLogic.materials.get("goblin_ear", 0) < 1 and GlobalLogic.materials.get("fire_essence", 0) < 1:
-		GlobalLogic.materials["goblin_ear"] = 1
-	GlobalLogic.inventory_updated.emit()
+	var has_berserk_mat: bool = GlobalLogic.materials.get("goblin_ear", 0) >= 1 or GlobalLogic.materials.get("fire_essence", 0) >= 1
+	var task_text: String = "Racik Berserk Potion" if has_berserk_mat else "Hancurkan Peti"
 
-	_set_task("Racik Berserk Potion")
-	step_started.emit(Step.CRAFT_BERSERK, "Racik Berserk Potion")
+	_set_task(task_text)
+	step_started.emit(Step.CRAFT_BERSERK, task_text)
 
 	if GlobalLogic.potions.get("berserk", 0) >= 1:
 		_advance_from_craft_berserk()

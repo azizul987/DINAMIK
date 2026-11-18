@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://b6dstbox0001"]
+
+[ext_resource type="Script" path="res://destructible_prop.gd" id="1_prop"]
+[ext_resource type="PackedScene" uid="uid://b6wqhomqcbctf" path="res://DungeonTiles/scenes/Props/Set_1/prop_set_1_box.tscn" id="2_box_mesh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_box"]
+size = Vector3(1.1, 1.1, 1.1)
+
+[node name="DestructibleBox" type="StaticBody3D"]
+script = ExtResource("1_prop")
+max_health = 10.0
+drop_item_type = "slime_gel"
+drop_item_amount = 1
+drop_item_color = Color(0.2, 0.9, 0.45, 1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("BoxShape3D_box")
+
+[node name="VisualRoot" parent="." instance=ExtResource("2_box_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+
+[node name="HitAudio" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+unit_size = 2.5
+max_distance = 20.0

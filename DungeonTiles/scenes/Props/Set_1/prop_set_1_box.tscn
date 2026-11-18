@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://b6wqhomqcbctf"]
 
-[ext_resource type="Material" uid="uid://c87df5igj8fvv" path="res://Assets/ModularDungeonAsset/DungeonTiles/material/PropSet_1_Mat.tres" id="1_hpi6q"]
+[ext_resource type="Material" uid="uid://c87df5igj8fvv" path="res://DungeonTiles/material/PropSet_1_Mat.tres" id="1_hpi6q"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ttqlg"]
 _surfaces = [{

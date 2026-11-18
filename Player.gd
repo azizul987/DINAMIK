@@ -91,6 +91,7 @@ var is_attacking: bool = false
 var can_attack: bool = true
 var locked_target: Node3D = null
 var is_holding_z_target: bool = false
+var _rmb_press_time: int = 0
 
 var combo_index: int = 0
 var combo_timer: float = 0.0
@@ -649,12 +650,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			if event.pressed:
 				is_holding_z_target = true
-				handle_z_target_input()
+				_rmb_press_time = Time.get_ticks_msec()
+				if locked_target != null:
+					locked_target = null
+				else:
+					handle_z_target_input()
 			else:
+				var hold_dur := (Time.get_ticks_msec() - _rmb_press_time) / 1000.0
 				is_holding_z_target = false
-				# Jika dilepas dan tidak ada musuh yang dikunci, keluar dari mode strafe
-				if locked_target == null and camera_pivot and camera_pivot.has_method("snap_behind_player"):
-					pass
+				if hold_dur > 0.22 and locked_target != null:
+					locked_target = null
 		elif event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
 			handle_z_target_input()
 		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -852,19 +857,24 @@ func attack() -> void:
 	if character_rig:
 		_attack_start_rig_pos = character_rig.position
 
-	# Hadapkan karakter ke target (Z-targeting / auto-target / arah kamera)
-	var target_to_face: Node3D = locked_target if (locked_target and is_instance_valid(locked_target)) else _find_soft_target()
-	if target_to_face and is_instance_valid(target_to_face):
-		var to_enemy: Vector3 = target_to_face.global_position - global_position
+	# Hadapkan karakter ke target saat lock-on, atau hadapkan ke input arah gerak (WASD) / arah kamera
+	if locked_target and is_instance_valid(locked_target):
+		var to_enemy: Vector3 = locked_target.global_position - global_position
 		to_enemy.y = 0.0
 		if to_enemy.length_squared() > 0.01:
 			mesh_instance.rotation.y = atan2(to_enemy.x, to_enemy.z)
 	else:
-		var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
-		var forward: Vector3 = -cam_basis.z
-		forward.y = 0.0
-		if forward.length_squared() > 0.01:
-			mesh_instance.rotation.y = atan2(forward.x, forward.z)
+		var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+		if input_dir.length_squared() > 0.1:
+			var move_dir := _get_camera_relative_direction(input_dir)
+			if move_dir.length_squared() > 0.01:
+				mesh_instance.rotation.y = atan2(move_dir.x, move_dir.z)
+		else:
+			var cam_basis: Basis = camera_pivot.global_transform.basis if camera_pivot else global_transform.basis
+			var forward: Vector3 = -cam_basis.z
+			forward.y = 0.0
+			if forward.length_squared() > 0.01:
+				mesh_instance.rotation.y = atan2(forward.x, forward.z)
 
 	# Mainkan animasi serangan di AnimationPlayer
 	if animation_player and animation_player.has_animation(anim_name):
@@ -953,10 +963,13 @@ func _apply_animation_root_displacement() -> void:
 func _resolve_damage_target(node: Node) -> Node:
 	if not node or node == self:
 		return null
-	if node.has_method("take_damage"):
-		return node
-	if node.get_parent() and node.get_parent().has_method("take_damage"):
-		return node.get_parent()
+	var curr: Node = node
+	for _i in range(4):
+		if not curr or curr == self:
+			break
+		if curr.has_method("take_damage"):
+			return curr
+		curr = curr.get_parent()
 	return null
 
 func _apply_hit_to_target(target: Node) -> void:

@@ -1,8 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dsx2o6i2gtvio"]
 
-[ext_resource type="Script" path="res://safe_room.gd" id="1_saferoom"]
 [ext_resource type="Script" uid="uid://bhg7k1cgksxt6" path="res://Player.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://ccnec6r88jsj4" path="res://safe_room.gd" id="1_saferoom"]
 [ext_resource type="Script" uid="uid://bgo85e8kye2ny" path="res://camera_pivot.gd" id="2_0xm2m"]
+[ext_resource type="MeshLibrary" uid="uid://ctt52t6ypk3ef" path="res://DungeonTiles/scenes/MeshLibrary/rooms.tres" id="2_qmpnr"]
 [ext_resource type="Script" uid="uid://bcveboefkhqd8" path="res://hud_controller.gd" id="3_hud"]
 [ext_resource type="Texture2D" uid="uid://dbfmrnvqnscpc" path="res://icon.svg" id="4_icon"]
 [ext_resource type="StyleBox" uid="uid://df72836abc101" path="res://resources/ui/panel_box.tres" id="9_panel_box"]
@@ -10,10 +11,9 @@
 [ext_resource type="StyleBox" uid="uid://ca83a18def202" path="res://resources/ui/slot_box.tres" id="11_slot_box"]
 [ext_resource type="Shader" uid="uid://clf73n3am1ia3" path="res://shaders/toxic_veins.gdshader" id="12_toxic_shader"]
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
-[ext_resource type="PackedScene" path="res://portal.tscn" id="18_portal"]
+[ext_resource type="PackedScene" uid="uid://b2lonq43mc2wy" path="res://portal.tscn" id="18_portal"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
-[ext_resource type="AnimationLibrary" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
-[ext_resource type="Material" path="res://DungeonTiles/material/DungeonBrickFloor_mat.tres" id="27_floor_mat"]
+[ext_resource type="AnimationLibrary" uid="uid://uyrmce8vk617" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -27,7 +27,7 @@ albedo_color = Color(0.25, 0.18, 0.12, 1)
 roughness = 0.8
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
-size = Vector3(2.4, 1.4, 2.0)
+size = Vector3(2.4, 1.4, 2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_slash"]
 transparency = 1
@@ -46,7 +46,6 @@ transparency = 1
 blend_mode = 1
 shading_mode = 0
 vertex_color_use_as_albedo = true
-albedo_color = Color(1, 1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_spark"]
 material = SubResource("StandardMaterial3D_spark")
@@ -81,35 +80,37 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="SafeRoom" type="Node3D"]
+[node name="SafeRoom" type="Node3D" unique_id=839460912]
 script = ExtResource("1_saferoom")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=68816743]
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 10, 0)
 light_color = Color(0.95, 0.92, 0.82, 1)
 light_energy = 0.85
 shadow_enabled = true
 
-[node name="SafeZoneLight" type="OmniLight3D" parent="."]
+[node name="SafeZoneLight" type="OmniLight3D" parent="." unique_id=753316717]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
 light_color = Color(0.2, 0.95, 0.65, 1)
 light_energy = 1.6
 omni_range = 18.0
 
-[node name="FloorPlatform" type="CSGBox3D" parent="."]
+[node name="FloorPlatform" type="GridMap" parent="." unique_id=583930113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-use_collision = true
-size = Vector3(14, 0.5, 14)
-material = ExtResource("27_floor_mat")
+mesh_library = ExtResource("2_qmpnr")
+data = {
+"cells": PackedInt32Array(0, 1, 6, 0, 0, 4, 2, 0, 4, 2, 65534, 4, 0, 65534, 4, 65534, 0, 4, 65534, 65534, 4, 65534, 65532, 4, 0, 65532, 4, 2, 65532, 4, 65534, 65530, 4, 0, 65530, 4, 2, 65530, 4, 4, 65530, 4, 65532, 65530, 4, 65534, 1, 5, 2, 1, 1048581, 65534, 65535, 1441798, 65534, 65533, 1441798, 2, 65535, 1048582, 2, 65533, 1048582)
+}
+metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="ReturnPortal" parent="." instance=ExtResource("18_portal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -5.2)
+[node name="ReturnPortal" parent="." unique_id=227663928 instance=ExtResource("18_portal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9783798, -5.2)
 portal_id = "safe_room_return_portal"
 target_scene_path = "res://main.tscn"
-portal_color = Color(0.15, 0.75, 1.0, 1.0)
 
 [node name="Players" type="CharacterBody3D" parent="." unique_id=1728051542]
 unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92024755, 1.1582742, 0)
 wall_min_slide_angle = 1.2391838
 script = ExtResource("1_ig7tw")
 
@@ -188,20 +189,20 @@ unique_name_in_owner = true
 [node name="SlashAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=715]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-max_distance = 25.0
 unit_size = 2.5
+max_distance = 25.0
 
 [node name="SlashHitAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=716]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-max_distance = 25.0
 unit_size = 2.5
+max_distance = 25.0
 
 [node name="FootstepAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=709]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-max_distance = 18.0
 unit_size = 2.0
+max_distance = 18.0
 
 [node name="CameraPivot" type="Node3D" parent="Players" unique_id=1336900825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)

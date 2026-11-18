@@ -77,18 +77,6 @@ func _process(_delta: float) -> void:
 				target_reticle.self_modulate = Color(1.0, 0.8, 0.2, 0.95)
 				target_reticle.position = screen_pos - Vector2(12, 12)
 				return
-	elif player and player.has_method("_find_soft_target"):
-		var soft_target: Node3D = player._find_soft_target()
-		if soft_target and is_instance_valid(soft_target):
-			var cam := get_viewport().get_camera_3d()
-			if cam:
-				var target_pos: Vector3 = soft_target.global_position + Vector3(0, 0.6, 0)
-				if not cam.is_position_behind(target_pos):
-					var screen_pos := cam.unproject_position(target_pos)
-					target_reticle.visible = true
-					target_reticle.self_modulate = Color(0.85, 0.95, 1.0, 0.42)
-					target_reticle.position = screen_pos - Vector2(12, 12)
-					return
 	target_reticle.visible = false
 
 func _ready() -> void:

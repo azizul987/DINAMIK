@@ -17,15 +17,13 @@
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="15_door"]
 [ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
-[ext_resource type="PackedScene" path="res://portal.tscn" id="18_portal"]
+[ext_resource type="PackedScene" uid="uid://b2lonq43mc2wy" path="res://portal.tscn" id="18_portal"]
 [ext_resource type="PackedScene" path="res://archer_enemy.tscn" id="19_archer"]
 [ext_resource type="ArrayMesh" uid="uid://fltpsydjryp5" path="res://resources/weapon/OBJ/Axe.obj" id="20_ryguw"]
-[ext_resource type="PackedScene" uid="uid://b4rkeubtkyc3w" path="res://resources/mob/Exports/GLB (Godot-Unreal)/Imp.glb" id="21_d13ii"]
-[ext_resource type="PackedScene" uid="uid://cvbvecj2enuy6" path="res://resources/mob/Exports/GLB (Godot-Unreal)/Puglin.glb" id="22_1u8w0"]
-[ext_resource type="Script" uid="uid://da38wfbux3u3e" path="res://procedural_biped_animator.gd" id="23_d13ii"]
-[ext_resource type="AnimationLibrary" uid="uid://bj4iqs5q6xj66" path="res://resources/mob/mob_anim_library.tres" id="24_mob_anim"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
 [ext_resource type="AnimationLibrary" uid="uid://uyrmce8vk617" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
+[ext_resource type="PackedScene" path="res://destructible_chest.tscn" id="27_chest"]
+[ext_resource type="PackedScene" path="res://destructible_box.tscn" id="28_box"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -928,43 +926,22 @@ omni_range = 3.5
 [node name="CollisionShape3D" type="CollisionShape3D" parent="door3/StaticBody3D" unique_id=329780893]
 shape = SubResource("ConcavePolygonShape3D_6dlmt")
 
-[node name="LevelExitPortal" parent="." unique_id=2100000010 instance=ExtResource("18_portal")]
+[node name="Exit" parent="." unique_id=2100000020 instance=ExtResource("18_portal")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.685307, 0.33593762, 14.931508)
-portal_id = "dungeon_exit_portal"
-target_scene_path = "res://safe_room.tscn"
-
-[node name="NoTutorPortal" parent="." unique_id=2100000020 instance=ExtResource("18_portal")]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.35, 0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.210838, 0.35, 14.504486)
 portal_id = "portal_no_tutor"
 target_scene_path = "res://safe_room.tscn"
-portal_color = Color(0.2, 0.95, 0.65, 1)
+portal_color = Color(1, 1, 1, 1)
 
 [node name="Axe" type="MeshInstance3D" parent="." unique_id=310211272]
 transform = Transform3D(-0.99695826, -0.077937074, 0, 0.077937074, -0.99695826, 0, 0, 0, 1, -23.183065, 2.071207, 15.5386715)
 mesh = ExtResource("20_ryguw")
 
-[node name="Imp" parent="." unique_id=148355656 node_paths=PackedStringArray("skeleton", "animation_player", "visual_root") instance=ExtResource("21_d13ii")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.117804, 0.35331944, 15.355704)
-script = ExtResource("23_d13ii")
-skeleton = NodePath("Armature/Skeleton3D")
-animation_player = NodePath("AnimationPlayer")
-visual_root = NodePath("Armature")
+[node name="Chest" parent="." unique_id=2100000030 instance=ExtResource("27_chest")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0.35, 12.5)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Imp" unique_id=754769178]
-libraries/ = ExtResource("24_mob_anim")
-autoplay = &"idle"
-playback_default_blend_time = 0.25
+[node name="Box_1" parent="." unique_id=2100000031 instance=ExtResource("28_box")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.0, 0.35, 13.5)
 
-[node name="Puglin" parent="." unique_id=1673851444 node_paths=PackedStringArray("skeleton", "animation_player", "visual_root") instance=ExtResource("22_1u8w0")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5047836, 0.355032, -0.3249588)
-script = ExtResource("23_d13ii")
-skeleton = NodePath("Armature/Skeleton3D")
-animation_player = NodePath("AnimationPlayer")
-visual_root = NodePath("Armature")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Puglin" unique_id=1164192171]
-libraries/ = ExtResource("24_mob_anim")
-autoplay = &"idle"
-playback_default_blend_time = 0.25
+[node name="Box_2" parent="." unique_id=2100000032 instance=ExtResource("28_box")]
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -12.0, 0.35, 11.2)

@@ -125,6 +125,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_time_since_last_mouse = 0.0
 		var parent_node := get_parent()
 		var is_locked := parent_node and "locked_target" in parent_node and parent_node.locked_target != null
+		if is_locked and absf(event.relative.x) > 36.0:
+			parent_node.locked_target = null
+			is_locked = false
+
 		var sens := mouse_sensitivity * (0.25 if is_locked else 1.0)
 
 		if not is_locked:
