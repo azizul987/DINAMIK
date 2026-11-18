@@ -2,17 +2,17 @@
 
 [ext_resource type="Script" path="res://dash_wind_effect.gd" id="1_script"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dust"]
 transparency = 1
 shading_mode = 0
-albedo_color = Color(0.88, 0.96, 1, 0.75)
+albedo_color = Color(0.85, 0.92, 1, 0.45)
 
-[sub_resource type="TorusMesh" id="TorusMesh_ring"]
-material = SubResource("StandardMaterial3D_ring")
-inner_radius = 0.25
-outer_radius = 0.45
-rings = 12
-ring_segments = 3
+[sub_resource type="SphereMesh" id="SphereMesh_dust"]
+material = SubResource("StandardMaterial3D_dust")
+radius = 0.1
+height = 0.2
+radial_segments = 8
+rings = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_streaks"]
 transparency = 1
@@ -21,28 +21,68 @@ albedo_color = Color(0.92, 0.98, 1, 0.65)
 
 [sub_resource type="BoxMesh" id="BoxMesh_streak"]
 material = SubResource("StandardMaterial3D_streaks")
-size = Vector3(0.03, 0.03, 0.75)
+size = Vector3(0.018, 0.018, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vapor"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.9, 0.96, 1, 0.5)
+
+[sub_resource type="SphereMesh" id="SphereMesh_vapor"]
+material = SubResource("StandardMaterial3D_vapor")
+radius = 0.05
+height = 0.1
+radial_segments = 6
+rings = 3
 
 [node name="DashWindEffect" type="Node3D"]
 script = ExtResource("1_script")
 
-[node name="WindRing" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0)
-mesh = SubResource("TorusMesh_ring")
+[node name="WindDust" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 12
+lifetime = 0.32
+one_shot = true
+explosiveness = 0.95
+mesh = SubResource("SphereMesh_dust")
+direction = Vector3(0, 0.3, -1)
+spread = 55.0
+gravity = Vector3(0, -1.5, 0)
+initial_velocity_min = 2.5
+initial_velocity_max = 5.2
+scale_amount_min = 0.6
+scale_amount_max = 1.4
 
 [node name="WindStreaks" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
 emitting = false
-amount = 14
-lifetime = 0.28
+amount = 16
+lifetime = 0.25
 one_shot = true
-explosiveness = 0.92
+explosiveness = 0.95
 mesh = SubResource("BoxMesh_streak")
 direction = Vector3(0, 0, -1)
-spread = 30.0
+spread = 22.0
 gravity = Vector3(0, 0, 0)
-initial_velocity_min = 5.5
-initial_velocity_max = 11.0
-scale_amount_min = 0.6
+initial_velocity_min = 7.5
+initial_velocity_max = 15.0
+scale_amount_min = 0.5
+scale_amount_max = 1.2
+
+[node name="AirVapor" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+emitting = false
+amount = 10
+lifetime = 0.3
+one_shot = true
+explosiveness = 0.9
+mesh = SubResource("SphereMesh_vapor")
+direction = Vector3(0, 0.2, -1)
+spread = 40.0
+gravity = Vector3(0, -0.5, 0)
+initial_velocity_min = 3.5
+initial_velocity_max = 7.0
+scale_amount_min = 0.7
 scale_amount_max = 1.3
 
 [node name="WindAudio" type="AudioStreamPlayer3D" parent="."]

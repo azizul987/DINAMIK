@@ -1,13 +1,15 @@
-extends Node3D
 class_name GroundSlamShockwave
+extends Node3D
 
-@onready var shockwave_ring: MeshInstance3D = $ShockwaveRing
-@onready var dust_debris: GPUParticles3D = $DustDebris
-@onready var impact_audio: AudioStreamPlayer3D = $ImpactAudio
+@onready var radial_dust: CPUParticles3D = $RadialDustRing if has_node("RadialDustRing") else null
+@onready var dust_debris: GPUParticles3D = $DustDebris if has_node("DustDebris") else null
+@onready var impact_audio: AudioStreamPlayer3D = $ImpactAudio if has_node("ImpactAudio") else null
 
 static var _cached_impact_wav: AudioStreamWAV = null
 
 func _ready() -> void:
+	set_process(false)
+	set_physics_process(false)
 	_play_procedural_stomp_audio()
 	_animate_shockwave()
 
@@ -40,22 +42,13 @@ static func _generate_stomp_wav() -> AudioStreamWAV:
 	return wav
 
 func _animate_shockwave() -> void:
+	if radial_dust:
+		radial_dust.restart()
+		radial_dust.emitting = true
 	if dust_debris:
+		dust_debris.restart()
 		dust_debris.emitting = true
 
-	if shockwave_ring and shockwave_ring.material_override:
-		var base_mat := shockwave_ring.material_override as StandardMaterial3D
-		if base_mat:
-			var mat := base_mat.duplicate() as StandardMaterial3D
-			shockwave_ring.material_override = mat
-			mat.albedo_color = Color(1.0, 0.82, 0.45, 0.85)
-			shockwave_ring.scale = Vector3(0.3, 0.04, 0.3)
-			var tw := create_tween()
-			tw.set_parallel(true)
-			tw.tween_property(shockwave_ring, "scale", Vector3(3.2, 0.04, 3.2), 0.32).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			tw.tween_property(mat, "albedo_color:a", 0.0, 0.32).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-
-	get_tree().create_timer(0.48).timeout.connect(func():
-		if is_instance_valid(self):
-			queue_free()
-	)
+	var cleanup_tw := create_tween()
+	cleanup_tw.tween_interval(0.45)
+	cleanup_tw.tween_callback(queue_free)

@@ -19,7 +19,7 @@
 [ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://b2lonq43mc2wy" path="res://portal.tscn" id="18_portal"]
-[ext_resource type="PackedScene" path="res://archer_enemy.tscn" id="19_archer"]
+[ext_resource type="PackedScene" uid="uid://dfarcher0001" path="res://archer_enemy.tscn" id="19_archer"]
 [ext_resource type="ArrayMesh" uid="uid://fltpsydjryp5" path="res://resources/weapon/OBJ/Axe.obj" id="20_ryguw"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
 [ext_resource type="AnimationLibrary" uid="uid://db67kswo0a6a5" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
@@ -277,7 +277,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.728136, 0.74075574, 5.9238
 
 [node name="ArcherEnemy" parent="." unique_id=2100000011 instance=ExtResource("19_archer")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.77186394, 0.8, 6.041749)
+transform = Transform3D(1.69, 0, 0, 0, 1.69, 0, 0, 0, 1.69, 0.77186394, 0.8, 6.041749)
 
 [node name="SpikeTrap" parent="." unique_id=1970698199 instance=ExtResource("6_spike_trap")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.829979, 0.35161388, -2.2)

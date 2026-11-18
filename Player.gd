@@ -653,7 +653,7 @@ func _physics_process(delta: float) -> void:
 	if not _was_on_floor_prev and is_on_floor() and _prev_vertical_velocity < landing_impact_threshold:
 		_spawn_footstep_dust()
 		_play_footstep_sound()
-		if _prev_vertical_velocity < -7.0:
+		if _prev_vertical_velocity < -10.5:
 			_spawn_ground_slam_shockwave(global_position + Vector3(0.0, 0.03, 0.0), 0.85)
 			if camera_pivot and camera_pivot.has_method("add_trauma"):
 				camera_pivot.add_trauma(0.35)
@@ -810,7 +810,7 @@ func _spawn_dash_wind_effect(dir: Vector3) -> void:
 	if not wind:
 		return
 	parent_node.add_child(wind)
-	wind.global_position = global_position + Vector3(0.0, 0.85, 0.0)
+	wind.global_position = global_position + Vector3(0.0, 0.25, 0.0)
 	wind.setup(dir)
 
 func _spawn_ghost_trail() -> void:
@@ -828,10 +828,12 @@ func _spawn_ghost_trail() -> void:
 		return
 
 	parent_node.add_child(ghost)
-	ghost.global_position = mesh_instance.global_position + Vector3(0.0, 1.0, 0.0)
+	ghost.global_position = mesh_instance.global_position
 	ghost.global_rotation = mesh_instance.global_rotation
 	ghost.scale = mesh_instance.scale
-	ghost.start_fade(dash_ghost_color)
+
+	var skel: Skeleton3D = mesh_instance.find_child("Skeleton3D", true, false) as Skeleton3D if mesh_instance else null
+	ghost.start_fade(dash_ghost_color, skel)
 
 ## Memproses input tombol Z-Targeting (RMB / Q / Tab / MMB) ala The Legend of Zelda:
 ## - Jika ada target musuh terdekat: Kunci musuh (Lock-on).

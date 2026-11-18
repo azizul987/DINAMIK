@@ -61,11 +61,12 @@ var shoot_timer: float = 0.0
 var hurt_timer: float = 0.0
 var _detection_check_timer: float = 0.0
 
-@onready var visual_root: Node3D = $VisualRoot if has_node("VisualRoot") else null
-@onready var collision_shape: CollisionShape3D = $CollisionShape3D if has_node("CollisionShape3D") else null
-@onready var bow_pivot: Node3D = $VisualRoot/BowPivot if has_node("VisualRoot/BowPivot") else null
-@onready var arrow_spawn_point: Marker3D = $VisualRoot/BowPivot/ArrowSpawnPoint if has_node("VisualRoot/BowPivot/ArrowSpawnPoint") else null
-@onready var aim_laser: MeshInstance3D = $VisualRoot/BowPivot/AimLaser if has_node("VisualRoot/BowPivot/AimLaser") else null
+@onready var visual_root: Node3D = $VisualRoot if has_node("VisualRoot") else (find_child("VisualRoot", true, false) as Node3D)
+@onready var animation_player: AnimationPlayer = $VisualRoot/AnimationPlayer if has_node("VisualRoot/AnimationPlayer") else (find_child("AnimationPlayer", true, false) as AnimationPlayer)
+@onready var collision_shape: CollisionShape3D = $CollisionShape3D if has_node("CollisionShape3D") else (find_child("CollisionShape3D", true, false) as CollisionShape3D)
+@onready var bow_pivot: Node3D = find_child("BowPivot", true, false) as Node3D
+@onready var arrow_spawn_point: Marker3D = find_child("ArrowSpawnPoint", true, false) as Marker3D
+@onready var nocked_arrow: MeshInstance3D = find_child("NockedArrow", true, false) as MeshInstance3D
 @onready var hit_particles: CPUParticles3D = $HitParticles if has_node("HitParticles") else null
 @onready var hp_viewport: SubViewport = $HpViewport if has_node("HpViewport") else null
 @onready var hp_bar: ProgressBar = $HpViewport/HpBar if has_node("HpViewport/HpBar") else null
@@ -93,6 +94,14 @@ func _ready() -> void:
 	if bow_pivot:
 		_bow_initial_transform = bow_pivot.transform
 
+	if visual_root:
+		var mace := visual_root.find_child("Imp_Mace", true, false) as VisualInstance3D
+		if mace:
+			mace.visible = false
+
+	if animation_player and animation_player.has_animation("idle"):
+		animation_player.play("idle")
+
 	_cache_mesh_list()
 	_setup_health_bar()
 	_setup_flash_material()
@@ -103,7 +112,7 @@ func _cache_mesh_list() -> void:
 	if visual_root:
 		for child in visual_root.find_children("*", "MeshInstance3D", true, false):
 			var m := child as MeshInstance3D
-			if m and m != aim_laser:
+			if m and m.name != "Imp_Mace":
 				_flash_meshes.append(m)
 
 func _setup_health_bar() -> void:
@@ -199,6 +208,9 @@ func _update_player_detection() -> void:
 			idle_timer = randf_range(min_idle_time, max_idle_time)
 
 func _process_idle(delta: float) -> void:
+	if animation_player and animation_player.current_animation != "idle" and animation_player.has_animation("idle"):
+		animation_player.play("idle", 0.15)
+
 	velocity.x = move_toward(velocity.x, 0.0, 5.0 * delta)
 	velocity.z = move_toward(velocity.z, 0.0, 5.0 * delta)
 
@@ -207,6 +219,9 @@ func _process_idle(delta: float) -> void:
 		_pick_new_patrol_destination()
 
 func _process_patrol(delta: float) -> void:
+	if animation_player and animation_player.current_animation != "walk" and animation_player.has_animation("walk"):
+		animation_player.play("walk", 0.15)
+
 	var to_dest: Vector3 = target_destination - global_position
 	to_dest.y = 0.0
 	var dist := to_dest.length()
@@ -234,6 +249,9 @@ func _process_chase(delta: float) -> void:
 		current_state = State.IDLE
 		return
 
+	if animation_player and animation_player.current_animation != "walk" and animation_player.has_animation("walk"):
+		animation_player.play("walk", 0.15)
+
 	var to_player: Vector3 = player_ref.global_position - global_position
 	to_player.y = 0.0
 	var dist := to_player.length()
@@ -251,6 +269,9 @@ func _process_kite(delta: float) -> void:
 	if not is_instance_valid(player_ref):
 		current_state = State.IDLE
 		return
+
+	if animation_player and animation_player.current_animation != "walk" and animation_player.has_animation("walk"):
+		animation_player.play("walk", 0.15)
 
 	var to_player: Vector3 = player_ref.global_position - global_position
 	to_player.y = 0.0
@@ -274,8 +295,8 @@ func _start_aiming() -> void:
 	velocity.x = 0.0
 	velocity.z = 0.0
 
-	if aim_laser:
-		aim_laser.visible = true
+	if nocked_arrow:
+		nocked_arrow.visible = true
 
 	if shoot_audio and _cached_draw_stream:
 		shoot_audio.stream = _cached_draw_stream
@@ -291,6 +312,9 @@ func _process_aiming(delta: float) -> void:
 		_cancel_aiming()
 		return
 
+	if animation_player and animation_player.current_animation != "idle" and animation_player.has_animation("idle"):
+		animation_player.play("idle", 0.15)
+
 	var to_player: Vector3 = player_ref.global_position - global_position
 	to_player.y = 0.0
 	_face_direction(to_player.normalized(), delta * 1.5)
@@ -301,8 +325,8 @@ func _process_aiming(delta: float) -> void:
 
 func _cancel_aiming() -> void:
 	current_state = State.IDLE
-	if aim_laser:
-		aim_laser.visible = false
+	if nocked_arrow:
+		nocked_arrow.visible = false
 	if bow_pivot:
 		bow_pivot.transform = _bow_initial_transform
 
@@ -311,8 +335,8 @@ func _release_arrow() -> void:
 	state_timer = 0.35
 	shoot_timer = shoot_cooldown
 
-	if aim_laser:
-		aim_laser.visible = false
+	if nocked_arrow:
+		nocked_arrow.visible = false
 
 	if shoot_audio and _cached_release_stream:
 		shoot_audio.stream = _cached_release_stream
@@ -340,6 +364,9 @@ func _release_arrow() -> void:
 		tw.tween_property(bow_pivot, "position:z", _bow_initial_transform.origin.z, 0.22)
 
 func _process_shooting(delta: float) -> void:
+	if animation_player and animation_player.current_animation != "idle" and animation_player.has_animation("idle"):
+		animation_player.play("idle", 0.15)
+
 	state_timer -= delta
 	if state_timer <= 0.0:
 		current_state = State.IDLE
@@ -384,8 +411,8 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bo
 	else:
 		current_state = State.HURT
 		hurt_timer = 0.35
-		if aim_laser:
-			aim_laser.visible = false
+		if nocked_arrow:
+			nocked_arrow.visible = false
 
 func _update_hp_bar() -> void:
 	if hp_viewport:
@@ -446,7 +473,7 @@ func _spawn_damage_number(amount: float) -> void:
 		text_color = Color(1.0, 0.75, 0.2, 1.0)
 		f_size = 42
 
-	var spawn_pos := global_position + Vector3(randf_range(-0.25, 0.25), 1.6, randf_range(-0.25, 0.25))
+	var spawn_pos := global_position + Vector3(randf_range(-0.25, 0.25), 1.35, randf_range(-0.25, 0.25))
 	var parent_node := get_parent()
 	if not parent_node:
 		parent_node = get_tree().current_scene
@@ -467,8 +494,8 @@ func _die() -> void:
 		if is_instance_valid(mesh_inst):
 			mesh_inst.set_instance_shader_parameter("hit_flash", 0.0)
 
-	if aim_laser:
-		aim_laser.visible = false
+	if nocked_arrow:
+		nocked_arrow.visible = false
 	if hp_sprite:
 		hp_sprite.visible = false
 	if hp_viewport:

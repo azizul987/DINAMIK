@@ -2,17 +2,17 @@
 
 [ext_resource type="Script" path="res://ground_slam_shockwave.gd" id="1_shockwave"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_radial_dust"]
 transparency = 1
-cull_mode = 2
 shading_mode = 0
-albedo_color = Color(1, 0.82, 0.45, 0.85)
+albedo_color = Color(0.86, 0.84, 0.8, 0.45)
 
-[sub_resource type="TorusMesh" id="TorusMesh_ring"]
-inner_radius = 0.45
-outer_radius = 0.85
-rings = 16
-ring_segments = 4
+[sub_resource type="SphereMesh" id="SphereMesh_radial_dust"]
+material = SubResource("StandardMaterial3D_radial_dust")
+radius = 0.1
+height = 0.2
+radial_segments = 8
+rings = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_debris"]
 transparency = 1
@@ -46,10 +46,22 @@ scale_curve = SubResource("CurveTexture_scale")
 [node name="GroundSlamShockwave" type="Node3D"]
 script = ExtResource("1_shockwave")
 
-[node name="ShockwaveRing" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.3, 0, 0, 0, 0.04, 0, 0, 0, 0.3, 0, 0.03, 0)
-material_override = SubResource("StandardMaterial3D_ring")
-mesh = SubResource("TorusMesh_ring")
+[node name="RadialDustRing" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+emitting = false
+amount = 16
+lifetime = 0.38
+one_shot = true
+explosiveness = 0.92
+mesh = SubResource("SphereMesh_radial_dust")
+direction = Vector3(0, 0.1, 0)
+spread = 180.0
+flatness = 0.85
+gravity = Vector3(0, -1, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 5.5
+scale_amount_min = 0.7
+scale_amount_max = 1.5
 
 [node name="DustDebris" type="GPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
