@@ -175,6 +175,23 @@ func _ready() -> void:
 		animation_player.playback_default_blend_time = 0.15
 		if animation_player.has_animation("idle"):
 			animation_player.play("idle")
+	_check_and_restore_saved_transform()
+
+func _check_and_restore_saved_transform() -> void:
+	if GlobalLogic.has_pending_player_restore():
+		var restore_data: Dictionary = GlobalLogic.consume_pending_player_restore()
+		if restore_data.has("position") and restore_data["position"] is Vector3:
+			global_position = restore_data["position"]
+		if restore_data.has("rotation_y"):
+			var rot_y: float = float(restore_data["rotation_y"])
+			rotation.y = rot_y
+			if camera_pivot:
+				camera_pivot.rotation.y = rot_y
+		print("[Player] Posisi berhasil dipulihkan ke %s dan rotasi ke %s" % [str(global_position), str(rotation.y)])
+	# Sinkronkan status darah dan racun terkini ke antarmuka
+	GlobalLogic.player_hp_changed.emit(GlobalLogic.current_hp, GlobalLogic.max_hp)
+	GlobalLogic.toxicity_changed.emit(GlobalLogic.current_toxicity, GlobalLogic.max_toxicity)
+	GlobalLogic.inventory_updated.emit()
 
 func _setup_weapon_attachment() -> void:
 	if not mesh_instance:

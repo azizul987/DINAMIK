@@ -2,17 +2,24 @@ class_name PauseMenu
 extends Control
 
 @onready var btn_resume: Button = %BtnResume
+@onready var btn_save: Button = %BtnSave
 @onready var btn_restart: Button = %BtnRestart
 @onready var btn_main_menu: Button = %BtnMainMenu
 @onready var menu_card: PanelContainer = %MenuCard
 @onready var dark_overlay: ColorRect = %DarkOverlay
+@onready var save_toast: Label = %SaveToast
 
 var is_paused: bool = false
+var _toast_tween: Tween = null
 
 func _ready() -> void:
 	visible = false
+	if save_toast:
+		save_toast.visible = false
 	btn_resume.pressed.connect(_on_resume_pressed)
 	btn_resume.mouse_entered.connect(GlobalLogic.play_ui_hover)
+	btn_save.pressed.connect(_on_save_pressed)
+	btn_save.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_restart.pressed.connect(_on_restart_pressed)
 	btn_restart.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_main_menu.pressed.connect(_on_main_menu_pressed)
@@ -35,6 +42,8 @@ func pause() -> void:
 	is_paused = true
 	get_tree().paused = true
 	visible = true
+	if save_toast:
+		save_toast.visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	GlobalLogic.play_ui_switch()
 	GlobalLogic.duck_bgm(true)
@@ -51,12 +60,38 @@ func resume() -> void:
 	is_paused = false
 	get_tree().paused = false
 	visible = false
+	if save_toast:
+		save_toast.visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	GlobalLogic.duck_bgm(false)
 
 func _on_resume_pressed() -> void:
 	GlobalLogic.play_ui_click()
 	resume()
+
+func _on_save_pressed() -> void:
+	GlobalLogic.play_ui_click()
+	var success := GlobalLogic.save_game()
+	if success:
+		_show_save_toast("Permainan Berhasil Disimpan!")
+	else:
+		_show_save_toast("Gagal Menyimpan Permainan!")
+
+func _show_save_toast(msg: String) -> void:
+	if not save_toast:
+		return
+	save_toast.text = msg
+	save_toast.visible = true
+	save_toast.modulate.a = 1.0
+	if _toast_tween and _toast_tween.is_valid():
+		_toast_tween.kill()
+	_toast_tween = create_tween()
+	_toast_tween.tween_interval(1.2)
+	_toast_tween.tween_property(save_toast, "modulate:a", 0.0, 0.6)
+	_toast_tween.tween_callback(func():
+		if is_instance_valid(save_toast):
+			save_toast.visible = false
+	)
 
 func _on_restart_pressed() -> void:
 	GlobalLogic.play_ui_click()

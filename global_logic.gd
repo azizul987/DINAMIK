@@ -51,6 +51,10 @@ var ironskin_timer: float = 0.0
 var last_consumed_potion: String = ""
 var last_potion_timestamp: float = 0.0
 
+# Save & Load System State
+const SAVE_FILE_PATH := "user://savegame.json"
+var pending_player_restore: Dictionary = {}
+
 var is_boss_active: bool = false
 var boss_name_active: String = ""
 var boss_max_hp_active: float = 0.0
@@ -370,7 +374,8 @@ func reset_safe_zone() -> void:
 	ironskin_timer = 0.0
 	last_consumed_potion = ""
 	last_potion_timestamp = 0.0
-	current_hp = max_hp
+	max_hp = 100.0
+	current_hp = 100.0
 	current_toxicity = 0.0
 	player_hp_changed.emit(current_hp, max_hp)
 	toxicity_changed.emit(current_toxicity, max_toxicity)
@@ -516,7 +521,8 @@ func reset_game_state() -> void:
 	ironskin_timer = 0.0
 	last_consumed_potion = ""
 	last_potion_timestamp = 0.0
-	current_hp = max_hp
+	max_hp = 100.0
+	current_hp = 100.0
 	current_toxicity = 0.0
 	tolerance_level = 1
 	max_toxicity = 100.0
@@ -564,3 +570,170 @@ func update_boss_hp(c_hp: float, m_hp: float) -> void:
 func trigger_boss_defeated() -> void:
 	is_boss_active = false
 	boss_defeated_event.emit()
+
+# ==============================================================================
+# SISTEM SIMPAN & MUAT PERMAINAN (SAVE & LOAD SYSTEM)
+# ==============================================================================
+
+func has_save_file() -> bool:
+	return FileAccess.file_exists(SAVE_FILE_PATH)
+
+func delete_save_file() -> void:
+	if has_save_file():
+		DirAccess.remove_absolute(SAVE_FILE_PATH)
+
+func has_pending_player_restore() -> bool:
+	return not pending_player_restore.is_empty()
+
+func consume_pending_player_restore() -> Dictionary:
+	var data := pending_player_restore.duplicate()
+	pending_player_restore.clear()
+	return data
+
+func save_game(custom_pos: Vector3 = Vector3.ZERO, custom_rot_y: float = 0.0, custom_scene_path: String = "", use_custom_transform: bool = false) -> bool:
+	var target_scene_path := custom_scene_path
+	if target_scene_path.is_empty():
+		var current_scn := get_tree().current_scene
+		if current_scn and not current_scn.scene_file_path.is_empty():
+			target_scene_path = current_scn.scene_file_path
+		else:
+			target_scene_path = "res://main.tscn"
+
+	var player_pos := custom_pos
+	var player_rot_y := custom_rot_y
+
+	if not use_custom_transform:
+		var p_node := get_tree().get_first_node_in_group("player") as Node3D
+		if p_node:
+			player_pos = p_node.global_position
+			player_rot_y = p_node.rotation.y
+
+	var save_dict := {
+		"version": 1,
+		"timestamp": int(Time.get_unix_time_from_system()),
+		"scene_path": target_scene_path,
+		"player": {
+			"position": {
+				"x": snappedf(player_pos.x, 0.0001),
+				"y": snappedf(player_pos.y, 0.0001),
+				"z": snappedf(player_pos.z, 0.0001)
+			},
+			"rotation_y": snappedf(player_rot_y, 0.0001),
+			"current_hp": current_hp,
+			"max_hp": max_hp,
+			"current_toxicity": current_toxicity,
+			"max_toxicity": max_toxicity,
+			"tolerance_level": tolerance_level
+		},
+		"inventory": {
+			"materials": materials.duplicate(),
+			"potions": potions.duplicate()
+		},
+		"progression": {
+			"current_floor": current_floor,
+			"is_tutorial_active": is_tutorial_active,
+			"is_tutorial_completed": is_tutorial_completed,
+			"current_tutorial_step": current_tutorial_step
+		}
+	}
+
+	var json_str := JSON.stringify(save_dict, "\t")
+	var file := FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
+	if not file:
+		printerr("[SaveSystem] Gagal membuka file untuk menulis: ", FileAccess.get_open_error())
+		return false
+
+	file.store_string(json_str)
+	file.close()
+	print("[SaveSystem] Permainan berhasil disimpan ke %s (Scene: %s, Pos: %s)" % [SAVE_FILE_PATH, target_scene_path, str(player_pos)])
+	return true
+
+func load_game() -> bool:
+	if not has_save_file():
+		printerr("[SaveSystem] Tidak ada file simpanan untuk dimuat.")
+		return false
+
+	var file := FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
+	if not file:
+		printerr("[SaveSystem] Gagal membaca file simpanan: ", FileAccess.get_open_error())
+		return false
+
+	var content := file.get_as_text()
+	file.close()
+
+	var parsed = JSON.parse_string(content)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		printerr("[SaveSystem] Format berkas simpanan tidak valid!")
+		return false
+
+	var data: Dictionary = parsed
+
+	# Pulihkan data pemain
+	if data.has("player") and typeof(data["player"]) == TYPE_DICTIONARY:
+		var p_data: Dictionary = data["player"]
+		current_hp = float(p_data.get("current_hp", 100.0))
+		max_hp = float(p_data.get("max_hp", 100.0))
+		current_toxicity = float(p_data.get("current_toxicity", 0.0))
+		max_toxicity = float(p_data.get("max_toxicity", 100.0))
+		tolerance_level = int(p_data.get("tolerance_level", 1))
+
+		var pos_dict = p_data.get("position", {})
+		var restored_pos := Vector3.ZERO
+		if typeof(pos_dict) == TYPE_DICTIONARY:
+			restored_pos = Vector3(
+				float(pos_dict.get("x", 0.0)),
+				float(pos_dict.get("y", 0.0)),
+				float(pos_dict.get("z", 0.0))
+			)
+		var restored_rot_y: float = float(p_data.get("rotation_y", 0.0))
+
+		pending_player_restore = {
+			"position": restored_pos,
+			"rotation_y": restored_rot_y
+		}
+
+	# Pulihkan inventori
+	if data.has("inventory") and typeof(data["inventory"]) == TYPE_DICTIONARY:
+		var inv_data: Dictionary = data["inventory"]
+		if inv_data.has("materials") and typeof(inv_data["materials"]) == TYPE_DICTIONARY:
+			for k in inv_data["materials"].keys():
+				materials[k] = int(inv_data["materials"][k])
+		if inv_data.has("potions") and typeof(inv_data["potions"]) == TYPE_DICTIONARY:
+			for k in inv_data["potions"].keys():
+				potions[k] = int(inv_data["potions"][k])
+
+	# Pulihkan progres
+	if data.has("progression") and typeof(data["progression"]) == TYPE_DICTIONARY:
+		var prog: Dictionary = data["progression"]
+		current_floor = int(prog.get("current_floor", 1))
+		is_tutorial_active = bool(prog.get("is_tutorial_active", false))
+		is_tutorial_completed = bool(prog.get("is_tutorial_completed", true))
+		current_tutorial_step = int(prog.get("current_tutorial_step", 8))
+
+	is_dead = false
+	is_berserk_active = false
+	is_strength_active = false
+	is_slow_active = false
+	is_ironskin_active = false
+	ironskin_timer = 0.0
+
+	# Reset visual audio filter
+	if lpf_effect:
+		lpf_effect.cutoff_hz = 20500.0
+	if tinnitus_player:
+		tinnitus_player.volume_db = -80.0
+
+	# Pancarkan sinyal perubahan state
+	player_hp_changed.emit(current_hp, max_hp)
+	toxicity_changed.emit(current_toxicity, max_toxicity)
+	toxicity_stage_changed.emit(get_toxicity_stage())
+	inventory_updated.emit()
+
+	var target_scene_path: String = data.get("scene_path", "res://main.tscn")
+	if target_scene_path.is_empty() or not ResourceLoader.exists(target_scene_path):
+		target_scene_path = "res://main.tscn"
+
+	print("[SaveSystem] Berhasil memuat data permainan. Pindah ke scene: %s" % target_scene_path)
+	get_tree().change_scene_to_file(target_scene_path)
+	return true
+

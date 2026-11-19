@@ -68,6 +68,12 @@ custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "Lanjutkan"
 
+[node name="BtnSave" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Simpan Permainan"
+
 [node name="BtnRestart" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
@@ -79,3 +85,12 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "Menu Utama"
+
+[node name="SaveToast" type="Label" parent="CenterContainer/MenuCard/Margin/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25, 0.85, 0.45, 1)
+theme_override_font_sizes/font_size = 14
+text = "Permainan Berhasil Disimpan!"
+horizontal_alignment = 1

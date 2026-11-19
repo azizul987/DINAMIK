@@ -68,11 +68,17 @@ layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
+[node name="BtnContinue" type="Button" parent="CenterContainer/MainVBox/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 44)
+layout_mode = 2
+text = "Lanjutkan"
+
 [node name="BtnPlay" type="Button" parent="CenterContainer/MainVBox/Buttons" unique_id=1019285297]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 44)
 layout_mode = 2
-text = "Mulai"
+text = "Mulai Baru"
 
 [node name="BtnGuide" type="Button" parent="CenterContainer/MainVBox/Buttons" unique_id=266788390]
 unique_name_in_owner = true
