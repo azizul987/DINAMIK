@@ -673,6 +673,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.286232, 1.635814, 13.7079
 
 [node name="SpikeTrap" parent="." unique_id=941220555 instance=ExtResource("18_7mylh")]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -25.09387, 1.2050872, 19.721554)
+visible = false
 
 [node name="torture_device_004" parent="." unique_id=1670722306 instance=ExtResource("14_gxpff")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.026018, 1.1000004, 6.5170135)

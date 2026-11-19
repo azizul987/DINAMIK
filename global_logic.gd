@@ -568,15 +568,23 @@ func complete_tutorial() -> void:
 	current_tutorial_step = 8
 	tutorial_completed.emit()
 
-## Memeriksa apakah scene yang aktif saat ini adalah scene tutorial (main.tscn).
-func is_in_tutorial_scene() -> bool:
+## Memeriksa apakah scene saat ini adalah level dungeon (bukan tutorial).
+func is_in_dungeon_level() -> bool:
 	var cur_scene := get_tree().current_scene if get_tree() else null
 	if not cur_scene or cur_scene.scene_file_path.is_empty():
 		return false
 	var path := cur_scene.scene_file_path
-	if path.ends_with("level1.tscn") or path.ends_with("level2.tscn") or path.ends_with("SafeRoom.tscn") or path.ends_with("main_menu.tscn"):
+	return path.ends_with("level1.tscn") or path.ends_with("level2.tscn") or path.ends_with("SafeRoom.tscn")
+
+## Memeriksa apakah scene yang aktif saat ini adalah scene tutorial (main.tscn).
+func is_in_tutorial_scene() -> bool:
+	var cur_scene := get_tree().current_scene if get_tree() else null
+	if not cur_scene or cur_scene.scene_file_path.is_empty():
+		return true
+	var path := cur_scene.scene_file_path
+	if path.ends_with("level1.tscn") or path.ends_with("level2.tscn") or path.ends_with("SafeRoom.tscn"):
 		return false
-	return path.ends_with("main.tscn")
+	return true
 
 ## Memvalidasi dan memastikan tutorial dinonaktifkan di luar scene tutorial.
 func validate_tutorial_for_current_scene() -> void:
@@ -602,10 +610,15 @@ func reset_game_state() -> void:
 	tolerance_level = 1
 	max_toxicity = 100.0
 
-	var in_tutor := is_in_tutorial_scene()
-	is_tutorial_active = in_tutor
-	is_tutorial_completed = not in_tutor
-	current_tutorial_step = 0 if in_tutor else 8
+	var in_dungeon := is_in_dungeon_level()
+	if in_dungeon:
+		is_tutorial_active = false
+		is_tutorial_completed = true
+		current_tutorial_step = 8
+	else:
+		is_tutorial_active = true
+		is_tutorial_completed = false
+		current_tutorial_step = 0
 	current_floor = 1
 	materials = {
 		"slime_gel": 0,

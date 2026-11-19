@@ -67,11 +67,8 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
 
-	# Validasi: Tutorial BUKAN di Level 1, Level 2, atau Safe Room
-	var cur_scene := get_tree().current_scene if get_tree() else null
-	var scene_path: String = cur_scene.scene_file_path if cur_scene and cur_scene.scene_file_path else ""
-	var is_disallowed: bool = scene_path.ends_with("level1.tscn") or scene_path.ends_with("level2.tscn") or scene_path.ends_with("SafeRoom.tscn") or scene_path.ends_with("main_menu.tscn")
-	if is_disallowed or (GlobalLogic and "is_tutorial_completed" in GlobalLogic and GlobalLogic.is_tutorial_completed):
+	# Jika tutorial sudah selesai, matikan controller
+	if GlobalLogic and "is_tutorial_completed" in GlobalLogic and GlobalLogic.is_tutorial_completed:
 		_setup_ui()
 		if ui_container:
 			ui_container.visible = false
@@ -584,6 +581,8 @@ func _setup_ui() -> void:
 		var bar = main_control.get_node_or_null("ObjectiveBar")
 		if bar and bar is PanelContainer:
 			ui_container = bar
+			ui_container.visible = true
+			ui_container.modulate.a = 1.0
 			ui_task = bar.get_node_or_null("ObjectiveText") as Label
 			if not ui_task and bar.get_child_count() > 0 and bar.get_child(0) is Label:
 				ui_task = bar.get_child(0) as Label
@@ -596,6 +595,7 @@ func _set_task(task: String) -> void:
 	ui_task.text = task
 	ui_task.add_theme_color_override("font_color", UIPalette.TEXT_TITLE)
 	ui_container.modulate.a = 1.0
+	ui_container.visible = true
 
 func _show_step_done(done_text: String) -> void:
 	if not ui_task or not ui_container:

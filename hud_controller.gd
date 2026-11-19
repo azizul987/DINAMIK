@@ -146,16 +146,15 @@ func _setup_objective_bar_listener() -> void:
 	if not objective_bar:
 		return
 
-	# Validasi: Tutorial BUKAN di Level 1 atau Level 2.
-	# ObjectiveBar HANYA boleh aktif di scene tutorial (main.tscn).
-	var cur_scene := get_tree().current_scene if get_tree() else null
-	var scene_path: String = cur_scene.scene_file_path if cur_scene and cur_scene.scene_file_path else ""
-	var is_disallowed: bool = scene_path.ends_with("level1.tscn") or scene_path.ends_with("level2.tscn") or scene_path.ends_with("SafeRoom.tscn") or scene_path.ends_with("main_menu.tscn") or scene_path.contains("level")
+	# Validasi: ObjectiveBar HANYA boleh aktif jika ada TutorialController di scene (main.tscn)
+	# dan tutorial belum diselesaikan. Di Level 1, Level 2, Safe Room, otomatis disembunyikan.
+	var has_tutorial: bool = has_node("../../../TutorialController") or (get_tree() and get_tree().root.find_child("TutorialController", true, false) != null)
 
-	if is_disallowed or GlobalLogic.is_tutorial_completed or not GlobalLogic.is_tutorial_active:
+	if not has_tutorial or GlobalLogic.is_tutorial_completed or not GlobalLogic.is_tutorial_active:
 		objective_bar.visible = false
 		return
 
+	objective_bar.visible = true
 	GlobalLogic.tutorial_completed.connect(func():
 		if is_instance_valid(objective_bar):
 			var tw := create_tween()
