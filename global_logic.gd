@@ -62,6 +62,7 @@ var heartbeat_player: AudioStreamPlayer = null
 var heartbeat_timer: float = 0.0
 
 # BGM & SFX System
+const BGM_MENU_PATH := "res://resources/audio/music/menu_theme.ogg"
 const BGM_DUNGEON_PATH := "res://resources/audio/music/dungeon_ambient.ogg"
 const BGM_BOSS_PATH := "res://resources/audio/music/combat_boss.ogg"
 const BGM_ENCOUNTER_PATH := "res://resources/audio/music/combat_encounter.ogg"

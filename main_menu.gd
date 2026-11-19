@@ -11,7 +11,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().paused = false
 	guide_modal.visible = false
-	GlobalLogic.play_bgm(GlobalLogic.BGM_DUNGEON_PATH, "dungeon", 1.5, -12.0)
+	GlobalLogic.play_bgm(GlobalLogic.BGM_MENU_PATH, "menu", 1.2, -7.0)
 
 	btn_play.pressed.connect(_on_play_pressed)
 	btn_play.mouse_entered.connect(GlobalLogic.play_ui_hover)

@@ -126,9 +126,10 @@ Game ini dikembangkan menggunakan **Godot Engine 4** dengan memanfaatkan aset gr
   * **Kreator**: **Alkakrab** ([Itch.io](https://alkakrab.itch.io/6-dark-fantasy-boss-battle-tracks))
   * **Lisensi**: Free for Commercial Use (Royalty-Free 100% human-composed looping audio).
   * **Trek Terintegrasi**:
-    * `resources/audio/music/dungeon_ambient.ogg`: Eksplorasi dungeon & tema menu utama.
-    * `resources/audio/music/combat_boss.ogg`: Pertarungan boss gotik megah Archmage Malakor.
-    * `resources/audio/music/combat_encounter.ogg`: Pertarungan intens gerombolan monster.
+    * `resources/audio/music/menu_theme.ogg`: Musik tema judul Main Menu bernuansa gotik misterius (Eclipsed Desolation).
+    * `resources/audio/music/dungeon_ambient.ogg`: Eksplorasi dungeon bernuansa kelam (Whispers of the Abyss).
+    * `resources/audio/music/combat_boss.ogg`: Pertarungan boss gotik megah Archmage Malakor (Veil of Eternal Nightfall).
+    * `resources/audio/music/combat_encounter.ogg`: Pertarungan intens gerombolan monster (Shadowforge Convergence).
 * **UI Sound Effects (Kenney UI Audio Pack)**:
   * **Kreator**: **Kenney** ([kenney.nl](https://kenney.nl/assets/ui-audio))
   * **Lisensi**: [Creative Commons Zero (CC0 1.0 Universal - Public Domain)](https://creativecommons.org/publicdomain/zero/1.0/)
