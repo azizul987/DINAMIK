@@ -1,0 +1,1716 @@
+{
+ "categories": {
+  "wood": "Wood & Plants",
+  "stone": "Stone & Ores",
+  "ingot": "Ingots",
+  "gem": "Gems",
+  "magic": "Magic",
+  "food": "Food",
+  "animal": "Animal Materials",
+  "craft": "Crafting",
+  "potion": "Potions & Liquids",
+  "tech": "Tech"
+ },
+ "items": [
+  {
+   "id": "oak_log",
+   "index": 1,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Oak Log",
+   "description": "oak wood log with bark and visible rings",
+   "static": "static/001_oak_log.png",
+   "anim": {
+    "strip": "anim/001_oak_log_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 0
+   }
+  },
+  {
+   "id": "birch_log",
+   "index": 2,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Birch Log",
+   "description": "white birch log with black bark marks",
+   "static": "static/002_birch_log.png",
+   "anim": {
+    "strip": "anim/002_birch_log_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 1
+   }
+  },
+  {
+   "id": "pine_log",
+   "index": 3,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Pine Log",
+   "description": "dark pine log with resin drops",
+   "static": "static/003_pine_log.png",
+   "anim": {
+    "strip": "anim/003_pine_log_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 2
+   }
+  },
+  {
+   "id": "planks",
+   "index": 4,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Planks",
+   "description": "stack of three wooden planks",
+   "static": "static/004_planks.png",
+   "anim": {
+    "strip": "anim/004_planks_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 3
+   }
+  },
+  {
+   "id": "sticks",
+   "index": 5,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Sticks",
+   "description": "bundle of sticks tied with twine",
+   "static": "static/005_sticks.png",
+   "anim": {
+    "strip": "anim/005_sticks_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 4
+   }
+  },
+  {
+   "id": "bamboo",
+   "index": 6,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Bamboo",
+   "description": "three green bamboo stalks",
+   "static": "static/006_bamboo.png",
+   "anim": {
+    "strip": "anim/006_bamboo_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 5
+   }
+  },
+  {
+   "id": "cactus",
+   "index": 7,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Cactus",
+   "description": "chunk of green cactus with spikes",
+   "static": "static/007_cactus.png",
+   "anim": {
+    "strip": "anim/007_cactus_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 6
+   }
+  },
+  {
+   "id": "red_mushroom",
+   "index": 8,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Red Mushroom",
+   "description": "red mushroom with white spots",
+   "static": "static/008_red_mushroom.png",
+   "anim": {
+    "strip": "anim/008_red_mushroom_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 7
+   }
+  },
+  {
+   "id": "glow_mushroom",
+   "index": 9,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Glow Mushroom",
+   "description": "blue glowing mushroom",
+   "static": "static/009_glow_mushroom.png",
+   "anim": {
+    "strip": "anim/009_glow_mushroom_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 8
+   }
+  },
+  {
+   "id": "vine",
+   "index": 10,
+   "category": "wood",
+   "category_name": "Wood & Plants",
+   "name": "Vine",
+   "description": "coil of green jungle vine with leaves",
+   "static": "static/010_vine.png",
+   "anim": {
+    "strip": "anim/010_vine_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 9
+   }
+  },
+  {
+   "id": "stone",
+   "index": 11,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Stone",
+   "description": "grey rough stone chunk",
+   "static": "static/011_stone.png",
+   "anim": {
+    "strip": "anim/011_stone_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 10
+   }
+  },
+  {
+   "id": "cobblestone",
+   "index": 12,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Cobblestone",
+   "description": "pile of cobblestones",
+   "static": "static/012_cobblestone.png",
+   "anim": {
+    "strip": "anim/012_cobblestone_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 11
+   }
+  },
+  {
+   "id": "coal",
+   "index": 13,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Coal",
+   "description": "black coal lump",
+   "static": "static/013_coal.png",
+   "anim": {
+    "strip": "anim/013_coal_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 12
+   }
+  },
+  {
+   "id": "iron_ore",
+   "index": 14,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Iron Ore",
+   "description": "rock with orange-brown iron ore veins",
+   "static": "static/014_iron_ore.png",
+   "anim": {
+    "strip": "anim/014_iron_ore_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 13
+   }
+  },
+  {
+   "id": "copper_ore",
+   "index": 15,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Copper Ore",
+   "description": "rock with green and copper ore veins",
+   "static": "static/015_copper_ore.png",
+   "anim": {
+    "strip": "anim/015_copper_ore_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 14
+   }
+  },
+  {
+   "id": "gold_ore",
+   "index": 16,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Gold Ore",
+   "description": "rock with shiny gold ore nuggets",
+   "static": "static/016_gold_ore.png",
+   "anim": {
+    "strip": "anim/016_gold_ore_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 15
+   }
+  },
+  {
+   "id": "silver_ore",
+   "index": 17,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Silver Ore",
+   "description": "rock with bright silver ore veins",
+   "static": "static/017_silver_ore.png",
+   "anim": {
+    "strip": "anim/017_silver_ore_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 16
+   }
+  },
+  {
+   "id": "tin_ore",
+   "index": 18,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Tin Ore",
+   "description": "rock with pale grey tin ore",
+   "static": "static/018_tin_ore.png",
+   "anim": {
+    "strip": "anim/018_tin_ore_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 17
+   }
+  },
+  {
+   "id": "mithril_ore",
+   "index": 19,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Mithril Ore",
+   "description": "rock with glowing cyan mithril ore",
+   "static": "static/019_mithril_ore.png",
+   "anim": {
+    "strip": "anim/019_mithril_ore_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 18
+   }
+  },
+  {
+   "id": "obsidian",
+   "index": 20,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Obsidian",
+   "description": "sharp black purple obsidian shard",
+   "static": "static/020_obsidian.png",
+   "anim": {
+    "strip": "anim/020_obsidian_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 19
+   }
+  },
+  {
+   "id": "marble",
+   "index": 21,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Marble",
+   "description": "white marble block with grey veins",
+   "static": "static/021_marble.png",
+   "anim": {
+    "strip": "anim/021_marble_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 20
+   }
+  },
+  {
+   "id": "clay",
+   "index": 22,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Clay",
+   "description": "lump of orange clay",
+   "static": "static/022_clay.png",
+   "anim": {
+    "strip": "anim/022_clay_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 21
+   }
+  },
+  {
+   "id": "sand",
+   "index": 23,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Sand",
+   "description": "small pile of golden sand",
+   "static": "static/023_sand.png",
+   "anim": {
+    "strip": "anim/023_sand_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 22
+   }
+  },
+  {
+   "id": "flint",
+   "index": 24,
+   "category": "stone",
+   "category_name": "Stone & Ores",
+   "name": "Flint",
+   "description": "dark grey flint stone",
+   "static": "static/024_flint.png",
+   "anim": {
+    "strip": "anim/024_flint_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 23
+   }
+  },
+  {
+   "id": "iron_ingot",
+   "index": 25,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Iron Ingot",
+   "description": "iron ingot bar",
+   "static": "static/025_iron_ingot.png",
+   "anim": {
+    "strip": "anim/025_iron_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 24
+   }
+  },
+  {
+   "id": "copper_ingot",
+   "index": 26,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Copper Ingot",
+   "description": "copper ingot bar",
+   "static": "static/026_copper_ingot.png",
+   "anim": {
+    "strip": "anim/026_copper_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 25
+   }
+  },
+  {
+   "id": "gold_ingot",
+   "index": 27,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Gold Ingot",
+   "description": "shiny gold ingot bar",
+   "static": "static/027_gold_ingot.png",
+   "anim": {
+    "strip": "anim/027_gold_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 26
+   }
+  },
+  {
+   "id": "silver_ingot",
+   "index": 28,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Silver Ingot",
+   "description": "silver ingot bar",
+   "static": "static/028_silver_ingot.png",
+   "anim": {
+    "strip": "anim/028_silver_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 27
+   }
+  },
+  {
+   "id": "steel_ingot",
+   "index": 29,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Steel Ingot",
+   "description": "dark blue steel ingot bar",
+   "static": "static/029_steel_ingot.png",
+   "anim": {
+    "strip": "anim/029_steel_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 28
+   }
+  },
+  {
+   "id": "mithril_ingot",
+   "index": 30,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Mithril Ingot",
+   "description": "glowing cyan mithril ingot bar",
+   "static": "static/030_mithril_ingot.png",
+   "anim": {
+    "strip": "anim/030_mithril_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 29
+   }
+  },
+  {
+   "id": "bronze_ingot",
+   "index": 31,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Bronze Ingot",
+   "description": "bronze ingot bar",
+   "static": "static/031_bronze_ingot.png",
+   "anim": {
+    "strip": "anim/031_bronze_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 30
+   }
+  },
+  {
+   "id": "adamant_ingot",
+   "index": 32,
+   "category": "ingot",
+   "category_name": "Ingots",
+   "name": "Adamant Ingot",
+   "description": "purple adamantite ingot bar",
+   "static": "static/032_adamant_ingot.png",
+   "anim": {
+    "strip": "anim/032_adamant_ingot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 31
+   }
+  },
+  {
+   "id": "ruby",
+   "index": 33,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Ruby",
+   "description": "faceted red ruby gem",
+   "static": "static/033_ruby.png",
+   "anim": {
+    "strip": "anim/033_ruby_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 32
+   }
+  },
+  {
+   "id": "sapphire",
+   "index": 34,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Sapphire",
+   "description": "faceted blue sapphire gem",
+   "static": "static/034_sapphire.png",
+   "anim": {
+    "strip": "anim/034_sapphire_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 33
+   }
+  },
+  {
+   "id": "emerald",
+   "index": 35,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Emerald",
+   "description": "faceted green emerald gem",
+   "static": "static/035_emerald.png",
+   "anim": {
+    "strip": "anim/035_emerald_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 34
+   }
+  },
+  {
+   "id": "amethyst",
+   "index": 36,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Amethyst",
+   "description": "purple amethyst crystal cluster",
+   "static": "static/036_amethyst.png",
+   "anim": {
+    "strip": "anim/036_amethyst_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 35
+   }
+  },
+  {
+   "id": "topaz",
+   "index": 37,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Topaz",
+   "description": "faceted yellow topaz gem",
+   "static": "static/037_topaz.png",
+   "anim": {
+    "strip": "anim/037_topaz_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 36
+   }
+  },
+  {
+   "id": "diamond",
+   "index": 38,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Diamond",
+   "description": "brilliant white diamond",
+   "static": "static/038_diamond.png",
+   "anim": {
+    "strip": "anim/038_diamond_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 37
+   }
+  },
+  {
+   "id": "onyx",
+   "index": 39,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Onyx",
+   "description": "polished black onyx stone",
+   "static": "static/039_onyx.png",
+   "anim": {
+    "strip": "anim/039_onyx_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 38
+   }
+  },
+  {
+   "id": "opal",
+   "index": 40,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Opal",
+   "description": "iridescent rainbow opal",
+   "static": "static/040_opal.png",
+   "anim": {
+    "strip": "anim/040_opal_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 39
+   }
+  },
+  {
+   "id": "pearl",
+   "index": 41,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Pearl",
+   "description": "white pearl in an open shell",
+   "static": "static/041_pearl.png",
+   "anim": {
+    "strip": "anim/041_pearl_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 40
+   }
+  },
+  {
+   "id": "aquamarine",
+   "index": 42,
+   "category": "gem",
+   "category_name": "Gems",
+   "name": "Aquamarine",
+   "description": "faceted light blue aquamarine gem",
+   "static": "static/042_aquamarine.png",
+   "anim": {
+    "strip": "anim/042_aquamarine_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 41
+   }
+  },
+  {
+   "id": "mana_crystal",
+   "index": 43,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Mana Crystal",
+   "description": "floating blue mana crystal",
+   "static": "static/043_mana_crystal.png",
+   "anim": {
+    "strip": "anim/043_mana_crystal_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 42
+   }
+  },
+  {
+   "id": "fire_essence",
+   "index": 44,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Fire Essence",
+   "description": "orb of swirling fire essence",
+   "static": "static/044_fire_essence.png",
+   "anim": {
+    "strip": "anim/044_fire_essence_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 43
+   }
+  },
+  {
+   "id": "ice_essence",
+   "index": 45,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Ice Essence",
+   "description": "orb of frozen ice essence with frost",
+   "static": "static/045_ice_essence.png",
+   "anim": {
+    "strip": "anim/045_ice_essence_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 44
+   }
+  },
+  {
+   "id": "lightning_essence",
+   "index": 46,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Lightning Essence",
+   "description": "orb of crackling yellow lightning",
+   "static": "static/046_lightning_essence.png",
+   "anim": {
+    "strip": "anim/046_lightning_essence_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 45
+   }
+  },
+  {
+   "id": "nature_essence",
+   "index": 47,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Nature Essence",
+   "description": "green orb of nature essence with a leaf",
+   "static": "static/047_nature_essence.png",
+   "anim": {
+    "strip": "anim/047_nature_essence_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 46
+   }
+  },
+  {
+   "id": "shadow_essence",
+   "index": 48,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Shadow Essence",
+   "description": "dark purple shadow essence orb with smoke",
+   "static": "static/048_shadow_essence.png",
+   "anim": {
+    "strip": "anim/048_shadow_essence_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 47
+   }
+  },
+  {
+   "id": "holy_orb",
+   "index": 49,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Holy Orb",
+   "description": "radiant golden holy light orb",
+   "static": "static/049_holy_orb.png",
+   "anim": {
+    "strip": "anim/049_holy_orb_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 48
+   }
+  },
+  {
+   "id": "soul_gem",
+   "index": 50,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Soul Gem",
+   "description": "glowing violet soul gem",
+   "static": "static/050_soul_gem.png",
+   "anim": {
+    "strip": "anim/050_soul_gem_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 49
+   }
+  },
+  {
+   "id": "star_fragment",
+   "index": 51,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Star Fragment",
+   "description": "glowing yellow star fragment",
+   "static": "static/051_star_fragment.png",
+   "anim": {
+    "strip": "anim/051_star_fragment_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 50
+   }
+  },
+  {
+   "id": "void_shard",
+   "index": 52,
+   "category": "magic",
+   "category_name": "Magic",
+   "name": "Void Shard",
+   "description": "black and magenta void crystal shard",
+   "static": "static/052_void_shard.png",
+   "anim": {
+    "strip": "anim/052_void_shard_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 51
+   }
+  },
+  {
+   "id": "wheat",
+   "index": 53,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Wheat",
+   "description": "bundle of golden wheat",
+   "static": "static/053_wheat.png",
+   "anim": {
+    "strip": "anim/053_wheat_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 52
+   }
+  },
+  {
+   "id": "apple",
+   "index": 54,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Apple",
+   "description": "shiny red apple",
+   "static": "static/054_apple.png",
+   "anim": {
+    "strip": "anim/054_apple_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 53
+   }
+  },
+  {
+   "id": "carrot",
+   "index": 55,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Carrot",
+   "description": "orange carrot with green top",
+   "static": "static/055_carrot.png",
+   "anim": {
+    "strip": "anim/055_carrot_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 54
+   }
+  },
+  {
+   "id": "potato",
+   "index": 56,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Potato",
+   "description": "brown potato",
+   "static": "static/056_potato.png",
+   "anim": {
+    "strip": "anim/056_potato_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 55
+   }
+  },
+  {
+   "id": "corn",
+   "index": 57,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Corn",
+   "description": "ear of yellow corn",
+   "static": "static/057_corn.png",
+   "anim": {
+    "strip": "anim/057_corn_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 56
+   }
+  },
+  {
+   "id": "berries",
+   "index": 58,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Berries",
+   "description": "cluster of blue berries",
+   "static": "static/058_berries.png",
+   "anim": {
+    "strip": "anim/058_berries_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 57
+   }
+  },
+  {
+   "id": "honey",
+   "index": 59,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Honey",
+   "description": "jar of golden honey",
+   "static": "static/059_honey.png",
+   "anim": {
+    "strip": "anim/059_honey_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 58
+   }
+  },
+  {
+   "id": "egg",
+   "index": 60,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Egg",
+   "description": "white egg",
+   "static": "static/060_egg.png",
+   "anim": {
+    "strip": "anim/060_egg_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 59
+   }
+  },
+  {
+   "id": "milk",
+   "index": 61,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Milk",
+   "description": "glass bottle of milk",
+   "static": "static/061_milk.png",
+   "anim": {
+    "strip": "anim/061_milk_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 60
+   }
+  },
+  {
+   "id": "cheese",
+   "index": 62,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Cheese",
+   "description": "wheel of yellow cheese with a slice cut",
+   "static": "static/062_cheese.png",
+   "anim": {
+    "strip": "anim/062_cheese_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 61
+   }
+  },
+  {
+   "id": "fish",
+   "index": 63,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Fish",
+   "description": "fresh blue fish",
+   "static": "static/063_fish.png",
+   "anim": {
+    "strip": "anim/063_fish_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 62
+   }
+  },
+  {
+   "id": "meat",
+   "index": 64,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Meat",
+   "description": "raw meat steak with bone",
+   "static": "static/064_meat.png",
+   "anim": {
+    "strip": "anim/064_meat_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 63
+   }
+  },
+  {
+   "id": "bread",
+   "index": 65,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Bread",
+   "description": "loaf of baked bread",
+   "static": "static/065_bread.png",
+   "anim": {
+    "strip": "anim/065_bread_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 64
+   }
+  },
+  {
+   "id": "pumpkin",
+   "index": 66,
+   "category": "food",
+   "category_name": "Food",
+   "name": "Pumpkin",
+   "description": "orange pumpkin",
+   "static": "static/066_pumpkin.png",
+   "anim": {
+    "strip": "anim/066_pumpkin_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 65
+   }
+  },
+  {
+   "id": "leather",
+   "index": 67,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Leather",
+   "description": "folded brown leather hide",
+   "static": "static/067_leather.png",
+   "anim": {
+    "strip": "anim/067_leather_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 66
+   }
+  },
+  {
+   "id": "wool",
+   "index": 68,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Wool",
+   "description": "ball of white wool",
+   "static": "static/068_wool.png",
+   "anim": {
+    "strip": "anim/068_wool_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 67
+   }
+  },
+  {
+   "id": "feather",
+   "index": 69,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Feather",
+   "description": "white and blue feather",
+   "static": "static/069_feather.png",
+   "anim": {
+    "strip": "anim/069_feather_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 68
+   }
+  },
+  {
+   "id": "bone",
+   "index": 70,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Bone",
+   "description": "white bone",
+   "static": "static/070_bone.png",
+   "anim": {
+    "strip": "anim/070_bone_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 69
+   }
+  },
+  {
+   "id": "fang",
+   "index": 71,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Fang",
+   "description": "sharp beast fang",
+   "static": "static/071_fang.png",
+   "anim": {
+    "strip": "anim/071_fang_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 70
+   }
+  },
+  {
+   "id": "dragon_scale",
+   "index": 72,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Dragon Scale",
+   "description": "red dragon scale",
+   "static": "static/072_dragon_scale.png",
+   "anim": {
+    "strip": "anim/072_dragon_scale_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 71
+   }
+  },
+  {
+   "id": "spider_silk",
+   "index": 73,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Spider Silk",
+   "description": "white spider silk bundle",
+   "static": "static/073_spider_silk.png",
+   "anim": {
+    "strip": "anim/073_spider_silk_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 72
+   }
+  },
+  {
+   "id": "slime",
+   "index": 74,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Slime",
+   "description": "green slime ball",
+   "static": "static/074_slime.png",
+   "anim": {
+    "strip": "anim/074_slime_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 73
+   }
+  },
+  {
+   "id": "shell",
+   "index": 75,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Shell",
+   "description": "spiral sea shell",
+   "static": "static/075_shell.png",
+   "anim": {
+    "strip": "anim/075_shell_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 74
+   }
+  },
+  {
+   "id": "horn",
+   "index": 76,
+   "category": "animal",
+   "category_name": "Animal Materials",
+   "name": "Horn",
+   "description": "curved beast horn",
+   "static": "static/076_horn.png",
+   "anim": {
+    "strip": "anim/076_horn_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 75
+   }
+  },
+  {
+   "id": "cloth",
+   "index": 77,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Cloth",
+   "description": "rolled bolt of red cloth",
+   "static": "static/077_cloth.png",
+   "anim": {
+    "strip": "anim/077_cloth_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 76
+   }
+  },
+  {
+   "id": "rope",
+   "index": 78,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Rope",
+   "description": "coil of rope",
+   "static": "static/078_rope.png",
+   "anim": {
+    "strip": "anim/078_rope_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 77
+   }
+  },
+  {
+   "id": "thread",
+   "index": 79,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Thread",
+   "description": "spool of thread with a needle",
+   "static": "static/079_thread.png",
+   "anim": {
+    "strip": "anim/079_thread_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 78
+   }
+  },
+  {
+   "id": "paper",
+   "index": 80,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Paper",
+   "description": "stack of paper sheets",
+   "static": "static/080_paper.png",
+   "anim": {
+    "strip": "anim/080_paper_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 79
+   }
+  },
+  {
+   "id": "ink",
+   "index": 81,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Ink",
+   "description": "bottle of black ink with a quill",
+   "static": "static/081_ink.png",
+   "anim": {
+    "strip": "anim/081_ink_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 80
+   }
+  },
+  {
+   "id": "glass",
+   "index": 82,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Glass",
+   "description": "clear empty glass bottle",
+   "static": "static/082_glass.png",
+   "anim": {
+    "strip": "anim/082_glass_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 81
+   }
+  },
+  {
+   "id": "beeswax",
+   "index": 83,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Beeswax",
+   "description": "block of yellow beeswax",
+   "static": "static/083_beeswax.png",
+   "anim": {
+    "strip": "anim/083_beeswax_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 82
+   }
+  },
+  {
+   "id": "nails",
+   "index": 84,
+   "category": "craft",
+   "category_name": "Crafting",
+   "name": "Nails",
+   "description": "pile of iron nails",
+   "static": "static/084_nails.png",
+   "anim": {
+    "strip": "anim/084_nails_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 83
+   }
+  },
+  {
+   "id": "health_potion",
+   "index": 85,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Health Potion",
+   "description": "round flask of red health potion",
+   "static": "static/085_health_potion.png",
+   "anim": {
+    "strip": "anim/085_health_potion_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 84
+   }
+  },
+  {
+   "id": "mana_potion",
+   "index": 86,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Mana Potion",
+   "description": "round flask of blue mana potion",
+   "static": "static/086_mana_potion.png",
+   "anim": {
+    "strip": "anim/086_mana_potion_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 85
+   }
+  },
+  {
+   "id": "stamina_potion",
+   "index": 87,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Stamina Potion",
+   "description": "flask of green stamina potion",
+   "static": "static/087_stamina_potion.png",
+   "anim": {
+    "strip": "anim/087_stamina_potion_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 86
+   }
+  },
+  {
+   "id": "water_bucket",
+   "index": 88,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Water Bucket",
+   "description": "wooden bucket of water",
+   "static": "static/088_water_bucket.png",
+   "anim": {
+    "strip": "anim/088_water_bucket_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 87
+   }
+  },
+  {
+   "id": "oil_flask",
+   "index": 89,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Oil Flask",
+   "description": "flask of dark oil",
+   "static": "static/089_oil_flask.png",
+   "anim": {
+    "strip": "anim/089_oil_flask_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 88
+   }
+  },
+  {
+   "id": "lava_bucket",
+   "index": 90,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Lava Bucket",
+   "description": "iron bucket of glowing lava",
+   "static": "static/090_lava_bucket.png",
+   "anim": {
+    "strip": "anim/090_lava_bucket_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 89
+   }
+  },
+  {
+   "id": "poison",
+   "index": 91,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Poison",
+   "description": "small vial of purple poison with skull label",
+   "static": "static/091_poison.png",
+   "anim": {
+    "strip": "anim/091_poison_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 90
+   }
+  },
+  {
+   "id": "elixir",
+   "index": 92,
+   "category": "potion",
+   "category_name": "Potions & Liquids",
+   "name": "Elixir",
+   "description": "ornate golden elixir bottle",
+   "static": "static/092_elixir.png",
+   "anim": {
+    "strip": "anim/092_elixir_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 91
+   }
+  },
+  {
+   "id": "battery",
+   "index": 93,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Battery",
+   "description": "battery cell with green charge",
+   "static": "static/093_battery.png",
+   "anim": {
+    "strip": "anim/093_battery_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 92
+   }
+  },
+  {
+   "id": "gear",
+   "index": 94,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Gear",
+   "description": "bronze gear cog",
+   "static": "static/094_gear.png",
+   "anim": {
+    "strip": "anim/094_gear_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 93
+   }
+  },
+  {
+   "id": "spring",
+   "index": 95,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Spring",
+   "description": "metal coil spring",
+   "static": "static/095_spring.png",
+   "anim": {
+    "strip": "anim/095_spring_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 94
+   }
+  },
+  {
+   "id": "chip",
+   "index": 96,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Chip",
+   "description": "green circuit microchip",
+   "static": "static/096_chip.png",
+   "anim": {
+    "strip": "anim/096_chip_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 95
+   }
+  },
+  {
+   "id": "energy_cell",
+   "index": 97,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Energy Cell",
+   "description": "glowing blue energy cell canister",
+   "static": "static/097_energy_cell.png",
+   "anim": {
+    "strip": "anim/097_energy_cell_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 96
+   }
+  },
+  {
+   "id": "gunpowder",
+   "index": 98,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Gunpowder",
+   "description": "small sack of black gunpowder",
+   "static": "static/098_gunpowder.png",
+   "anim": {
+    "strip": "anim/098_gunpowder_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 97
+   }
+  },
+  {
+   "id": "oil_barrel",
+   "index": 99,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Oil Barrel",
+   "description": "black crude oil barrel",
+   "static": "static/099_oil_barrel.png",
+   "anim": {
+    "strip": "anim/099_oil_barrel_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 98
+   }
+  },
+  {
+   "id": "uranium",
+   "index": 100,
+   "category": "tech",
+   "category_name": "Tech",
+   "name": "Uranium",
+   "description": "glowing green uranium rod",
+   "static": "static/100_uranium.png",
+   "anim": {
+    "strip": "anim/100_uranium_strip.png",
+    "frames": 8,
+    "frame_w": 64,
+    "frame_h": 64,
+    "fps": 10,
+    "atlas_row": 99
+   }
+  }
+ ]
+}

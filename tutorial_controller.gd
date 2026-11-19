@@ -63,7 +63,9 @@ var ui_container: PanelContainer = null
 var ui_task: Label = null
 
 func _ready() -> void:
-	if GlobalLogic and GlobalLogic.is_tutorial_completed:
+	if Engine.is_editor_hint():
+		return
+	if GlobalLogic and "is_tutorial_completed" in GlobalLogic and GlobalLogic.is_tutorial_completed:
 		_setup_ui()
 		if ui_container:
 			ui_container.visible = false

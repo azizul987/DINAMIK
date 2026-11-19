@@ -4,7 +4,6 @@ extends Control
 @onready var btn_resume: Button = %BtnResume
 @onready var btn_restart: Button = %BtnRestart
 @onready var btn_main_menu: Button = %BtnMainMenu
-@onready var btn_quit: Button = %BtnQuit
 @onready var menu_card: PanelContainer = %MenuCard
 @onready var dark_overlay: ColorRect = %DarkOverlay
 
@@ -15,7 +14,6 @@ func _ready() -> void:
 	btn_resume.pressed.connect(_on_resume_pressed)
 	btn_restart.pressed.connect(_on_restart_pressed)
 	btn_main_menu.pressed.connect(_on_main_menu_pressed)
-	btn_quit.pressed.connect(_on_quit_pressed)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE):
@@ -62,6 +60,3 @@ func _on_main_menu_pressed() -> void:
 	resume()
 	GlobalLogic.reset_game_state()
 	get_tree().change_scene_to_file("res://main_menu.tscn")
-
-func _on_quit_pressed() -> void:
-	get_tree().quit()

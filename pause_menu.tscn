@@ -53,7 +53,7 @@ theme_override_constants/separation = 18
 
 [node name="Title" type="Label" parent="CenterContainer/MenuCard/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.94, 0.97, 1)
+theme_override_colors/font_color = Color(0.12, 0.15, 0.2, 1)
 theme_override_font_sizes/font_size = 22
 text = "JEDA"
 horizontal_alignment = 1
@@ -79,9 +79,3 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 text = "Menu Utama"
-
-[node name="BtnQuit" type="Button" parent="CenterContainer/MenuCard/Margin/VBox/ButtonContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-text = "Keluar"

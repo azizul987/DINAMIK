@@ -9,6 +9,9 @@ signal inventory_updated()
 signal potion_consumed(potion_name: String)
 signal tutorial_step_changed(step: int)
 signal tutorial_completed()
+signal boss_engaged(boss_name: String, max_hp: float, current_hp: float)
+signal boss_hp_updated(current_hp: float, max_hp: float)
+signal boss_defeated_event()
 
 enum ToxicityStage { SAFE, MODERATE, HIGH, OVERDOSE }
 
@@ -47,6 +50,11 @@ var is_ironskin_active: bool = false
 var ironskin_timer: float = 0.0
 var last_consumed_potion: String = ""
 var last_potion_timestamp: float = 0.0
+
+var is_boss_active: bool = false
+var boss_name_active: String = ""
+var boss_max_hp_active: float = 0.0
+var boss_current_hp_active: float = 0.0
 
 var lpf_effect: AudioEffectLowPassFilter = null
 var tinnitus_player: AudioStreamPlayer = null
@@ -371,6 +379,10 @@ func reset_game_state() -> void:
 		"berserk": 0,
 		"ironskin": 0
 	}
+	is_boss_active = false
+	boss_name_active = ""
+	boss_max_hp_active = 0.0
+	boss_current_hp_active = 0.0
 	if lpf_effect:
 		lpf_effect.cutoff_hz = 20500.0
 	if tinnitus_player:
@@ -379,3 +391,19 @@ func reset_game_state() -> void:
 	toxicity_changed.emit(current_toxicity, max_toxicity)
 	toxicity_stage_changed.emit(ToxicityStage.SAFE)
 	inventory_updated.emit()
+
+func trigger_boss_engaged(b_name: String, m_hp: float, c_hp: float) -> void:
+	is_boss_active = true
+	boss_name_active = b_name
+	boss_max_hp_active = m_hp
+	boss_current_hp_active = c_hp
+	boss_engaged.emit(b_name, m_hp, c_hp)
+
+func update_boss_hp(c_hp: float, m_hp: float) -> void:
+	boss_current_hp_active = c_hp
+	boss_max_hp_active = m_hp
+	boss_hp_updated.emit(c_hp, m_hp)
+
+func trigger_boss_defeated() -> void:
+	is_boss_active = false
+	boss_defeated_event.emit()

@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://c8orbproj0001"]
+
+[ext_resource type="Script" path="res://magic_orb_projectile.gd" id="1_orb"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_orb"]
+radius = 0.28
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orb_outer"]
+shading_mode = 0
+albedo_color = Color(0.92, 0.25, 0.95, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_orb_outer"]
+material = SubResource("StandardMaterial3D_orb_outer")
+radius = 0.22
+height = 0.44
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_orb_core"]
+shading_mode = 0
+albedo_color = Color(0.35, 0.95, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_orb_core"]
+material = SubResource("StandardMaterial3D_orb_core")
+radius = 0.12
+height = 0.24
+radial_segments = 12
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trail"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.85, 0.2, 0.95, 0.8)
+
+[sub_resource type="SphereMesh" id="SphereMesh_trail"]
+material = SubResource("StandardMaterial3D_trail")
+radius = 0.08
+height = 0.16
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_impact"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.4, 0.95, 1, 0.9)
+
+[sub_resource type="SphereMesh" id="SphereMesh_impact"]
+material = SubResource("StandardMaterial3D_impact")
+radius = 0.05
+height = 0.1
+radial_segments = 8
+rings = 4
+
+[node name="MagicOrbProjectile" type="Area3D"]
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("1_orb")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_orb")
+
+[node name="VisualNode" type="Node3D" parent="."]
+
+[node name="OuterMesh" type="MeshInstance3D" parent="VisualNode"]
+mesh = SubResource("SphereMesh_orb_outer")
+
+[node name="CoreMesh" type="MeshInstance3D" parent="VisualNode"]
+mesh = SubResource("SphereMesh_orb_core")
+
+[node name="TrailParticles" type="CPUParticles3D" parent="."]
+amount = 14
+lifetime = 0.25
+mesh = SubResource("SphereMesh_trail")
+gravity = Vector3(0, 0, 0)
+scale_amount_min = 0.5
+scale_amount_max = 1.0
+
+[node name="ImpactParticles" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 16
+lifetime = 0.3
+one_shot = true
+explosiveness = 0.9
+mesh = SubResource("SphereMesh_impact")
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, -6, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 6.0
+
+[node name="AudioPlayer" type="AudioStreamPlayer3D" parent="."]
+unit_size = 3.0
+max_distance = 35.0

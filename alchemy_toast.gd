@@ -1,15 +1,35 @@
 extends PanelContainer
 class_name AlchemyToast
 
+const POTION_TEXTURES: Dictionary = {
+	"healing": preload("res://resources/pixel_resources_pack/static/085_health_potion.png"),
+	"strength": preload("res://resources/pixel_resources_pack/static/092_elixir.png"),
+	"slow": preload("res://resources/pixel_resources_pack/static/086_mana_potion.png"),
+	"berserk": preload("res://resources/pixel_resources_pack/static/091_poison.png"),
+	"ironskin": preload("res://resources/pixel_resources_pack/static/089_oil_flask.png"),
+}
+
 @onready var toast_icon: TextureRect = $HBox/Icon
 @onready var toast_label: Label = $HBox/Label
 
+func _ensure_nodes() -> void:
+	if not toast_icon:
+		toast_icon = get_node_or_null("HBox/Icon")
+	if not toast_label:
+		toast_label = get_node_or_null("HBox/Label")
+
 func pop(potion_name: String, tint: Color, start_pos: Vector2) -> void:
+	_ensure_nodes()
 	if toast_label:
 		toast_label.text = "+1 %s!" % potion_name.to_upper()
 		toast_label.add_theme_color_override("font_color", tint)
 	if toast_icon:
-		toast_icon.self_modulate = tint
+		var p_key := potion_name.to_lower()
+		if POTION_TEXTURES.has(p_key):
+			toast_icon.texture = POTION_TEXTURES[p_key]
+			toast_icon.self_modulate = Color.WHITE
+		else:
+			toast_icon.self_modulate = tint
 
 	position = start_pos
 	pivot_offset = size * 0.5

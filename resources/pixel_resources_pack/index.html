@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pixel Resources Pack</title>
+<style>
+body{margin:0;background:#222034;color:#eee8d5;font:15px/1.4 system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}h1{margin:0 0 4px;font-size:24px}p{color:#a7a3c2;margin:0 0 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.bar button{background:#35324f;color:#eee8d5;border:2px solid #4b4770;border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}
+.bar button.on{background:#ffd166;color:#222034;border-color:#ffd166}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.cell{background:#2c2945;border:2px solid #3b3760;border-radius:8px;padding:10px 6px 8px;text-align:center}
+.spr{width:96px;height:96px;margin:0 auto;background-size:768px 96px;image-rendering:pixelated;animation:play .8s steps(8) infinite}
+@keyframes play{to{background-position-x:-768px}}.nm{font-size:12px;margin-top:4px}.ct{font-size:10px;color:#8f8bb0}
+</style></head><body><div class="wrap"><h1>Pixel Resources Pack</h1><p>100 animated resources · 64×64 · 8 frames</p>
+<div class="bar" id="bar"></div><div class="grid" id="grid"></div></div>
+<script>
+fetch('resources.json').then(r=>r.json()).then(d=>{let cat='all';const bar=document.getElementById('bar'),grid=document.getElementById('grid');
+bar.innerHTML='<button class="on" data-c="all">All</button>'+Object.entries(d.categories).map(([k,v])=>`<button data-c="${k}">${v}</button>`).join('');
+bar.onclick=e=>{const b=e.target.closest('button');if(!b)return;cat=b.dataset.c;bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));draw()};
+function draw(){grid.innerHTML=d.items.filter(i=>cat==='all'||i.category===cat).map(i=>`<div class="cell"><div class="spr" style="background-image:url(${i.anim.strip})"></div><div class="nm">${i.name}</div><div class="ct">${i.category_name}</div></div>`).join('')}draw()});
+</script></body></html>

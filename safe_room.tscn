@@ -14,6 +14,15 @@
 [ext_resource type="PackedScene" uid="uid://b2lonq43mc2wy" path="res://portal.tscn" id="18_portal"]
 [ext_resource type="PackedScene" uid="uid://bo1hwpps3f1hx" path="res://char/Characters/gltf/Ranger.glb" id="25_ranger"]
 [ext_resource type="AnimationLibrary" uid="uid://uyrmce8vk617" path="res://resources/player/player_anim_library.tres" id="26_player_anim"]
+[ext_resource type="Texture2D" path="res://resources/potion-ball.png" id="27_potion_ball"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/074_slime.png" id="28_mat_slime"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/044_fire_essence.png" id="29_mat_fire"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/045_ice_essence.png" id="30_mat_frost"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/085_health_potion.png" id="31_potion_heal"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/092_elixir.png" id="32_potion_strength"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/086_mana_potion.png" id="33_potion_slow"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/091_poison.png" id="34_potion_berserk"]
+[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/094_gear.png" id="35_icon_craft"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -63,7 +72,12 @@ content_margin_left = 8.0
 content_margin_top = 4.0
 content_margin_right = 8.0
 content_margin_bottom = 4.0
-bg_color = Color(0.12, 0.14, 0.18, 0.8)
+bg_color = Color(0.9, 0.92, 0.95, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.82, 0.88, 0.8)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
@@ -74,11 +88,67 @@ content_margin_left = 12.0
 content_margin_top = 6.0
 content_margin_right = 12.0
 content_margin_bottom = 6.0
-bg_color = Color(0.13, 0.15, 0.19, 0.7)
+bg_color = Color(0.92, 0.94, 0.97, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.84, 0.9, 0.8)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.06, 0.08, 0.11, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.23, 0.3, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_damage"]
+bg_color = Color(0.95, 0.45, 0.35, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hp_front"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.85, 0.16, 0.22, 1)
+border_width_top = 1
+border_color = Color(1, 0.4, 0.45, 0.6)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toxic_bg"]
+bg_color = Color(0.06, 0.08, 0.1, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.14, 0.22, 0.18, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toxic_fill"]
+bg_color = Color(0.12, 0.88, 0.42, 1)
+border_width_top = 1
+border_color = Color(0.5, 1, 0.7, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
 [node name="SafeRoom" type="Node3D" unique_id=839460912]
 script = ExtResource("1_saferoom")
@@ -276,29 +346,59 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Toxic" type="ProgressBar" parent="CanvasLayer/Control" unique_id=2135592360]
-unique_name_in_owner = true
-layout_mode = 1
-offset_left = 17.0
-offset_top = 73.0
-offset_right = 343.0
-offset_bottom = 122.0
-theme_override_colors/font_color = Color(3.85046e-07, 0.7551492, 0.49844563, 1)
-theme_override_font_sizes/font_size = 32
+[node name="StatusHUD" type="VBoxContainer" parent="CanvasLayer/Control" unique_id=3100000001]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 304.0
+offset_bottom = 58.0
+theme_override_constants/separation = 6
 
-[node name="Hp" type="ProgressBar" parent="CanvasLayer/Control" unique_id=2084889367]
+[node name="HpBarContainer" type="Control" parent="CanvasLayer/Control/StatusHUD" unique_id=3100000004]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 18)
+layout_mode = 2
+
+[node name="HpDamage" type="ProgressBar" parent="CanvasLayer/Control/StatusHUD/HpBarContainer" unique_id=3100000005]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = -1131.0
-offset_top = 12.0
-offset_right = -817.0
-offset_bottom = 61.0
-grow_horizontal = 0
-theme_override_colors/font_color = Color(0.85, 0.15, 0.25, 1)
-theme_override_font_sizes/font_size = 32
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_damage")
+show_percentage = false
+
+[node name="Hp" type="ProgressBar" parent="CanvasLayer/Control/StatusHUD/HpBarContainer" unique_id=2084889367]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxEmpty_hp_front")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+show_percentage = false
+
+[node name="ToxicBarContainer" type="Control" parent="CanvasLayer/Control/StatusHUD" unique_id=3100000008]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 12)
+layout_mode = 2
+
+[node name="Toxic" type="ProgressBar" parent="CanvasLayer/Control/StatusHUD/ToxicBarContainer" unique_id=2135592360]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_toxic_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_toxic_fill")
+show_percentage = false
 
 [node name="QuickSlotsBar" type="HBoxContainer" parent="CanvasLayer/Control" unique_id=592520786]
 layout_mode = 1
@@ -340,18 +440,17 @@ text = "0"
 
 [node name="IconHeal" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox" unique_id=407]
 unique_name_in_owner = true
-self_modulate = Color(0.2, 0.9, 0.5, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("31_potion_heal")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotHeal/VBox" unique_id=404]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_colors/font_color = Color(0.2, 0.24, 0.3, 1)
 theme_override_font_sizes/font_size = 11
 text = "1"
 horizontal_alignment = 1
@@ -380,18 +479,17 @@ text = "0"
 
 [node name="IconStrength" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox" unique_id=417]
 unique_name_in_owner = true
-self_modulate = Color(1, 0.6, 0.2, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("32_potion_strength")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotStrength/VBox" unique_id=414]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_colors/font_color = Color(0.2, 0.24, 0.3, 1)
 theme_override_font_sizes/font_size = 11
 text = "2"
 horizontal_alignment = 1
@@ -420,18 +518,17 @@ text = "0"
 
 [node name="IconSlow" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox" unique_id=427]
 unique_name_in_owner = true
-self_modulate = Color(0.3, 0.75, 1, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("33_potion_slow")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotSlow/VBox" unique_id=424]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_colors/font_color = Color(0.2, 0.24, 0.3, 1)
 theme_override_font_sizes/font_size = 11
 text = "3"
 horizontal_alignment = 1
@@ -460,18 +557,17 @@ text = "0"
 
 [node name="IconBerserk" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=437]
 unique_name_in_owner = true
-self_modulate = Color(1, 0.25, 0.35, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("34_potion_berserk")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/SlotBerserk/VBox" unique_id=434]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.8, 0.88, 1)
+theme_override_colors/font_color = Color(0.2, 0.24, 0.3, 1)
 theme_override_font_sizes/font_size = 11
 text = "4"
 horizontal_alignment = 1
@@ -497,19 +593,18 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="IconCraft" type="TextureRect" parent="CanvasLayer/Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=444]
-self_modulate = Color(0.9, 0.8, 0.3, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
-texture = ExtResource("4_icon")
+texture = ExtResource("35_icon_craft")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Key" type="Label" parent="CanvasLayer/Control/QuickSlotsBar/BtnCraftToggle/VBox" unique_id=443]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.85, 0.4, 1)
+theme_override_colors/font_color = Color(0.85, 0.48, 0.05, 1)
 theme_override_font_sizes/font_size = 11
 text = "C"
 horizontal_alignment = 1
@@ -531,7 +626,7 @@ theme_override_styles/panel = ExtResource("9_panel_box")
 [node name="ObjectiveText" type="Label" parent="CanvasLayer/Control/ObjectiveBar" unique_id=2100000003]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.88, 0.92, 1)
+theme_override_colors/font_color = Color(0.12, 0.15, 0.2, 1)
 theme_override_font_sizes/font_size = 13
 text = "Berjalan ke lingkaran target"
 horizontal_alignment = 1
@@ -567,6 +662,7 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox" unique_id=1130125351]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.15, 0.2, 1)
 theme_override_font_sizes/font_size = 19
 text = "MEJA ALKIMIA"
 horizontal_alignment = 1
@@ -585,11 +681,10 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipSlime/HBox" unique_id=311001003]
-self_modulate = Color(0.2, 0.9, 0.5, 1)
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("28_mat_slime")
 expand_mode = 1
 stretch_mode = 5
 
@@ -608,11 +703,10 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFire/HBox" unique_id=311001007]
-self_modulate = Color(1, 0.6, 0.2, 1)
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("29_mat_fire")
 expand_mode = 1
 stretch_mode = 5
 
@@ -631,11 +725,10 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/MaterialsBar/ChipFrost/HBox" unique_id=311001011]
-self_modulate = Color(0.3, 0.75, 1, 1)
 custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("30_mat_frost")
 expand_mode = 1
 stretch_mode = 5
 
@@ -661,11 +754,10 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox" unique_id=811001001]
-self_modulate = Color(0.2, 0.9, 0.5, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("31_potion_heal")
 expand_mode = 1
 stretch_mode = 5
 
@@ -675,13 +767,13 @@ size_flags_horizontal = 3
 
 [node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox/Info" unique_id=280103302]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.9, 0.5, 1)
+theme_override_colors/font_color = Color(0.08, 0.65, 0.38, 1)
 theme_override_font_sizes/font_size = 14
 text = "Healing Potion"
 
 [node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowHeal/HBox/Info" unique_id=1999635762]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
+theme_override_colors/font_color = Color(0.35, 0.4, 0.48, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Slime Gel"
 
@@ -701,11 +793,10 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox" unique_id=811001002]
-self_modulate = Color(1, 0.6, 0.2, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("32_potion_strength")
 expand_mode = 1
 stretch_mode = 5
 
@@ -715,13 +806,13 @@ size_flags_horizontal = 3
 
 [node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox/Info" unique_id=1863986502]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
+theme_override_colors/font_color = Color(0.95, 0.45, 0.08, 1)
 theme_override_font_sizes/font_size = 14
 text = "Strength Potion"
 
 [node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowStrength/HBox/Info" unique_id=1485570316]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
+theme_override_colors/font_color = Color(0.35, 0.4, 0.48, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Telinga Goblin"
 
@@ -741,11 +832,10 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox" unique_id=811001003]
-self_modulate = Color(0.3, 0.75, 1, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("33_potion_slow")
 expand_mode = 1
 stretch_mode = 5
 
@@ -755,13 +845,13 @@ size_flags_horizontal = 3
 
 [node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox/Info" unique_id=1649568066]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.75, 1, 1)
+theme_override_colors/font_color = Color(0.02, 0.55, 0.8, 1)
 theme_override_font_sizes/font_size = 14
 text = "Slow Potion"
 
 [node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowSlow/HBox/Info" unique_id=111490904]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
+theme_override_colors/font_color = Color(0.35, 0.4, 0.48, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Frost Wing"
 
@@ -781,11 +871,10 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Icon" type="TextureRect" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox" unique_id=811001004]
-self_modulate = Color(1, 0.25, 0.35, 1)
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_vertical = 4
-texture = ExtResource("4_icon")
+texture = ExtResource("34_potion_berserk")
 expand_mode = 1
 stretch_mode = 5
 
@@ -795,13 +884,13 @@ size_flags_horizontal = 3
 
 [node name="Name" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox/Info" unique_id=1803893203]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.25, 0.35, 1)
+theme_override_colors/font_color = Color(0.92, 0.22, 0.28, 1)
 theme_override_font_sizes/font_size = 14
 text = "Berserk Potion"
 
 [node name="Cost" type="Label" parent="CanvasLayer/Control/CraftingPanel/Margin/VBox/RecipeList/RowBerserk/HBox/Info" unique_id=981128649]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
+theme_override_colors/font_color = Color(0.35, 0.4, 0.48, 1)
 theme_override_font_sizes/font_size = 11
 text = "Butuh: 1 Slime + 1 Api"
 

@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://3d5sdoo4ggb5"]
+
+[ext_resource type="Script" path="res://shockwave_ring.gd" id="1_shock"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.2, 0.85, 1, 0.85)
+
+[sub_resource type="TorusMesh" id="TorusMesh_ring"]
+material = SubResource("StandardMaterial3D_ring")
+inner_radius = 0.88
+outer_radius = 1.0
+rings = 24
+ring_segments = 8
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hit"]
+height = 0.35
+radius = 1.0
+
+[node name="ShockwaveRing" type="Node3D"]
+script = ExtResource("1_shock")
+
+[node name="RingMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+mesh = SubResource("TorusMesh_ring")
+
+[node name="HitArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HitArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.175, 0)
+shape = SubResource("CylinderShape3D_hit")
+
+[node name="AudioPlayer" type="AudioStreamPlayer3D" parent="."]
+unit_size = 3.5
+max_distance = 40.0
+
+[connection signal="body_entered" from="HitArea" to="." method="_on_hit_area_body_entered"]

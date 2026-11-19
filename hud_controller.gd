@@ -60,6 +60,22 @@ var toxic_mat: ShaderMaterial = null
 var _prev_hp: float = 100.0
 var _prev_toxic: float = 0.0
 
+@onready var boss_bar_container: PanelContainer = %BossBarContainer if has_node("%BossBarContainer") else null
+@onready var boss_title: Label = %BossTitle if has_node("%BossTitle") else null
+@onready var boss_pips: HBoxContainer = %BossPips if has_node("%BossPips") else null
+@onready var pip1: Label = %Pip1 if has_node("%Pip1") else null
+@onready var pip2: Label = %Pip2 if has_node("%Pip2") else null
+@onready var pip3: Label = %Pip3 if has_node("%Pip3") else null
+@onready var boss_under_bar: ProgressBar = %BossUnderBar if has_node("%BossUnderBar") else null
+@onready var boss_lag_bar: ProgressBar = %BossLagBar if has_node("%BossLagBar") else null
+@onready var boss_hp_bar: ProgressBar = %BossHpBar if has_node("%BossHpBar") else null
+
+var _boss_lag_tween: Tween = null
+var _boss_flash_tween: Tween = null
+var _current_boss_layer: int = 1
+var _boss_fill_style: StyleBoxFlat = null
+var _boss_under_style: StyleBoxFlat = null
+
 func _setup_toxic_overlay() -> void:
 	if not toxic_overlay and has_node("ToxicOverlay"):
 		toxic_overlay = $ToxicOverlay as ColorRect
@@ -94,10 +110,16 @@ func _ready() -> void:
 	btn_slow.pressed.connect(func(): _on_craft_button_pressed("slow", btn_slow, row_slow))
 	btn_berserk.pressed.connect(func(): _on_craft_button_pressed("berserk", btn_berserk, row_berserk))
 	GlobalLogic.potion_consumed.connect(_on_potion_consumed_juice)
+	GlobalLogic.boss_engaged.connect(_on_boss_engaged)
+	GlobalLogic.boss_hp_updated.connect(_on_boss_hp_updated)
+	GlobalLogic.boss_defeated_event.connect(_on_boss_defeated)
 
 	_on_toxicity_changed(GlobalLogic.current_toxicity, GlobalLogic.max_toxicity)
 	_on_hp_changed(GlobalLogic.current_hp, GlobalLogic.max_hp)
 	_on_inventory_updated()
+
+	if GlobalLogic.is_boss_active:
+		_on_boss_engaged(GlobalLogic.boss_name_active, GlobalLogic.boss_max_hp_active, GlobalLogic.boss_current_hp_active)
 
 func _setup_ironskin_ui() -> void:
 	if quick_slots_bar and slot_berserk:
@@ -532,3 +554,138 @@ static func _generate_fail_wav() -> AudioStreamWAV:
 	wav.mix_rate = int(sample_hz)
 	wav.data = buffer
 	return wav
+
+func _on_boss_engaged(b_name: String, _m_hp: float, c_hp: float) -> void:
+	if not boss_bar_container:
+		return
+	if boss_title:
+		boss_title.text = b_name
+
+	_current_boss_layer = 1
+	_ensure_boss_styles()
+	_update_boss_layer_visuals(c_hp, false)
+
+	boss_bar_container.visible = true
+	boss_bar_container.modulate.a = 0.0
+	boss_bar_container.position.y = -20.0
+
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(boss_bar_container, "modulate:a", 1.0, 0.45).set_ease(Tween.EASE_OUT)
+	tw.tween_property(boss_bar_container, "position:y", 16.0, 0.45).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func _on_boss_hp_updated(c_hp: float, _m_hp: float) -> void:
+	if not boss_bar_container:
+		return
+	if not boss_bar_container.visible:
+		boss_bar_container.visible = true
+		boss_bar_container.modulate.a = 1.0
+	_update_boss_layer_visuals(c_hp, true)
+
+func _on_boss_defeated() -> void:
+	if not boss_bar_container:
+		return
+	_set_pip_states(false, false, false)
+
+	var tw := create_tween()
+	tw.tween_interval(0.4)
+	tw.tween_property(boss_bar_container, "modulate:a", 0.0, 1.2).set_ease(Tween.EASE_IN)
+	tw.tween_callback(func() -> void:
+		boss_bar_container.visible = false
+	)
+
+func _ensure_boss_styles() -> void:
+	if not boss_hp_bar or not boss_under_bar:
+		return
+	if not _boss_fill_style:
+		var fill_sb = boss_hp_bar.get_theme_stylebox("fill")
+		if fill_sb is StyleBoxFlat:
+			_boss_fill_style = fill_sb.duplicate() as StyleBoxFlat
+			boss_hp_bar.add_theme_stylebox_override("fill", _boss_fill_style)
+
+	if not _boss_under_style:
+		var under_sb = boss_under_bar.get_theme_stylebox("fill")
+		if under_sb is StyleBoxFlat:
+			_boss_under_style = under_sb.duplicate() as StyleBoxFlat
+			boss_under_bar.add_theme_stylebox_override("fill", _boss_under_style)
+
+func _update_boss_layer_visuals(c_hp: float, animate_lag: bool) -> void:
+	_ensure_boss_styles()
+	var layer_val: float = 60.0
+	var new_layer: int = 1
+	var active_color: Color = Color(0.68, 0.32, 0.95, 1.0) # Violet Amethyst
+	var under_color: Color = Color(0.06, 0.72, 0.85, 1.0) # Glacial Cyan
+
+	if c_hp > 120.0:
+		new_layer = 1
+		layer_val = clampf(c_hp - 120.0, 0.0, 60.0)
+		active_color = Color(0.68, 0.32, 0.95, 1.0)
+		under_color = Color(0.06, 0.72, 0.85, 1.0)
+		_set_pip_states(true, true, true)
+	elif c_hp > 60.0:
+		new_layer = 2
+		layer_val = clampf(c_hp - 60.0, 0.0, 60.0)
+		active_color = Color(0.06, 0.72, 0.85, 1.0)
+		under_color = Color(0.92, 0.22, 0.32, 1.0)
+		_set_pip_states(false, true, true)
+	elif c_hp > 0.0:
+		new_layer = 3
+		layer_val = clampf(c_hp, 0.0, 60.0)
+		active_color = Color(0.92, 0.22, 0.32, 1.0)
+		under_color = Color(0.12, 0.14, 0.18, 1.0)
+		_set_pip_states(false, false, true)
+	else:
+		new_layer = 3
+		layer_val = 0.0
+		active_color = Color(0.92, 0.22, 0.32, 1.0)
+		under_color = Color(0.12, 0.14, 0.18, 1.0)
+		_set_pip_states(false, false, false)
+
+	if new_layer != _current_boss_layer:
+		_trigger_layer_break(new_layer)
+		_current_boss_layer = new_layer
+
+	if _boss_fill_style:
+		_boss_fill_style.bg_color = active_color
+	if _boss_under_style:
+		_boss_under_style.bg_color = under_color
+
+	if boss_hp_bar:
+		boss_hp_bar.value = layer_val
+
+	if boss_lag_bar:
+		if not animate_lag:
+			boss_lag_bar.value = layer_val
+		else:
+			if _boss_lag_tween and _boss_lag_tween.is_valid():
+				_boss_lag_tween.kill()
+			_boss_lag_tween = create_tween()
+			_boss_lag_tween.tween_interval(0.22)
+			_boss_lag_tween.tween_property(boss_lag_bar, "value", layer_val, 0.38).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _set_pip_states(p1_active: bool, p2_active: bool, p3_active: bool) -> void:
+	if pip1:
+		pip1.text = "◆" if p1_active else "◇"
+		pip1.modulate = Color(0.68, 0.32, 0.95, 1.0) if p1_active else Color(0.4, 0.45, 0.55, 0.45)
+	if pip2:
+		pip2.text = "◆" if p2_active else "◇"
+		pip2.modulate = Color(0.06, 0.72, 0.85, 1.0) if p2_active else Color(0.4, 0.45, 0.55, 0.45)
+	if pip3:
+		pip3.text = "◆" if p3_active else "◇"
+		pip3.modulate = Color(0.92, 0.22, 0.32, 1.0) if p3_active else Color(0.4, 0.45, 0.55, 0.45)
+
+func _trigger_layer_break(new_layer: int) -> void:
+	if not boss_bar_container:
+		return
+	if _boss_flash_tween and _boss_flash_tween.is_valid():
+		_boss_flash_tween.kill()
+
+	_boss_flash_tween = create_tween()
+	boss_bar_container.self_modulate = Color(2.0, 2.0, 2.0, 1.0)
+	_boss_flash_tween.tween_property(boss_bar_container, "self_modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	var broken_pip: Label = pip1 if new_layer == 2 else pip2
+	if broken_pip:
+		var p_tw := create_tween()
+		p_tw.tween_property(broken_pip, "scale", Vector2(1.5, 1.5), 0.1)
+		p_tw.tween_property(broken_pip, "scale", Vector2.ONE, 0.18)
