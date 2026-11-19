@@ -61,8 +61,164 @@ var tinnitus_player: AudioStreamPlayer = null
 var heartbeat_player: AudioStreamPlayer = null
 var heartbeat_timer: float = 0.0
 
+# BGM & SFX System
+const BGM_DUNGEON_PATH := "res://resources/audio/music/dungeon_ambient.ogg"
+const BGM_BOSS_PATH := "res://resources/audio/music/combat_boss.ogg"
+const BGM_ENCOUNTER_PATH := "res://resources/audio/music/combat_encounter.ogg"
+
+const SFX_UI_CLICK_PATH := "res://resources/audio/sfx/ui_click.wav"
+const SFX_UI_HOVER_PATH := "res://resources/audio/sfx/ui_hover.wav"
+const SFX_UI_SWITCH_PATH := "res://resources/audio/sfx/ui_switch.wav"
+
+var bgm_player_a: AudioStreamPlayer = null
+var bgm_player_b: AudioStreamPlayer = null
+var _active_bgm_channel: int = 0
+var _bgm_fade_tween: Tween = null
+var current_bgm_track_id: String = ""
+var _base_bgm_volume_db: float = -8.0
+var _is_bgm_ducked: bool = false
+
+var ui_click_player: AudioStreamPlayer = null
+var ui_hover_player: AudioStreamPlayer = null
+var ui_switch_player: AudioStreamPlayer = null
+
+static var _cached_ui_click_stream: AudioStream = null
+static var _cached_ui_hover_stream: AudioStream = null
+static var _cached_ui_switch_stream: AudioStream = null
+
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_setup_toxicity_audio()
+	_setup_bgm_system()
+	_setup_ui_audio()
+
+func _setup_bgm_system() -> void:
+	bgm_player_a = AudioStreamPlayer.new()
+	bgm_player_a.name = "BGMPlayerA"
+	bgm_player_a.bus = "Master"
+	bgm_player_a.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(bgm_player_a)
+
+	bgm_player_b = AudioStreamPlayer.new()
+	bgm_player_b.name = "BGMPlayerB"
+	bgm_player_b.bus = "Master"
+	bgm_player_b.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(bgm_player_b)
+
+	boss_engaged.connect(_on_boss_engaged_bgm)
+	boss_defeated_event.connect(_on_boss_defeated_bgm)
+
+func _setup_ui_audio() -> void:
+	ui_click_player = AudioStreamPlayer.new()
+	ui_click_player.name = "UIClickPlayer"
+	ui_click_player.bus = "Master"
+	ui_click_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(ui_click_player)
+
+	ui_hover_player = AudioStreamPlayer.new()
+	ui_hover_player.name = "UIHoverPlayer"
+	ui_hover_player.bus = "Master"
+	ui_hover_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(ui_hover_player)
+
+	ui_switch_player = AudioStreamPlayer.new()
+	ui_switch_player.name = "UISwitchPlayer"
+	ui_switch_player.bus = "Master"
+	ui_switch_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(ui_switch_player)
+
+	if FileAccess.file_exists(SFX_UI_CLICK_PATH):
+		_cached_ui_click_stream = load(SFX_UI_CLICK_PATH)
+		ui_click_player.stream = _cached_ui_click_stream
+	if FileAccess.file_exists(SFX_UI_HOVER_PATH):
+		_cached_ui_hover_stream = load(SFX_UI_HOVER_PATH)
+		ui_hover_player.stream = _cached_ui_hover_stream
+	if FileAccess.file_exists(SFX_UI_SWITCH_PATH):
+		_cached_ui_switch_stream = load(SFX_UI_SWITCH_PATH)
+		ui_switch_player.stream = _cached_ui_switch_stream
+
+func play_bgm(stream_path: String, track_id: String = "", fade_duration: float = 1.4, target_volume_db: float = -8.0) -> void:
+	if current_bgm_track_id == track_id and not track_id.is_empty():
+		return
+
+	if not FileAccess.file_exists(stream_path):
+		return
+
+	var stream = load(stream_path) as AudioStream
+	if stream == null:
+		return
+
+	current_bgm_track_id = track_id
+	_base_bgm_volume_db = target_volume_db
+	_is_bgm_ducked = false
+	var outgoing_player = bgm_player_a if _active_bgm_channel == 0 else bgm_player_b
+	_active_bgm_channel = 1 if _active_bgm_channel == 0 else 0
+	var incoming_player = bgm_player_a if _active_bgm_channel == 0 else bgm_player_b
+
+	incoming_player.stream = stream
+	incoming_player.volume_db = -60.0
+	incoming_player.play()
+
+	if _bgm_fade_tween and _bgm_fade_tween.is_valid():
+		_bgm_fade_tween.kill()
+
+	_bgm_fade_tween = create_tween().set_parallel(true)
+	if outgoing_player and outgoing_player.playing:
+		_bgm_fade_tween.tween_property(outgoing_player, "volume_db", -60.0, fade_duration).set_trans(Tween.TRANS_SINE)
+	_bgm_fade_tween.tween_property(incoming_player, "volume_db", target_volume_db, fade_duration).set_trans(Tween.TRANS_SINE)
+	if outgoing_player and outgoing_player.playing:
+		_bgm_fade_tween.chain().tween_callback(outgoing_player.stop)
+
+func duck_bgm(duck: bool, fade_duration: float = 0.25) -> void:
+	if _is_bgm_ducked == duck:
+		return
+	_is_bgm_ducked = duck
+	var active_player = bgm_player_a if _active_bgm_channel == 0 else bgm_player_b
+	if not active_player or not active_player.playing:
+		return
+	var target_vol = _base_bgm_volume_db - (8.0 if duck else 0.0)
+	var tw = create_tween()
+	tw.tween_property(active_player, "volume_db", target_vol, fade_duration).set_trans(Tween.TRANS_SINE)
+
+func stop_bgm(fade_duration: float = 1.2) -> void:
+	current_bgm_track_id = ""
+	if _bgm_fade_tween and _bgm_fade_tween.is_valid():
+		_bgm_fade_tween.kill()
+	_bgm_fade_tween = create_tween().set_parallel(true)
+	var players_to_stop: Array[AudioStreamPlayer] = []
+	if bgm_player_a and bgm_player_a.playing:
+		_bgm_fade_tween.tween_property(bgm_player_a, "volume_db", -60.0, fade_duration).set_trans(Tween.TRANS_SINE)
+		players_to_stop.append(bgm_player_a)
+	if bgm_player_b and bgm_player_b.playing:
+		_bgm_fade_tween.tween_property(bgm_player_b, "volume_db", -60.0, fade_duration).set_trans(Tween.TRANS_SINE)
+		players_to_stop.append(bgm_player_b)
+	if not players_to_stop.is_empty():
+		_bgm_fade_tween.chain().tween_callback(func():
+			for p in players_to_stop:
+				if is_instance_valid(p):
+					p.stop()
+		)
+
+func _on_boss_engaged_bgm(_name: String, _max_hp: float, _curr_hp: float) -> void:
+	play_bgm(BGM_BOSS_PATH, "boss", 1.2, -6.0)
+
+func _on_boss_defeated_bgm() -> void:
+	play_bgm(BGM_DUNGEON_PATH, "dungeon", 2.2, -8.0)
+
+func play_ui_click(pitch_jitter: float = 0.05) -> void:
+	if ui_click_player and ui_click_player.stream:
+		ui_click_player.pitch_scale = randf_range(1.0 - pitch_jitter, 1.0 + pitch_jitter)
+		ui_click_player.play()
+
+func play_ui_hover(pitch_jitter: float = 0.04) -> void:
+	if ui_hover_player and ui_hover_player.stream:
+		ui_hover_player.pitch_scale = randf_range(1.0 - pitch_jitter, 1.0 + pitch_jitter)
+		ui_hover_player.play()
+
+func play_ui_switch(pitch_jitter: float = 0.03) -> void:
+	if ui_switch_player and ui_switch_player.stream:
+		ui_switch_player.pitch_scale = randf_range(1.0 - pitch_jitter, 1.0 + pitch_jitter)
+		ui_switch_player.play()
 
 func _setup_toxicity_audio() -> void:
 	lpf_effect = AudioEffectLowPassFilter.new()

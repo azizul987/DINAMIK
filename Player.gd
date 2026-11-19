@@ -137,6 +137,7 @@ var _character_meshes: Array[MeshInstance3D] = []
 
 static var _cached_slash_whoosh_wav: AudioStreamWAV = null
 static var _cached_slash_hit_wav: AudioStreamWAV = null
+static var _cached_player_hurt_wav: AudioStreamWAV = null
 
 @onready var camera_pivot: Node3D = $CameraPivot
 @onready var mesh_instance: Node3D = $Ranger if has_node("Ranger") else ($MeshInstance if has_node("MeshInstance") else self)
@@ -152,6 +153,7 @@ static var _cached_slash_hit_wav: AudioStreamWAV = null
 @onready var slash_audio: AudioStreamPlayer3D = %SlashAudio if has_node("%SlashAudio") else ($SlashAudio if has_node("SlashAudio") else null)
 @onready var slash_hit_audio: AudioStreamPlayer3D = %SlashHitAudio if has_node("%SlashHitAudio") else ($SlashHitAudio if has_node("SlashHitAudio") else null)
 @onready var footstep_audio: AudioStreamPlayer3D = %FootstepAudio if has_node("%FootstepAudio") else ($FootstepAudio if has_node("FootstepAudio") else null)
+@onready var hurt_audio: AudioStreamPlayer3D = %HurtAudio if has_node("%HurtAudio") else ($HurtAudio if has_node("HurtAudio") else null)
 
 func _ready() -> void:
 	add_to_group("player")
@@ -512,9 +514,9 @@ func _trigger_slash_arc(step: int, duration: float) -> void:
 	if slash_audio:
 		var pitch := 1.15
 		match step:
-			0: pitch = 1.18
-			1: pitch = 1.34
-			2: pitch = 0.76
+			0: pitch = 1.25
+			1: pitch = 1.05
+			2: pitch = 0.72
 		if GlobalLogic.is_berserk_active:
 			pitch *= 1.12
 		slash_audio.pitch_scale = pitch * randf_range(0.96, 1.04)
@@ -1113,7 +1115,14 @@ func _apply_hit_to_target(target: Node) -> void:
 
 	# 2. Audio hantaman tebasan pedang ke musuh (Slash Hit SFX)
 	if slash_hit_audio:
-		slash_hit_audio.pitch_scale = randf_range(0.92, 1.08)
+		var hit_pitch: float = 1.0
+		if combo_index == 2:
+			hit_pitch = 0.82
+		elif combo_index == 1:
+			hit_pitch = 1.05
+		else:
+			hit_pitch = 1.18
+		slash_hit_audio.pitch_scale = hit_pitch * randf_range(0.94, 1.06)
 		slash_hit_audio.play()
 
 	GlobalLogic.hit_stop(0.05, 0.05)
@@ -1221,6 +1230,7 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_sharp: boo
 			camera_pivot.fov_punch(2.0)
 
 	_trigger_hit_feedback()
+	_play_player_hurt_sound()
 	if is_drinking:
 		is_drinking = false
 		if _drink_tween and _drink_tween.is_valid():
@@ -1387,7 +1397,7 @@ static func _generate_slash_whoosh_wav() -> AudioStreamWAV:
 
 static func _generate_slash_hit_wav() -> AudioStreamWAV:
 	var sample_hz := 22050.0
-	var duration := 0.16
+	var duration := 0.18
 	var total_frames := int(sample_hz * duration)
 	var buffer := PackedByteArray()
 	buffer.resize(total_frames * 2)
@@ -1395,11 +1405,43 @@ static func _generate_slash_hit_wav() -> AudioStreamWAV:
 	for i in range(total_frames):
 		var t := float(i) / sample_hz
 		var progress := t / duration
-		var env := exp(-progress * 14.0)
-		var ping := sin(t * 1250.0 * TAU) * 0.5 + sin(t * 2600.0 * TAU) * 0.3
-		var crunch := (randf() * 2.0 - 1.0) * 0.5 * exp(-progress * 22.0)
-		var thump := sin(t * 110.0 * TAU) * 0.6 * exp(-progress * 18.0)
-		var sample := (ping + crunch + thump) * env * 0.95
+		var env := exp(-progress * 13.0)
+		var metal_ring := (sin(t * 1850.0 * TAU) * 0.45 + sin(t * 3100.0 * TAU) * 0.28) * exp(-progress * 20.0)
+		var crunch := (randf() * 2.0 - 1.0) * 0.45 * exp(-progress * 24.0)
+		var thump := sin(t * 120.0 * TAU) * 0.65 * exp(-progress * 16.0)
+		var sample := (metal_ring + crunch + thump) * env * 0.95
+		var val := int(clampf(sample, -1.0, 1.0) * 32767.0)
+		buffer.encode_s16(i * 2, val)
+
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = int(sample_hz)
+	wav.data = buffer
+	return wav
+
+func _play_player_hurt_sound() -> void:
+	if hurt_audio:
+		if _cached_player_hurt_wav == null:
+			_cached_player_hurt_wav = _generate_player_hurt_wav()
+		hurt_audio.stream = _cached_player_hurt_wav
+		hurt_audio.pitch_scale = randf_range(0.92, 1.08)
+		hurt_audio.play()
+
+static func _generate_player_hurt_wav() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var duration := 0.22
+	var total_frames := int(sample_hz * duration)
+	var buffer := PackedByteArray()
+	buffer.resize(total_frames * 2)
+
+	for i in range(total_frames):
+		var t := float(i) / sample_hz
+		var progress := t / duration
+		var env := exp(-progress * 12.0)
+		var punch := sin(t * 95.0 * TAU) * 0.7 * exp(-progress * 18.0)
+		var grunt := sin(t * 220.0 * TAU) * 0.45 * env
+		var noise := (randf() * 2.0 - 1.0) * 0.3 * exp(-progress * 24.0)
+		var sample := (punch + grunt + noise) * 0.95
 		var val := int(clampf(sample, -1.0, 1.0) * 32767.0)
 		buffer.encode_s16(i * 2, val)
 

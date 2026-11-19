@@ -140,16 +140,17 @@ static func _ensure_cached_audio() -> void:
 		_cached_whoosh.data = buf_w
 
 	if not _cached_hit:
-		var dur_hit := 0.15
+		var dur_hit := 0.16
 		var samples_h := int(sample_hz * dur_hit)
 		var buf_h := PackedByteArray()
 		buf_h.resize(samples_h * 2)
 		for i in range(samples_h):
 			var t := float(i) / sample_hz
-			var env := exp(-t * 24.0)
-			var noise := randf_range(-0.4, 0.4)
-			var tone := sin(t * 190.0 * TAU) * 0.5
-			var val := int((noise + tone) * env * 0.6 * 32767.0)
+			var env := exp(-t * 22.0)
+			var arrow_thud := sin(t * 160.0 * TAU) * 0.65
+			var tip_click := sin(t * 1350.0 * TAU) * 0.35 * exp(-t * 40.0)
+			var noise := (randf() * 2.0 - 1.0) * 0.25 * exp(-t * 28.0)
+			var val := int(clampf((arrow_thud + tip_click + noise) * env * 0.9, -1.0, 1.0) * 32767.0)
 			buf_h.encode_s16(i * 2, val)
 		_cached_hit = AudioStreamWAV.new()
 		_cached_hit.format = AudioStreamWAV.FORMAT_16_BITS

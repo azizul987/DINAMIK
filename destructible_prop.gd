@@ -21,13 +21,16 @@ const BREAK_PARTICLES_SCENE: PackedScene = preload("res://wood_break_particles.t
 @export_group("Audio")
 @export var hit_sound_enabled: bool = true
 @export var break_sound_enabled: bool = true
+@export_enum("wood", "ceramic", "metal") var prop_material: String = "wood"
 
 var current_health: float = 20.0
 var is_destroyed: bool = false
 var _initial_scale: Vector3 = Vector3.ONE
 var _wobble_tween: Tween = null
 
-static var _cached_hit_stream: AudioStreamWAV = null
+static var _cached_wood_hit_stream: AudioStreamWAV = null
+static var _cached_ceramic_hit_stream: AudioStreamWAV = null
+static var _cached_metal_hit_stream: AudioStreamWAV = null
 
 @onready var visual_root: Node3D = $VisualRoot if has_node("VisualRoot") else self
 @onready var collision_shape: CollisionShape3D = $CollisionShape3D if has_node("CollisionShape3D") else null
@@ -41,14 +44,35 @@ func _ready() -> void:
 	current_health = max_health
 	_initial_scale = scale
 	add_to_group("destructible_props")
+	_auto_detect_material()
 	_setup_audio()
+
+func _auto_detect_material() -> void:
+	if prop_material != "wood":
+		return
+	var lower_name: String = name.to_lower()
+	var lower_file: String = scene_file_path.to_lower()
+	if lower_name.contains("jar") or lower_name.contains("pot") or lower_file.contains("jar") or lower_file.contains("pot"):
+		prop_material = "ceramic"
+	elif lower_name.contains("chest") or lower_file.contains("chest"):
+		prop_material = "metal"
 
 func _setup_audio() -> void:
 	if not hit_audio:
 		return
-	if _cached_hit_stream == null:
-		_cached_hit_stream = _generate_wood_hit_sound()
-	hit_audio.stream = _cached_hit_stream
+	match prop_material:
+		"ceramic":
+			if _cached_ceramic_hit_stream == null:
+				_cached_ceramic_hit_stream = _generate_ceramic_hit_sound()
+			hit_audio.stream = _cached_ceramic_hit_stream
+		"metal":
+			if _cached_metal_hit_stream == null:
+				_cached_metal_hit_stream = _generate_metal_hit_sound()
+			hit_audio.stream = _cached_metal_hit_stream
+		_:
+			if _cached_wood_hit_stream == null:
+				_cached_wood_hit_stream = _generate_wood_hit_sound()
+			hit_audio.stream = _cached_wood_hit_stream
 
 static func _generate_wood_hit_sound() -> AudioStreamWAV:
 	var sample_hz := 22050.0
@@ -63,6 +87,50 @@ static func _generate_wood_hit_sound() -> AudioStreamWAV:
 		var thud := sin(t * 140.0 * TAU)
 		var knock := sin(t * 320.0 * TAU) * 0.4
 		var sample_val := (thud * 0.7 + knock * 0.3) * env * 32767.0
+		var val := clampi(int(sample_val), -32768, 32767)
+		buffer.encode_s16(i * 2, val)
+
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_hz)
+	stream.data = buffer
+	return stream
+
+static func _generate_ceramic_hit_sound() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var dur := 0.10
+	var total_samples := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total_samples * 2)
+
+	for i in range(total_samples):
+		var t := float(i) / sample_hz
+		var env := exp(-t * 42.0)
+		var ping1 := sin(t * 980.0 * TAU) * 0.6
+		var ping2 := sin(t * 2240.0 * TAU) * 0.4
+		var sample_val := (ping1 + ping2) * env * 32767.0
+		var val := clampi(int(sample_val), -32768, 32767)
+		buffer.encode_s16(i * 2, val)
+
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_hz)
+	stream.data = buffer
+	return stream
+
+static func _generate_metal_hit_sound() -> AudioStreamWAV:
+	var sample_hz := 22050.0
+	var dur := 0.16
+	var total_samples := int(sample_hz * dur)
+	var buffer := PackedByteArray()
+	buffer.resize(total_samples * 2)
+
+	for i in range(total_samples):
+		var t := float(i) / sample_hz
+		var env := exp(-t * 24.0)
+		var strike := sin(t * 680.0 * TAU) * 0.55
+		var overtone := sin(t * 1420.0 * TAU) * 0.35
+		var sample_val := (strike + overtone) * env * 32767.0
 		var val := clampi(int(sample_val), -32768, 32767)
 		buffer.encode_s16(i * 2, val)
 
@@ -123,6 +191,8 @@ func _spawn_break_particles() -> void:
 		if parent_scene:
 			parent_scene.add_child(part)
 			part.global_position = global_position + Vector3(0.0, 0.35, 0.0)
+			if part.has_method("setup_material"):
+				part.setup_material(prop_material)
 
 func _spawn_loot_drops() -> void:
 	_spawn_single_drop(drop_item_type, drop_item_amount, drop_item_color)

@@ -370,6 +370,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 unit_size = 2.0
 max_distance = 18.0
 
+[node name="HurtAudio" type="AudioStreamPlayer3D" parent="Players" unique_id=717]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+unit_size = 2.5
+max_distance = 25.0
+
 [node name="CameraPivot" type="Node3D" parent="Players" unique_id=1336900825]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 script = ExtResource("2_0xm2m")

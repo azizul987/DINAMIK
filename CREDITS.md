@@ -121,15 +121,23 @@ Game ini dikembangkan menggunakan **Godot Engine 4** dengan memanfaatkan aset gr
 
 ---
 
-## 11. Soundtrack & Audio Assets (Dark Fantasy BGM Reference)
-* **Boss Combat Soundtrack (Archmage Malakor)**:
-  * *Free 6 Dark Fantasy Boss Battle Tracks* oleh **alkakrab** ([Itch.io](https://alkakrab.itch.io/free-6-dark-fantasy-boss-battle-tracks)) — Free for Commercial Use, 100% human-composed looping tracks.
-* **Dungeon Ambience & Occult Exploration**:
-  * *Dark Dungeon Ambient Music Vol. 1 & 2* oleh **juanjo_sound** (**Michael Barker**) ([Itch.io](https://juanjo-sound.itch.io/dark-dungeon-ambient-music-vol-1)) — Free / Name-your-own-price, cleared for commercial games and video streaming.
-* **Safe Room / Alchemist Workshop & Menu**:
-  * *Dark Fantasy Occult & Medieval Tracks* oleh **Alexander Nakarada** ([FreePD / SerpentSound Studios](https://serpentsoundstudios.com/)) — Creative Commons Attribution 4.0 (CC BY 4.0) / CC0.
-* **Dynamic Encounter & Stems**:
-  * *Universal Music Pack* oleh **Tallbeard Studios / SubspaceAudio** ([OpenGameArt.org](https://opengameart.org/content/universal-music-pack)) — Creative Commons Zero (CC0 1.0 Universal).
+## 11. Soundtrack & Audio Assets
+* **Background Music (BGM - Dark Fantasy Music Pack)**:
+  * **Kreator**: **Alkakrab** ([Itch.io](https://alkakrab.itch.io/6-dark-fantasy-boss-battle-tracks))
+  * **Lisensi**: Free for Commercial Use (Royalty-Free 100% human-composed looping audio).
+  * **Trek Terintegrasi**:
+    * `resources/audio/music/dungeon_ambient.ogg`: Eksplorasi dungeon & tema menu utama.
+    * `resources/audio/music/combat_boss.ogg`: Pertarungan boss gotik megah Archmage Malakor.
+    * `resources/audio/music/combat_encounter.ogg`: Pertarungan intens gerombolan monster.
+* **UI Sound Effects (Kenney UI Audio Pack)**:
+  * **Kreator**: **Kenney** ([kenney.nl](https://kenney.nl/assets/ui-audio))
+  * **Lisensi**: [Creative Commons Zero (CC0 1.0 Universal - Public Domain)](https://creativecommons.org/publicdomain/zero/1.0/)
+  * **File Terintegrasi**:
+    * `resources/audio/sfx/ui_click.wav`: Suara klik tombol interaksi antarmuka.
+    * `resources/audio/sfx/ui_hover.wav`: Suara lembut penyorotan kursor (*hover*).
+    * `resources/audio/sfx/ui_switch.wav`: Suara transisi buka/tutup panel alkimia dan pause menu.
+* **Procedural Sound Effects Synthesis**:
+  * Seluruh efek suara perkelahian (tebasan pedang 3-tahap combo, hantaman hit spark, suara terluka pemain, denting panah meluncur & menancap, pecahan kotak kayu, guci keramik, peti logam, serta 3-tahap minum ramuan) disintesis secara real-time via `AudioStreamWAV` procedural buffer generator dengan modulasi filter low-pass toksisitas.
 
 ---
 

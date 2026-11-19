@@ -561,15 +561,16 @@ static func _ensure_cached_audio() -> void:
 
 	# 2. Bow release twang
 	if not _cached_release_stream:
-		var dur_rel := 0.22
+		var dur_rel := 0.24
 		var samples_r := int(sample_hz * dur_rel)
 		var buf_r := PackedByteArray()
 		buf_r.resize(samples_r * 2)
 		for i in range(samples_r):
 			var t := float(i) / sample_hz
-			var env := exp(-t * 18.0)
-			var freq := 440.0 + sin(t * 120.0) * 80.0
-			var val := int(sin(t * freq * TAU) * env * 0.65 * 32767.0)
+			var env := exp(-t * 16.0)
+			var pluck := sin(t * (680.0 - clampf(t / 0.03, 0.0, 1.0) * 360.0) * TAU) * 0.75
+			var string_vibe := sin(t * 220.0 * TAU) * 0.35 * exp(-t * 8.0)
+			var val := int(clampf((pluck + string_vibe) * env * 0.85, -1.0, 1.0) * 32767.0)
 			buf_r.encode_s16(i * 2, val)
 		_cached_release_stream = AudioStreamWAV.new()
 		_cached_release_stream.format = AudioStreamWAV.FORMAT_16_BITS

@@ -12,8 +12,11 @@ var is_paused: bool = false
 func _ready() -> void:
 	visible = false
 	btn_resume.pressed.connect(_on_resume_pressed)
+	btn_resume.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_restart.pressed.connect(_on_restart_pressed)
+	btn_restart.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_main_menu.pressed.connect(_on_main_menu_pressed)
+	btn_main_menu.mouse_entered.connect(GlobalLogic.play_ui_hover)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE):
@@ -33,6 +36,8 @@ func pause() -> void:
 	get_tree().paused = true
 	visible = true
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	GlobalLogic.play_ui_switch()
+	GlobalLogic.duck_bgm(true)
 
 	dark_overlay.modulate.a = 0.0
 	menu_card.scale = Vector2(0.92, 0.92)
@@ -47,16 +52,20 @@ func resume() -> void:
 	get_tree().paused = false
 	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	GlobalLogic.duck_bgm(false)
 
 func _on_resume_pressed() -> void:
+	GlobalLogic.play_ui_click()
 	resume()
 
 func _on_restart_pressed() -> void:
+	GlobalLogic.play_ui_click()
 	resume()
 	GlobalLogic.reset_game_state()
 	get_tree().reload_current_scene()
 
 func _on_main_menu_pressed() -> void:
+	GlobalLogic.play_ui_click()
 	resume()
 	GlobalLogic.reset_game_state()
 	get_tree().change_scene_to_file("res://main_menu.tscn")

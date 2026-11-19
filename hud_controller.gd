@@ -105,10 +105,15 @@ func _ready() -> void:
 	GlobalLogic.inventory_updated.connect(_on_inventory_updated)
 
 	btn_craft_toggle.pressed.connect(toggle_crafting)
+	btn_craft_toggle.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_heal.pressed.connect(func(): _on_craft_button_pressed("healing", btn_heal, row_heal))
+	btn_heal.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_strength.pressed.connect(func(): _on_craft_button_pressed("strength", btn_strength, row_strength))
+	btn_strength.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_slow.pressed.connect(func(): _on_craft_button_pressed("slow", btn_slow, row_slow))
+	btn_slow.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	btn_berserk.pressed.connect(func(): _on_craft_button_pressed("berserk", btn_berserk, row_berserk))
+	btn_berserk.mouse_entered.connect(GlobalLogic.play_ui_hover)
 	GlobalLogic.potion_consumed.connect(_on_potion_consumed_juice)
 	GlobalLogic.boss_engaged.connect(_on_boss_engaged)
 	GlobalLogic.boss_hp_updated.connect(_on_boss_hp_updated)
@@ -120,6 +125,8 @@ func _ready() -> void:
 
 	if GlobalLogic.is_boss_active:
 		_on_boss_engaged(GlobalLogic.boss_name_active, GlobalLogic.boss_max_hp_active, GlobalLogic.boss_current_hp_active)
+	else:
+		GlobalLogic.play_bgm(GlobalLogic.BGM_DUNGEON_PATH, "dungeon", 2.0, -8.0)
 
 func _setup_ironskin_ui() -> void:
 	if quick_slots_bar and slot_berserk:
@@ -167,6 +174,7 @@ func _setup_ironskin_ui() -> void:
 		if btn_ironskin:
 			btn_ironskin.name = "BtnIronskin"
 			btn_ironskin.pressed.connect(func(): _on_craft_button_pressed("ironskin", btn_ironskin, row_ironskin))
+			btn_ironskin.mouse_entered.connect(GlobalLogic.play_ui_hover)
 
 func _on_toxicity_changed(current: float, max_val: float) -> void:
 	if toxic_mat:
@@ -251,6 +259,7 @@ func _on_inventory_updated() -> void:
 
 func toggle_crafting() -> void:
 	crafting_panel.visible = not crafting_panel.visible
+	GlobalLogic.play_ui_switch()
 	if crafting_panel.visible:
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		crafting_panel.pivot_offset = crafting_panel.size * 0.5
@@ -513,21 +522,33 @@ static func _generate_craft_wav() -> AudioStreamWAV:
 
 static func _generate_drink_wav() -> AudioStreamWAV:
 	var sample_hz := 22050.0
-	var dur := 0.32
+	var dur := 0.44
 	var total := int(sample_hz * dur)
 	var buffer := PackedByteArray()
 	buffer.resize(total * 2)
 
 	for i in range(total):
 		var t := float(i) / sample_hz
+		# 1. Cork pop (0.00s - 0.05s)
 		var cork_env := exp(-t * 45.0)
 		var cork_freq := lerpf(220.0, 680.0, clampf(t / 0.04, 0.0, 1.0))
 		var cork := sin(t * cork_freq * TAU) * cork_env * 0.65
-		var t_gulp := maxf(0.0, t - 0.08)
-		var gulp_env := exp(-t_gulp * 16.0) if t >= 0.08 else 0.0
-		var gulp_freq := lerpf(240.0, 130.0, clampf(t_gulp / 0.18, 0.0, 1.0))
+
+		# 2. Liquid gulp / swallow (0.07s - 0.22s)
+		var t_gulp := maxf(0.0, t - 0.07)
+		var gulp_env := exp(-t_gulp * 16.0) if t >= 0.07 else 0.0
+		var gulp_freq := lerpf(260.0, 120.0, clampf(t_gulp / 0.16, 0.0, 1.0))
 		var gulp := sin(t_gulp * gulp_freq * TAU) * gulp_env * 0.55
-		var sample := int(clampf((cork + gulp) * 0.8, -1.0, 1.0) * 32767.0)
+
+		# 3. Magic buff shimmer chime (0.18s - 0.44s)
+		var t_chime := maxf(0.0, t - 0.18)
+		var chime_env := exp(-t_chime * 9.0) if t >= 0.18 else 0.0
+		var chime1 := sin(t_chime * 1174.66 * TAU) * 0.35
+		var chime2 := sin(t_chime * 1760.00 * TAU) * 0.25
+		var chime3 := sin(t_chime * 2349.32 * TAU) * 0.18
+		var chime := (chime1 + chime2 + chime3) * chime_env
+
+		var sample := int(clampf((cork + gulp + chime) * 0.85, -1.0, 1.0) * 32767.0)
 		buffer.encode_s16(i * 2, sample)
 
 	var wav := AudioStreamWAV.new()
