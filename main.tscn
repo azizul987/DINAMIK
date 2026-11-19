@@ -26,16 +26,15 @@
 [ext_resource type="PackedScene" uid="uid://c8dstchest01" path="res://destructible_chest.tscn" id="27_chest"]
 [ext_resource type="PackedScene" uid="uid://b6dstbox0001" path="res://destructible_box.tscn" id="28_box"]
 [ext_resource type="PackedScene" uid="uid://4qvx41ap082f" path="res://resources/bottle/botol_model.tscn" id="29_botol_model"]
-[ext_resource type="Texture2D" path="res://resources/potion-ball.png" id="30_potion_ball"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/074_slime.png" id="31_mat_slime"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/044_fire_essence.png" id="32_mat_fire"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/045_ice_essence.png" id="33_mat_frost"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/085_health_potion.png" id="34_potion_heal"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/092_elixir.png" id="35_potion_strength"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/086_mana_potion.png" id="36_potion_slow"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/091_poison.png" id="37_potion_berserk"]
-[ext_resource type="Texture2D" path="res://resources/pixel_resources_pack/static/094_gear.png" id="38_icon_craft"]
-[ext_resource type="PackedScene" path="res://boss_mage.tscn" id="39_boss_mage"]
+[ext_resource type="Texture2D" uid="uid://bpvkk3ru7r4ur" path="res://resources/pixel_resources_pack/static/074_slime.png" id="31_mat_slime"]
+[ext_resource type="Texture2D" uid="uid://071xci3e5x5g" path="res://resources/pixel_resources_pack/static/044_fire_essence.png" id="32_mat_fire"]
+[ext_resource type="Texture2D" uid="uid://dtyv1uw8xf883" path="res://resources/pixel_resources_pack/static/045_ice_essence.png" id="33_mat_frost"]
+[ext_resource type="Texture2D" uid="uid://d4mctvbcfh1gv" path="res://resources/pixel_resources_pack/static/085_health_potion.png" id="34_potion_heal"]
+[ext_resource type="Texture2D" uid="uid://cgymmkqur6g75" path="res://resources/pixel_resources_pack/static/092_elixir.png" id="35_potion_strength"]
+[ext_resource type="Texture2D" uid="uid://ckni8cqdowcnl" path="res://resources/pixel_resources_pack/static/086_mana_potion.png" id="36_potion_slow"]
+[ext_resource type="Texture2D" uid="uid://8i6vjmhf4sdi" path="res://resources/pixel_resources_pack/static/091_poison.png" id="37_potion_berserk"]
+[ext_resource type="Texture2D" uid="uid://n2wvjcacuxt3" path="res://resources/pixel_resources_pack/static/094_gear.png" id="38_icon_craft"]
+[ext_resource type="PackedScene" uid="uid://cbossmage0001" path="res://boss_mage.tscn" id="39_boss_mage"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -79,38 +78,6 @@ shader_parameter/toxicity_ratio = 0.0
 shader_parameter/pulse_speed = 4.5
 shader_parameter/vein_color = Color(0.12, 0.95, 0.35, 1)
 shader_parameter/miasma_color = Color(0.48, 0.04, 0.68, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chip"]
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
-bg_color = Color(0.9, 0.92, 0.95, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.78, 0.82, 0.88, 0.8)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.92, 0.94, 0.97, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.8, 0.84, 0.9, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
 bg_color = Color(0.06, 0.08, 0.11, 0.9)
@@ -182,14 +149,14 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_boss"]
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_lag"]
 bg_color = Color(0.95, 0.72, 0.18, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_boss"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_fill"]
 bg_color = Color(0.68, 0.32, 0.95, 1)
@@ -199,6 +166,38 @@ corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chip"]
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.9, 0.92, 0.95, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.82, 0.88, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_row"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.92, 0.94, 0.97, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.84, 0.9, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_v0ej8"]
 _surfaces = [{
@@ -256,10 +255,10 @@ shape = SubResource("CapsuleShape3D_0xm2m")
 [node name="Ranger" parent="Players" unique_id=596401858 instance=ExtResource("25_ranger")]
 unique_name_in_owner = true
 
-[node name="Rig_Medium" parent="Players/Ranger" index="0" unique_id=129934480]
+[node name="Rig_Medium" parent="Players/Ranger" index="0" unique_id=312921795]
 transform = Transform3D(0.99495, 0.0029121938, -0.10032955, -0.0054693976, 0.9996669, -0.025222417, 0.10022267, 0.025643786, 0.99463457, -0.015607447, -0.023654819, -0.025892764)
 
-[node name="Skeleton3D" parent="Players/Ranger/Rig_Medium" index="0" unique_id=1035453675]
+[node name="Skeleton3D" parent="Players/Ranger/Rig_Medium" index="0" unique_id=1726148020]
 bones/2/rotation = Quaternion(0.9901465, 0.12091988, -0.04032719, 0.05798393)
 bones/3/rotation = Quaternion(0.36022863, -0.039301876, -0.0047902935, 0.9320236)
 bones/4/rotation = Quaternion(-0.6257698, -0.05421131, 0.12728192, 0.7676409)
@@ -275,7 +274,7 @@ bones/18/rotation = Quaternion(-0.38217062, -0.122851096, -0.8916558, 0.20929183
 bones/19/rotation = Quaternion(-4.7583686e-08, -2.3750435e-08, -0.82408226, 0.5664702)
 bones/20/rotation = Quaternion(0.37238514, 0.07472957, 0.01696815, 0.9249092)
 
-[node name="Ranger_Cape" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="3" unique_id=554239830]
+[node name="Ranger_Cape" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="3" unique_id=368062019]
 transform = Transform3D(-199.87816, 6.97989, 0, 3.0510068e-07, 8.736952e-06, 200, 6.97989, 199.87816, -8.742278e-06, 0, 0.9006995, -0.42661762)
 mesh = ExtResource("3_0odxb")
 
@@ -458,7 +457,7 @@ texture = ExtResource("4_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="StatusHUD" type="VBoxContainer" parent="CanvasLayer/Control" unique_id=3100000001]
+[node name="StatusHUD" type="VBoxContainer" parent="CanvasLayer/Control" unique_id=-1194967295]
 layout_mode = 0
 offset_left = 24.0
 offset_top = 20.0
@@ -466,12 +465,12 @@ offset_right = 304.0
 offset_bottom = 58.0
 theme_override_constants/separation = 6
 
-[node name="HpBarContainer" type="Control" parent="CanvasLayer/Control/StatusHUD" unique_id=3100000004]
+[node name="HpBarContainer" type="Control" parent="CanvasLayer/Control/StatusHUD" unique_id=-1194967292]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 18)
 layout_mode = 2
 
-[node name="HpDamage" type="ProgressBar" parent="CanvasLayer/Control/StatusHUD/HpBarContainer" unique_id=3100000005]
+[node name="HpDamage" type="ProgressBar" parent="CanvasLayer/Control/StatusHUD/HpBarContainer" unique_id=-1194967291]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -495,7 +494,7 @@ theme_override_styles/background = SubResource("StyleBoxEmpty_hp_front")
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 show_percentage = false
 
-[node name="ToxicBarContainer" type="Control" parent="CanvasLayer/Control/StatusHUD" unique_id=3100000008]
+[node name="ToxicBarContainer" type="Control" parent="CanvasLayer/Control/StatusHUD" unique_id=-1194967288]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 12)
 layout_mode = 2
@@ -512,7 +511,7 @@ theme_override_styles/background = SubResource("StyleBoxFlat_toxic_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_toxic_fill")
 show_percentage = false
 
-[node name="BossBarContainer" type="PanelContainer" parent="CanvasLayer/Control" unique_id=3100000050]
+[node name="BossBarContainer" type="PanelContainer" parent="CanvasLayer/Control" unique_id=-1194967246]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(520, 48)
@@ -527,55 +526,55 @@ offset_bottom = 64.0
 grow_horizontal = 2
 theme_override_styles/panel = ExtResource("9_panel_box")
 
-[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/BossBarContainer" unique_id=3100000051]
+[node name="VBox" type="VBoxContainer" parent="CanvasLayer/Control/BossBarContainer" unique_id=-1194967245]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Header" type="HBoxContainer" parent="CanvasLayer/Control/BossBarContainer/VBox" unique_id=3100000052]
+[node name="Header" type="HBoxContainer" parent="CanvasLayer/Control/BossBarContainer/VBox" unique_id=-1194967244]
 layout_mode = 2
 
-[node name="BossTitle" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header" unique_id=3100000053]
+[node name="BossTitle" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header" unique_id=-1194967243]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12, 0.15, 0.2, 1)
 theme_override_font_sizes/font_size = 12
 text = "ARCHMAGE MALAKOR"
 
-[node name="Spacer" type="Control" parent="CanvasLayer/Control/BossBarContainer/VBox/Header" unique_id=3100000054]
+[node name="Spacer" type="Control" parent="CanvasLayer/Control/BossBarContainer/VBox/Header" unique_id=-1194967242]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BossPips" type="HBoxContainer" parent="CanvasLayer/Control/BossBarContainer/VBox/Header" unique_id=3100000055]
+[node name="BossPips" type="HBoxContainer" parent="CanvasLayer/Control/BossBarContainer/VBox/Header" unique_id=-1194967241]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Pip1" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header/BossPips" unique_id=3100000056]
+[node name="Pip1" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header/BossPips" unique_id=-1194967240]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.32, 0.95, 1)
 theme_override_font_sizes/font_size = 13
 text = "◆"
 
-[node name="Pip2" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header/BossPips" unique_id=3100000057]
+[node name="Pip2" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header/BossPips" unique_id=-1194967239]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.06, 0.72, 0.85, 1)
 theme_override_font_sizes/font_size = 13
 text = "◆"
 
-[node name="Pip3" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header/BossPips" unique_id=3100000058]
+[node name="Pip3" type="Label" parent="CanvasLayer/Control/BossBarContainer/VBox/Header/BossPips" unique_id=-1194967238]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.88, 0.2, 0.28, 1)
 theme_override_font_sizes/font_size = 13
 text = "◆"
 
-[node name="BarStack" type="Control" parent="CanvasLayer/Control/BossBarContainer/VBox" unique_id=3100000059]
+[node name="BarStack" type="Control" parent="CanvasLayer/Control/BossBarContainer/VBox" unique_id=-1194967237]
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 
-[node name="BossUnderBar" type="ProgressBar" parent="CanvasLayer/Control/BossBarContainer/VBox/BarStack" unique_id=3100000060]
+[node name="BossUnderBar" type="ProgressBar" parent="CanvasLayer/Control/BossBarContainer/VBox/BarStack" unique_id=-1194967236]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -589,7 +588,7 @@ max_value = 60.0
 value = 60.0
 show_percentage = false
 
-[node name="BossLagBar" type="ProgressBar" parent="CanvasLayer/Control/BossBarContainer/VBox/BarStack" unique_id=3100000061]
+[node name="BossLagBar" type="ProgressBar" parent="CanvasLayer/Control/BossBarContainer/VBox/BarStack" unique_id=-1194967235]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -603,7 +602,7 @@ max_value = 60.0
 value = 60.0
 show_percentage = false
 
-[node name="BossHpBar" type="ProgressBar" parent="CanvasLayer/Control/BossBarContainer/VBox/BarStack" unique_id=3100000062]
+[node name="BossHpBar" type="ProgressBar" parent="CanvasLayer/Control/BossBarContainer/VBox/BarStack" unique_id=-1194967234]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -1197,6 +1196,8 @@ shape = SubResource("ConcavePolygonShape3D_6dlmt")
 [node name="Exit" parent="." unique_id=2100000020 instance=ExtResource("18_portal")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.210838, 0.35, 14.504486)
+visible = false
+monitoring = false
 portal_id = "portal_no_tutor"
 target_scene_path = "res://safe_room.tscn"
 is_active = false
@@ -1228,10 +1229,8 @@ item_type = "frost_wing"
 
 [node name="Drop_SlimeGel_1" parent="." unique_id=2100000043 instance=ExtResource("14_item_drop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.5, 16)
-item_type = "slime_gel"
 
 [node name="Drop_SlimeGel_2" parent="." unique_id=2100000044 instance=ExtResource("14_item_drop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.5, 11)
-item_type = "slime_gel"
 
 [editable path="Players/Ranger"]
