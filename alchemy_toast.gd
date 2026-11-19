@@ -44,3 +44,30 @@ func pop(potion_name: String, tint: Color, start_pos: Vector2) -> void:
 	
 	tw.chain().tween_property(self, "modulate:a", 0.0, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tw.chain().tween_callback(queue_free)
+
+func pop_custom(text: String, icon_tex: Texture2D, tint: Color, start_pos: Vector2) -> void:
+	_ensure_nodes()
+	if toast_label:
+		toast_label.text = text
+		toast_label.add_theme_color_override("font_color", tint)
+	if toast_icon:
+		if icon_tex:
+			toast_icon.texture = icon_tex
+			toast_icon.self_modulate = Color.WHITE
+			toast_icon.visible = true
+		else:
+			toast_icon.visible = false
+
+	position = start_pos
+	pivot_offset = size * 0.5
+	scale = Vector2(0.4, 0.4)
+	modulate.a = 0.0
+
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(self, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(self, "modulate:a", 1.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(self, "position:y", start_pos.y - 28.0, 0.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	
+	tw.chain().tween_property(self, "modulate:a", 0.0, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.chain().tween_callback(queue_free)

@@ -12,6 +12,7 @@ signal tutorial_completed()
 signal boss_engaged(boss_name: String, max_hp: float, current_hp: float)
 signal boss_hp_updated(current_hp: float, max_hp: float)
 signal boss_defeated_event()
+signal game_autosaved()
 
 enum ToxicityStage { SAFE, MODERATE, HIGH, OVERDOSE }
 
@@ -54,6 +55,9 @@ var last_potion_timestamp: float = 0.0
 # Save & Load System State
 const SAVE_FILE_PATH := "user://savegame.json"
 var pending_player_restore: Dictionary = {}
+var autosave_enabled: bool = true
+var autosave_interval: float = 60.0
+var _autosave_timer: float = 0.0
 
 var is_boss_active: bool = false
 var boss_name_active: String = ""
@@ -319,6 +323,17 @@ func _process(delta: float) -> void:
 		if ironskin_timer <= 0.0:
 			is_ironskin_active = false
 
+	# Sistem Auto-Save Berkala
+	if autosave_enabled and not is_dead and not get_tree().paused:
+		var current_scn := get_tree().current_scene
+		if current_scn and not current_scn.scene_file_path.is_empty():
+			if current_scn.scene_file_path != "res://main_menu.tscn":
+				_autosave_timer += delta
+				if _autosave_timer >= autosave_interval:
+					_autosave_timer = 0.0
+					save_game()
+					game_autosaved.emit()
+
 func get_toxicity_ratio() -> float:
 	return current_toxicity / max_toxicity if max_toxicity > 0 else 0.0
 
@@ -546,6 +561,7 @@ func reset_game_state() -> void:
 	boss_name_active = ""
 	boss_max_hp_active = 0.0
 	boss_current_hp_active = 0.0
+	_autosave_timer = 0.0
 	if lpf_effect:
 		lpf_effect.cutoff_hz = 20500.0
 	if tinnitus_player:
@@ -736,4 +752,13 @@ func load_game() -> bool:
 	print("[SaveSystem] Berhasil memuat data permainan. Pindah ke scene: %s" % target_scene_path)
 	get_tree().change_scene_to_file(target_scene_path)
 	return true
+
+func set_autosave_interval(seconds: float) -> void:
+	autosave_interval = maxf(1.0, seconds)
+	_autosave_timer = 0.0
+
+func set_autosave_enabled(enabled: bool) -> void:
+	autosave_enabled = enabled
+	_autosave_timer = 0.0
+
 

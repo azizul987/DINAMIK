@@ -103,6 +103,7 @@ func _ready() -> void:
 	GlobalLogic.player_overdosed.connect(_on_overdose)
 	GlobalLogic.player_died.connect(_on_player_died)
 	GlobalLogic.inventory_updated.connect(_on_inventory_updated)
+	GlobalLogic.game_autosaved.connect(_on_game_autosaved)
 
 	btn_craft_toggle.pressed.connect(toggle_crafting)
 	btn_craft_toggle.mouse_entered.connect(GlobalLogic.play_ui_hover)
@@ -438,6 +439,18 @@ func _show_alchemy_toast(potion_name: String, tint: Color) -> void:
 	var start_pos := Vector2(screen_size.x * 0.5 - 90.0, screen_size.y * 0.5 - 215.0)
 	if toast.has_method("pop"):
 		toast.pop(potion_name, tint, start_pos)
+
+func _on_game_autosaved() -> void:
+	if not ALCHEMY_TOAST_SCENE or not toast_container:
+		return
+	var toast := ALCHEMY_TOAST_SCENE.instantiate()
+	if not toast:
+		return
+	toast_container.add_child(toast)
+	var screen_size := get_viewport_rect().size
+	var start_pos := Vector2(screen_size.x - 240.0, 24.0)
+	if toast.has_method("pop_custom"):
+		toast.pop_custom("PROGRES TERSIMPAN", null, Color(0.35, 0.95, 0.55, 1.0), start_pos)
 
 func _on_potion_consumed_juice(potion_name: String) -> void:
 	_play_potion_sfx("drink")
