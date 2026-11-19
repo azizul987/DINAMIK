@@ -16,7 +16,7 @@
 [ext_resource type="Material" uid="uid://dbtk0ncyclvyf" path="res://DungeonTiles/material/PropSet_5_Mat.tres" id="13_w48qg"]
 [ext_resource type="PackedScene" uid="uid://bf5jc4jqhyyya" path="res://item_drop.tscn" id="14_item_drop"]
 [ext_resource type="Script" uid="uid://dw5tb0vyvend" path="res://DOOR.gd" id="15_door"]
-[ext_resource type="PackedScene" path="res://tutorial_marker.tscn" id="16_marker"]
+[ext_resource type="PackedScene" uid="uid://c8ip2hi855313" path="res://tutorial_marker.tscn" id="16_marker"]
 [ext_resource type="PackedScene" path="res://pause_menu.tscn" id="17_pause_menu"]
 [ext_resource type="PackedScene" uid="uid://b2lonq43mc2wy" path="res://portal.tscn" id="18_portal"]
 [ext_resource type="PackedScene" uid="uid://dfarcher0001" path="res://archer_enemy.tscn" id="19_archer"]
@@ -34,7 +34,6 @@
 [ext_resource type="Texture2D" uid="uid://ckni8cqdowcnl" path="res://resources/pixel_resources_pack/static/086_mana_potion.png" id="36_potion_slow"]
 [ext_resource type="Texture2D" uid="uid://8i6vjmhf4sdi" path="res://resources/pixel_resources_pack/static/091_poison.png" id="37_potion_berserk"]
 [ext_resource type="Texture2D" uid="uid://n2wvjcacuxt3" path="res://resources/pixel_resources_pack/static/094_gear.png" id="38_icon_craft"]
-[ext_resource type="PackedScene" uid="uid://cbossmage0001" path="res://boss_mage.tscn" id="39_boss_mage"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0xm2m"]
 
@@ -71,6 +70,25 @@ vertex_color_use_as_albedo = true
 [sub_resource type="BoxMesh" id="BoxMesh_spark"]
 material = SubResource("StandardMaterial3D_spark")
 size = Vector3(0.04, 0.04, 0.16)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4k2k6"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+energy_multiplier = 0.25
+
+[sub_resource type="Sky" id="Sky_0rl1p"]
+sky_material = SubResource("ProceduralSkyMaterial_4k2k6")
+
+[sub_resource type="Environment" id="Environment_ok6jj"]
+background_mode = 2
+background_energy_multiplier = 0.3
+sky = SubResource("Sky_0rl1p")
+tonemap_mode = 2
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 1.4
+glow_strength = 1.03
+fog_light_color = Color(0.56987876, 0.60440665, 0.65811473, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_toxic"]
 shader = ExtResource("12_toxic_shader")
@@ -238,8 +256,8 @@ data = PackedVector3Array(0.9405, 2.6899, 0.0688, -0.9405, 2.6899, -0.0688, 0.94
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=331676642]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-light_color = Color(0.26438904, 0.264389, 0.264389, 1)
-light_energy = 0.937
+light_color = Color(0, 0, 0, 1)
+light_energy = 0.0
 shadow_enabled = true
 
 [node name="Players" type="CharacterBody3D" parent="." unique_id=1728051542]
@@ -255,36 +273,39 @@ shape = SubResource("CapsuleShape3D_0xm2m")
 [node name="Ranger" parent="Players" unique_id=596401858 instance=ExtResource("25_ranger")]
 unique_name_in_owner = true
 
-[node name="Rig_Medium" parent="Players/Ranger" index="0" unique_id=312921795]
-transform = Transform3D(0.99495, 0.0029121938, -0.10032955, -0.0054693976, 0.9996669, -0.025222417, 0.10022267, 0.025643786, 0.99463457, -0.015607447, -0.023654819, -0.025892764)
+[node name="Rig_Medium" parent="Players/Ranger" index="0" unique_id=402576931]
+transform = Transform3D(0.9788546, -0.11198917, -0.17117892, 0.04818329, 0.9395082, -0.33912063, 0.19880185, 0.3237018, 0.92503786, 0.061521582, -0.027444363, -0.23150243)
 
-[node name="Skeleton3D" parent="Players/Ranger/Rig_Medium" index="0" unique_id=1726148020]
-bones/2/rotation = Quaternion(0.9901465, 0.12091988, -0.04032719, 0.05798393)
-bones/3/rotation = Quaternion(0.36022863, -0.039301876, -0.0047902935, 0.9320236)
-bones/4/rotation = Quaternion(-0.6257698, -0.05421131, 0.12728192, 0.7676409)
-bones/6/rotation = Quaternion(0.9810675, -0.12473987, 0.07609844, 0.12710534)
-bones/7/rotation = Quaternion(0.36887828, -0.09763178, -0.02336463, 0.9240406)
-bones/8/rotation = Quaternion(-0.60769135, 0.004689291, -0.080130525, 0.79010653)
-bones/10/rotation = Quaternion(0.00032148542, 0.0022715284, -0.00039405562, 0.9999973)
-bones/11/rotation = Quaternion(0.0006457816, 0.0039150612, -0.001895702, 0.99999034)
-bones/13/rotation = Quaternion(-0.538295, 0.011752676, 0.83326733, 0.12556246)
-bones/14/rotation = Quaternion(-1.6149656e-07, -1.2665905e-07, 0.23182791, 0.9727568)
-bones/15/rotation = Quaternion(0.26819226, 0.015001241, 0.043832064, 0.9622509)
-bones/18/rotation = Quaternion(-0.38217062, -0.122851096, -0.8916558, 0.20929183)
-bones/19/rotation = Quaternion(-4.7583686e-08, -2.3750435e-08, -0.82408226, 0.5664702)
-bones/20/rotation = Quaternion(0.37238514, 0.07472957, 0.01696815, 0.9249092)
+[node name="Skeleton3D" parent="Players/Ranger/Rig_Medium" index="0" unique_id=368556026]
+bones/2/rotation = Quaternion(0.78941965, -0.008663029, -0.09985512, 0.60561585)
+bones/3/rotation = Quaternion(0.89661926, -0.0129253995, -0.040018998, 0.44080094)
+bones/4/rotation = Quaternion(-0.26385325, 0.0658862, -0.17421438, 0.946409)
+bones/6/rotation = Quaternion(0.980002, -0.08175717, -0.0066727605, 0.1812936)
+bones/7/rotation = Quaternion(0.519137, -0.077541985, 0.016507838, 0.85100627)
+bones/8/rotation = Quaternion(-0.76402926, 0.012533499, -0.033671584, 0.64418036)
+bones/10/rotation = Quaternion(0.094006985, 0.026863486, -0.015364062, 0.99509054)
+bones/11/rotation = Quaternion(0.187047, 0.057720173, -0.03239317, 0.98011863)
+bones/13/rotation = Quaternion(-0.6110835, 0.39749998, 0.6844698, -0.008481905)
+bones/14/rotation = Quaternion(-0.04497207, 0.089477286, 0.65973943, 0.74479204)
+bones/15/rotation = Quaternion(0.072395615, 0.024907133, 0.12589261, 0.98908526)
+bones/18/rotation = Quaternion(-0.6620538, -0.15233427, -0.73378724, -0.0059589474)
+bones/19/rotation = Quaternion(0.05659008, -0.12744917, -0.40644118, 0.9029728)
+bones/20/rotation = Quaternion(0.12798837, -0.050919216, -0.24238977, 0.9603507)
 
-[node name="Ranger_Cape" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="3" unique_id=368062019]
-transform = Transform3D(-199.87816, 6.97989, 0, 3.0510068e-07, 8.736952e-06, 200, 6.97989, 199.87816, -8.742278e-06, 0, 0.9006995, -0.42661762)
+[node name="Ranger_Cape" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="3" unique_id=1670754944]
+transform = Transform3D(-199.2827, 7.239747, 1.1920929e-07, 2.9802322e-08, -9.536743e-06, 201.42128, 6.959099, 207.31953, 7.1525574e-06, 0.0170785, 0.9050699, -0.25712657)
 mesh = ExtResource("3_0odxb")
 
 [node name="LeftHandAttachment" type="BoneAttachment3D" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="4" unique_id=720]
-transform = Transform3D(0.095435046, -0.35573027, 0.9297025, -0.3230314, 0.8723532, 0.36694628, -0.9415632, -0.335343, -0.03165868, 0.063513145, 0.9405566, 0.34706563)
+transform = Transform3D(-0.5673987, 0.016605942, 0.8232751, 0.44131622, 0.8502155, 0.28700465, -0.69519573, 0.5261714, -0.48973984, 0.38667953, 0.5320147, 0.28014335)
 bone_name = "handslot.l"
 bone_idx = 22
 
 [node name="Botol" parent="Players/Ranger/Rig_Medium/Skeleton3D/LeftHandAttachment" unique_id=721 instance=ExtResource("29_botol_model")]
 transform = Transform3D(0.009380758, -0.08585405, -0.21316914, -0.038862143, 0.20968136, -0.08615952, 0.22649887, 0.039532397, -0.0059543597, -0.0027021766, 0.039999995, -0.00999999)
+
+[node name="Ranger_Quiver" parent="Players/Ranger/Rig_Medium/Skeleton3D" index="8" unique_id=620708909]
+mesh = null
 
 [node name="WeaponPivot" type="Node3D" parent="Players/Ranger" unique_id=701]
 unique_name_in_owner = true
@@ -385,8 +406,15 @@ margin = 0.2
 
 [node name="Camera3D" type="Camera3D" parent="Players/CameraPivot/SpringArm3D" unique_id=523362783]
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Players" unique_id=1200436569]
+environment = SubResource("Environment_ok6jj")
+
 [node name="DummySlime" parent="." unique_id=711 instance=ExtResource("13_dummy_slime")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.728136, 0.74075574, 5.923851)
+
+[node name="TutorialMarker" parent="." unique_id=2100000004 instance=ExtResource("16_marker")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.9887156, 0.26, -0.018963814)
 
 [node name="ArcherEnemy" parent="." unique_id=2100000011 instance=ExtResource("19_archer")]
 unique_name_in_owner = true
@@ -1128,10 +1156,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.069235, 0, 3.6500878)
 script = ExtResource("8_tutorial")
 drop_position = Vector3(4.081149, 1.9657038, -5.7915773)
 
-[node name="TutorialMarker" parent="TutorialController" unique_id=2100000004 instance=ExtResource("16_marker")]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, -4.5)
-
 [node name="TutorialSlimeDrop" parent="TutorialController" unique_id=2100000009 instance=ExtResource("14_item_drop")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.081149, 1.9657038, -5.7915773)
@@ -1167,6 +1191,12 @@ light_color = Color(1, 0.22, 0.25, 1)
 light_energy = 1.2
 omni_range = 3.5
 
+[node name="SealLight2" type="OmniLight3D" parent="door2" unique_id=1140929791]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.67311, 0.763808, 2.294053)
+light_color = Color(1, 0.22, 0.25, 1)
+light_energy = 1.2
+omni_range = 3.5
+
 [node name="StaticBody3D" type="StaticBody3D" parent="door2" unique_id=567153666]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="door2/StaticBody3D" unique_id=403698645]
@@ -1196,11 +1226,8 @@ shape = SubResource("ConcavePolygonShape3D_6dlmt")
 [node name="Exit" parent="." unique_id=2100000020 instance=ExtResource("18_portal")]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.210838, 0.35, 14.504486)
-visible = false
-monitoring = false
 portal_id = "portal_no_tutor"
 target_scene_path = "res://safe_room.tscn"
-is_active = false
 portal_color = Color(1, 1, 1, 1)
 
 [node name="Axe" type="MeshInstance3D" parent="." unique_id=310211272]
@@ -1208,16 +1235,13 @@ transform = Transform3D(-0.99695826, -0.077937074, 0, 0.077937074, -0.99695826, 
 mesh = ExtResource("20_ryguw")
 
 [node name="Chest" parent="." unique_id=2100000030 instance=ExtResource("27_chest")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.5, 0.35, 12.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.701182, 0.35, -0.5080471)
 
 [node name="Box_1" parent="." unique_id=2100000031 instance=ExtResource("28_box")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0.35, 13.5)
 
 [node name="Box_2" parent="." unique_id=2100000032 instance=ExtResource("28_box")]
-transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -12, 0.35, 11.2)
-
-[node name="BossMage" parent="." unique_id=2100000040 instance=ExtResource("39_boss_mage")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -8, 0.35, 13.5)
+transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -10.201182, 0.35, -1.8080473)
 
 [node name="Drop_FireEssence" parent="." unique_id=2100000041 instance=ExtResource("14_item_drop")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.5, 10.5)
@@ -1231,6 +1255,6 @@ item_type = "frost_wing"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.5, 16)
 
 [node name="Drop_SlimeGel_2" parent="." unique_id=2100000044 instance=ExtResource("14_item_drop")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0.5, 11)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.1256075, 1.6277087, -2.008047)
 
 [editable path="Players/Ranger"]

@@ -42,6 +42,11 @@ const ITEM_DROP_SCENE: PackedScene = preload("res://item_drop.tscn")
 @export var min_idle_time: float = 1.2
 @export var max_idle_time: float = 2.8
 
+@export_group("Dungeon Glow")
+@export var glow_color: Color = Color(0.95, 0.45, 0.12, 1.0)
+@export var glow_intensity: float = 0.55
+@export var glow_pulse: float = 0.25
+
 @export_group("Loot Drop")
 @export var drop_item_type: String = "goblin_ear"
 @export var drop_item_name: String = "Telinga Goblin"
@@ -132,7 +137,7 @@ func _setup_health_bar() -> void:
 
 func _setup_flash_material() -> void:
 	if not _cached_overlay_mat:
-		var shader := load("res://shaders/hit_flash_overlay.gdshader") as Shader
+		var shader := load("res://shaders/dungeon_glow_overlay.gdshader") as Shader
 		if shader:
 			_cached_overlay_mat = ShaderMaterial.new()
 			_cached_overlay_mat.shader = shader
@@ -140,6 +145,9 @@ func _setup_flash_material() -> void:
 		for mesh_inst in _flash_meshes:
 			if is_instance_valid(mesh_inst):
 				mesh_inst.material_overlay = _cached_overlay_mat
+				mesh_inst.set_instance_shader_parameter("glow_color", glow_color)
+				mesh_inst.set_instance_shader_parameter("glow_intensity", glow_intensity)
+				mesh_inst.set_instance_shader_parameter("glow_pulse", glow_pulse)
 				mesh_inst.set_instance_shader_parameter("hit_flash", 0.0)
 				mesh_inst.set_instance_shader_parameter("flash_color", Color(1.0, 1.0, 1.0, 1.0))
 

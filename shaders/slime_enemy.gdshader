@@ -15,8 +15,11 @@ void fragment() {
 	ALBEDO = mix(base_col, flash_color.rgb, hit_flash);
 	ROUGHNESS = roughness;
 
-	// Slime emission glow + kilatan terang saat terkena hit
-	vec3 normal_emission = base_col * 0.7 * emission_multiplier;
+	// Denyut napas lambat — slime "bernapas" dalam gelap dungeon
+	float breath = 1.0 + sin(TIME * 2.2) * 0.25;
+
+	// Slime emission glow + denyar napas + kilatan terang saat terkena hit
+	vec3 normal_emission = base_col * 0.7 * emission_multiplier * breath;
 	vec3 flash_emission = flash_color.rgb * 1.5;
 	EMISSION = mix(normal_emission, flash_emission, hit_flash);
 }

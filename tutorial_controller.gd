@@ -103,6 +103,9 @@ func _setup_drop_node() -> void:
 func _setup_marker_nodes() -> void:
 	if not marker_area and has_node("TutorialMarker"):
 		marker_area = $TutorialMarker as Area3D
+	# Fallback: TutorialMarker bisa jadi sibling (bukan child), misal di main.tscn
+	if not marker_area and get_parent():
+		marker_area = get_parent().get_node_or_null("TutorialMarker") as Area3D
 	if marker_area:
 		if marker_area.position != marker_position and marker_position == Vector3(0.0, 0.26, -4.5):
 			marker_position = marker_area.position
@@ -232,7 +235,7 @@ func _spawn_ground_marker() -> void:
 func _on_marker_body_entered(body: Node3D) -> void:
 	if is_transitioning:
 		return
-	if body.name == "Players" or body is CharacterBody3D:
+	if body.name == "Players" or body.is_in_group("player"):
 		is_transitioning = true
 		_play_chime()
 

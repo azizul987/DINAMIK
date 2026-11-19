@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dg40l3lyf8uts"]
 
-[ext_resource type="Script" path="res://dummy_enemy.gd" id="1_dummy"]
-[ext_resource type="Shader" path="res://shaders/slime_enemy.gdshader" id="2_slime_shader"]
+[ext_resource type="Script" uid="uid://cs2ie3ic3a16i" path="res://dummy_enemy.gd" id="1_dummy"]
+[ext_resource type="Shader" uid="uid://l48ojmt08ost" path="res://shaders/slime_enemy.gdshader" id="2_slime_shader"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_slime"]
 radius = 0.45
@@ -10,7 +10,7 @@ radius = 0.45
 render_priority = 0
 shader = ExtResource("2_slime_shader")
 shader_parameter/roughness = 0.15
-shader_parameter/emission_multiplier = 0.5
+shader_parameter/emission_multiplier = 1.2
 
 [sub_resource type="SphereMesh" id="SphereMesh_slime"]
 material = SubResource("ShaderMaterial_slime")
@@ -61,16 +61,16 @@ corner_radius_bottom_left = 3
 [sub_resource type="ViewportTexture" id="ViewportTexture_hp"]
 viewport_path = NodePath("HpViewport")
 
-[node name="DummySlime" type="CharacterBody3D"]
+[node name="DummySlime" type="CharacterBody3D" unique_id=552804338]
 script = ExtResource("1_dummy")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1521882357]
 shape = SubResource("SphereShape3D_slime")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=615612740]
 mesh = SubResource("SphereMesh_slime")
 
-[node name="SplatParticles" type="CPUParticles3D" parent="."]
+[node name="SplatParticles" type="CPUParticles3D" parent="." unique_id=1890612448]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, 0)
 emitting = false
 amount = 10
@@ -84,12 +84,12 @@ gravity = Vector3(0, -12, 0)
 initial_velocity_min = 2.5
 initial_velocity_max = 4.5
 
-[node name="HpViewport" type="SubViewport" parent="."]
+[node name="HpViewport" type="SubViewport" parent="." unique_id=1651972730]
 transparent_bg = true
 size = Vector2i(120, 14)
 render_target_update_mode = 1
 
-[node name="HpLagBar" type="ProgressBar" parent="HpViewport"]
+[node name="HpLagBar" type="ProgressBar" parent="HpViewport" unique_id=1738441551]
 custom_minimum_size = Vector2(120, 14)
 offset_right = 120.0
 offset_bottom = 14.0
@@ -99,7 +99,7 @@ max_value = 30.0
 value = 30.0
 show_percentage = false
 
-[node name="HpBar" type="ProgressBar" parent="HpViewport"]
+[node name="HpBar" type="ProgressBar" parent="HpViewport" unique_id=1310594645]
 custom_minimum_size = Vector2(120, 14)
 offset_right = 120.0
 offset_bottom = 14.0
@@ -109,9 +109,14 @@ max_value = 30.0
 value = 30.0
 show_percentage = false
 
-[node name="HpSprite" type="Sprite3D" parent="."]
+[node name="HpSprite" type="Sprite3D" parent="." unique_id=258390571]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
+pixel_size = 0.0055
 billboard = 1
 no_depth_test = true
 texture = SubResource("ViewportTexture_hp")
-pixel_size = 0.0055
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=523290336]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17210579, 0)
+light_color = Color(0.5042392, 0.88617355, 0.16877386, 1)
+omni_range = 2.404
