@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://dtksv05hbm7qv" path="res://resources/Medieval Torture Devices-zip/Cage/torture_device_011.fbx" id="17_uuy0h"]
 [ext_resource type="PackedScene" uid="uid://cd6nx7yph80lv" path="res://resources/Medieval Torture Devices-zip/Cage-TAqDCvxcxd/torture_device_013.fbx" id="18_52iny"]
 [ext_resource type="PackedScene" uid="uid://wb83lyu8sh3u" path="res://resources/Crystal.glb" id="19_nauge"]
+[ext_resource type="PackedScene" uid="uid://nra6itep5nxo" path="res://resources/jamur-fathir.glb" id="20_ycv2e"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fug78"]
 transparency = 1
@@ -518,3 +519,24 @@ transform = Transform3D(4.2062063, -2.43346, -1.1773256, -2.637393, -4.1719418, 
 
 [node name="Crystal16" parent="." unique_id=714372494 instance=ExtResource("19_nauge")]
 transform = Transform3D(3.1182065, -2.5404139, 2.970367, -2.637393, -4.1719418, -0.79940593, 2.884605, -1.0682625, -3.9418101, -11.06753, 4.457506, 20.765314)
+
+[node name="jamur-fathir" parent="." unique_id=1784896393 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(2.5, 0, 0, 0, 1.0723379, 2.2583382, 0, -2.2583382, 1.0723379, -61.689007, 1.3186119, 17.610256)
+
+[node name="jamur-fathir2" parent="." unique_id=1175137881 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(2.3443892, -0.35907367, -0.79050976, 0.84554124, 1.4612725, 1.8438395, 0.19723037, -1.9964345, 1.4917612, -61.827953, 1.7669709, 17.610256)
+
+[node name="jamur-fathir3" parent="." unique_id=512379836 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(-1.0895997, 1.993945, -1.0425727, 1.2637324, 1.500731, 1.5494478, 1.8616533, 0.14829788, -1.6620035, -61.899574, 1.7669709, 5.9642487)
+
+[node name="jamur-fathir4" parent="." unique_id=790897876 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(0.6890934, 2.0200114, -1.3018086, 0, 1.3542708, 2.1014168, 2.403154, -0.57922906, 0.37328768, -61.937542, 0.9653982, 5.3022017)
+
+[node name="jamur-fathir5" parent="." unique_id=969250348 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, -46.9, 2.284657, 12.060992)
+
+[node name="jamur-fathir6" parent="." unique_id=1774357019 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(2.5, 0, 0, 0, 1.9992115, 1.5010506, 0, -1.5010506, 1.9992115, -46.62937, 3.1350622, 12.388781)
+
+[node name="jamur-fathir7" parent="." unique_id=1852595345 instance=ExtResource("20_ycv2e")]
+transform = Transform3D(2.5, 0, 0, 0, 1.5800732, -1.9373612, 0, 1.9373612, 1.5800732, -46.716858, 2.3325646, 9.507912)
