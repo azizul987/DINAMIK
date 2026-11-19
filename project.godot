@@ -10,10 +10,13 @@ config_version=5
 
 [application]
 
-config/name="DINAMIK"
+config/name="TOXEMIA"
+config/description="TOXEMIA - Dark Fantasy Occult Action RPG"
+config/version="1.0.0"
 run/main_scene="res://main_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://resources/app_icon.png"
+config/windows_native_icon="res://resources/app_icon.ico"
 
 [autoload]
 
@@ -23,7 +26,12 @@ gd="*uid://2juixsd1cldy"
 
 [display]
 
+window/size/viewport_width=1152
+window/size/viewport_height=648
+window/size/mode=0
+window/size/resizable=true
 window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
 
 [editor_plugins]
 

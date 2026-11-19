@@ -1,6 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+builds/
 
 # Agent function tracking registry
 FUNCTIONS_REGISTRY.md
