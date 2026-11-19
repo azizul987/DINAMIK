@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://cd6o8oxhpn8da" path="res://resources/Horror_Stain_03-128x128.png" id="16_6e4cv"]
 [ext_resource type="PackedScene" uid="uid://dtksv05hbm7qv" path="res://resources/Medieval Torture Devices-zip/Cage/torture_device_011.fbx" id="17_uuy0h"]
 [ext_resource type="PackedScene" uid="uid://cd6nx7yph80lv" path="res://resources/Medieval Torture Devices-zip/Cage-TAqDCvxcxd/torture_device_013.fbx" id="18_52iny"]
+[ext_resource type="PackedScene" uid="uid://wb83lyu8sh3u" path="res://resources/Crystal.glb" id="19_nauge"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fug78"]
 transparency = 1
@@ -469,3 +470,51 @@ mesh = SubResource("PlaneMesh_nxqqj")
 [node name="Darah90" type="MeshInstance3D" parent="." unique_id=214251070]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.324642, 1.1750784, 28.165653)
 mesh = SubResource("PlaneMesh_nxqqj")
+
+[node name="Crystal" parent="." unique_id=1870894129 instance=ExtResource("19_nauge")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -56.63968, 1.307409, 26.640276)
+
+[node name="Crystal2" parent="." unique_id=589124803 instance=ExtResource("19_nauge")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -54.8049, 1.3507677, 26.594711)
+
+[node name="Crystal3" parent="." unique_id=982602618 instance=ExtResource("19_nauge")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -56.316196, 1.307409, 26.640276)
+
+[node name="Crystal4" parent="." unique_id=340828703 instance=ExtResource("19_nauge")]
+transform = Transform3D(-5, 0, -4.371139e-07, 0, 5, 0, 4.371139e-07, 0, -5, -55.415543, 1.307409, 23.39958)
+
+[node name="Crystal5" parent="." unique_id=774516126 instance=ExtResource("19_nauge")]
+transform = Transform3D(3.9668727, 3.0436692, 3.4679505e-07, 3.0436692, -3.9668727, 2.6608606e-07, 4.3711393e-07, 2.6383957e-14, -5, -54.494705, 4.910838, 5.1058893)
+
+[node name="Crystal6" parent="." unique_id=1335402999 instance=ExtResource("19_nauge")]
+transform = Transform3D(3.917404, -2.7338607, 1.4764676, -0.28987366, -2.6871812, -4.2065454, 3.0935287, 3.2101502, -2.2638502, -50.937397, 4.7366724, 5.329872)
+
+[node name="Crystal7" parent="." unique_id=80080349 instance=ExtResource("19_nauge")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -47.044373, 1.3507677, 5.3315334)
+
+[node name="Crystal8" parent="." unique_id=1243043819 instance=ExtResource("19_nauge")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -50.52323, 1.3507677, 5.3332095)
+
+[node name="Crystal9" parent="." unique_id=1891988730 instance=ExtResource("19_nauge")]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, -45.71892, 1.3507677, 6.9847198)
+
+[node name="Crystal10" parent="." unique_id=677123605 instance=ExtResource("19_nauge")]
+transform = Transform3D(0.20065916, 0, -4.9959717, 0, 5, 0, 4.9959717, 0, 0.20065916, -31.632824, 1.3507677, 9.193083)
+
+[node name="Crystal11" parent="." unique_id=529199454 instance=ExtResource("19_nauge")]
+transform = Transform3D(-1.2611794, -0.1294789, 4.8365965, -2.6373925, -4.171943, -0.79940593, 4.056302, -2.7528393, 0.9840164, -31.260313, 4.5074277, 8.689628)
+
+[node name="Crystal12" parent="." unique_id=695736200 instance=ExtResource("19_nauge")]
+transform = Transform3D(-4.226309, 0, -2.6717618, 0, 5, 0, 2.6717618, 0, -4.226309, -31.730972, 1.3507677, 8.703501)
+
+[node name="Crystal13" parent="." unique_id=702297869 instance=ExtResource("19_nauge")]
+transform = Transform3D(-1.2611794, -0.1294789, 4.8365965, -2.6373925, -4.171943, -0.79940593, 4.056302, -2.7528393, 0.9840164, -28.611658, 4.5074277, 20.74851)
+
+[node name="Crystal14" parent="." unique_id=1490612122 instance=ExtResource("19_nauge")]
+transform = Transform3D(2.3401222, -2.212267, 3.8248792, -2.637393, -4.1719418, -0.79940593, 3.5451355, -1.6434001, -3.119495, -27.012993, 4.446618, 20.74851)
+
+[node name="Crystal15" parent="." unique_id=2030950764 instance=ExtResource("19_nauge")]
+transform = Transform3D(4.2062063, -2.43346, -1.1773256, -2.637393, -4.1719418, -0.79940593, -0.5932825, 1.2935071, -4.793209, -23.103304, 4.524779, 13.156725)
+
+[node name="Crystal16" parent="." unique_id=714372494 instance=ExtResource("19_nauge")]
+transform = Transform3D(3.1182065, -2.5404139, 2.970367, -2.637393, -4.1719418, -0.79940593, 2.884605, -1.0682625, -3.9418101, -11.06753, 4.457506, 20.765314)
