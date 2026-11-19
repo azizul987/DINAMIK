@@ -7,6 +7,7 @@ const POTION_TEXTURES: Dictionary = {
 	"slow": preload("res://resources/pixel_resources_pack/static/086_mana_potion.png"),
 	"berserk": preload("res://resources/pixel_resources_pack/static/091_poison.png"),
 	"ironskin": preload("res://resources/pixel_resources_pack/static/089_oil_flask.png"),
+	"nightvision": preload("res://resources/pixel_resources_pack/static/087_stamina_potion.png"),
 }
 
 @onready var toast_icon: TextureRect = $HBox/Icon

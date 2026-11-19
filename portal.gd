@@ -8,6 +8,9 @@ const FLOATING_TEXT_SCENE: PackedScene = preload("res://floating_text.tscn")
 
 @export var portal_id: String = "portal_exit"
 @export var target_scene_path: String = "res://scenes/level_1.tscn"
+@export var advance_floor: bool = false
+@export var is_victory_portal: bool = false
+@export var display_label: String = ""
 @export var is_active: bool = true:
 	set(val):
 		is_active = val
@@ -199,7 +202,9 @@ func trigger_teleport(_player_node: Node3D = null) -> void:
 		if label:
 			get_tree().root.add_child(label)
 			label.global_position = global_position + Vector3(0.0, 1.8, 0.0)
-			var popup_text := "SAFE ROOM" if portal_id == "portal_no_tutor" else "PORTAL AKTIF"
+			var popup_text := display_label
+			if popup_text.is_empty():
+				popup_text = "SAFE ROOM" if portal_id == "portal_no_tutor" else "PORTAL AKTIF"
 			label.pop(popup_text, portal_color.lightened(0.2), 34, 0.9, 0.8)
 
 	# Surge visual animation
@@ -216,8 +221,32 @@ func trigger_teleport(_player_node: Node3D = null) -> void:
 	tw.chain().tween_callback(func():
 		_is_surging = false
 		player_entered.emit(self, target_scene_path)
+
+		var is_level2 := false
+		var cur_scene := get_tree().current_scene
+		if cur_scene and cur_scene.scene_file_path:
+			is_level2 = cur_scene.scene_file_path.ends_with("level2.tscn")
+
+		if is_victory_portal or portal_id == "portal_victory" or (is_level2 and portal_id == "level_exit"):
+			_trigger_victory()
+			return
+
+		if advance_floor and GlobalLogic:
+			GlobalLogic.advance_floor()
 		if not target_scene_path.is_empty() and ResourceLoader.exists(target_scene_path):
-			if portal_id == "portal_no_tutor" or target_scene_path == "res://safe_room.tscn":
+			if portal_id == "portal_no_tutor" or target_scene_path == "res://SafeRoom.tscn" or target_scene_path.contains("level"):
 				GlobalLogic.complete_tutorial()
 			get_tree().change_scene_to_file(target_scene_path)
 	)
+
+func _trigger_victory() -> void:
+	print("[Portal] Pemain berhasil memenangkan permainan melalui portal kemenangan!")
+	if GlobalLogic:
+		GlobalLogic.trigger_victory()
+	else:
+		var end_scn := load("res://end_screen.tscn") as PackedScene
+		if end_scn:
+			var end_inst = end_scn.instantiate()
+			get_tree().root.add_child(end_inst)
+			if end_inst.has_method("show_end"):
+				end_inst.show_end("Kamu Menang", Color(0.95, 0.82, 0.22, 1.0), "Kamu berhasil keluar dari dungeon!")

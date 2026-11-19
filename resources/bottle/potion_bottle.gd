@@ -8,6 +8,7 @@ const COLOR_STRENGTH: Color = Color(1.0, 0.65, 0.15, 0.9)
 const COLOR_SLOW: Color = Color(0.25, 0.82, 1.0, 0.9)
 const COLOR_BERSERK: Color = Color(0.95, 0.15, 0.25, 0.95)
 const COLOR_IRONSKIN: Color = Color(0.85, 0.92, 0.98, 0.9)
+const COLOR_NIGHTVISION: Color = Color(0.6, 1.0, 0.35, 0.9)
 
 static var _cached_materials: Dictionary = {}
 
@@ -53,6 +54,8 @@ func _get_or_create_liquid_material(potion_name: String) -> StandardMaterial3D:
 			col = COLOR_BERSERK
 		"ironskin":
 			col = COLOR_IRONSKIN
+		"nightvision":
+			col = COLOR_NIGHTVISION
 		_:
 			col = COLOR_HEALING
 

@@ -126,10 +126,11 @@ value = 35.0
 show_percentage = false
 
 [node name="HpSprite" type="Sprite3D" parent="." unique_id=1726980176]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.55, 0)
+visible = false
 billboard = 1
 double_sided = false
-no_depth_test = true
+no_depth_test = false
 
 [node name="ShootAudio" type="AudioStreamPlayer3D" parent="." unique_id=1745311995]
 unit_size = 5.0

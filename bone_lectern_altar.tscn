@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://boss_altar.gd" id="1_ficic"]
+[ext_resource type="PackedScene" path="res://resources/pack_2_dark_fantasy_altar/p2_04_bone_lectern/p2_04_bone_lectern.fbx" id="2_6fywo"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q5ytc"]
+size = Vector3(2.0513601, 1.3308772, 1.4105631)
+
+[node name="BossAltar" type="StaticBody3D" unique_id=556138238]
+collision_mask = 0
+script = ExtResource("1_ficic")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1149199748]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00074005127, -0.0038454533, 0.0024034977)
+shape = SubResource("BoxShape3D_q5ytc")
+
+[node name="HitAudio" type="AudioStreamPlayer3D" parent="." unique_id=389670395]
+unit_size = 5.0
+max_distance = 30.0
+
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1308549042]
+
+[node name="Lectern" type="Node3D" parent="VisualRoot" unique_id=373474075 instance=ExtResource("2_6fywo")]

@@ -26,6 +26,7 @@ enum State {
 @export var patrol_radius: float = 6.0
 @export var detection_radius: float = 9.0
 @export var lose_interest_radius: float = 13.0
+@export var hp_bar_visible_radius: float = 9.0
 @export var attack_radius: float = 1.8
 
 @export_group("Hop Physics")
@@ -60,6 +61,7 @@ var is_chasing: bool = false
 var idle_timer: float = 0.0
 var state_timer: float = 0.0
 var attack_timer: float = 0.0
+var _detection_timer: float = 0.0
 var _current_respawns: int = 0
 var player_ref: Node3D = null
 
@@ -134,6 +136,9 @@ func _setup_health_bar() -> void:
 	if hp_sprite and hp_viewport and not hp_sprite.texture:
 		hp_sprite.texture = hp_viewport.get_texture()
 
+	if hp_sprite:
+		hp_sprite.visible = false
+
 	if hp_bar:
 		hp_bar.max_value = max_health
 		hp_bar.value = current_health
@@ -158,7 +163,10 @@ func _physics_process(delta: float) -> void:
 		return
 
 	attack_timer = maxf(0.0, attack_timer - delta)
-	_update_player_detection()
+	_detection_timer -= delta
+	if _detection_timer <= 0.0:
+		_detection_timer = 0.15
+		_update_player_detection()
 
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -223,15 +231,61 @@ func _update_player_detection() -> void:
 
 	if not player_ref or not is_instance_valid(player_ref) or GlobalLogic.is_dead:
 		is_chasing = false
+		if hp_sprite and not is_dead:
+			hp_sprite.visible = false
 		return
 
 	var dist := global_position.distance_to(player_ref.global_position)
+	_update_hp_bar_visibility(dist)
+
 	if is_chasing:
 		if dist > lose_interest_radius:
 			is_chasing = false
 	else:
 		if dist <= detection_radius:
 			is_chasing = true
+
+func _update_hp_bar_visibility(dist: float) -> void:
+	if not hp_sprite or is_dead:
+		return
+	var in_range: bool = dist <= hp_bar_visible_radius or (current_health < max_health and dist <= lose_interest_radius) or (is_chasing and dist <= lose_interest_radius)
+	var should_show: bool = in_range and _has_line_of_sight()
+	if hp_sprite.visible != should_show:
+		hp_sprite.visible = should_show
+
+func _has_line_of_sight() -> bool:
+	if not is_instance_valid(player_ref) or GlobalLogic.is_dead:
+		return false
+	var space_state := get_world_3d().direct_space_state
+	if not space_state:
+		return false
+
+	var from_pos := global_position + Vector3(0.0, 0.45, 0.0)
+	var to_pos := player_ref.global_position + Vector3(0.0, 0.9, 0.0)
+
+	var exclude_rids: Array[RID] = [get_rid()]
+	var query := PhysicsRayQueryParameters3D.create(from_pos, to_pos)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	for _i in range(5):
+		query.exclude = exclude_rids
+		var hit := space_state.intersect_ray(query)
+		if hit.is_empty():
+			return true
+		var col: Object = hit.collider
+		if col == player_ref:
+			return true
+		if col is Node:
+			var node := col as Node
+			if node.is_in_group("player") or player_ref.is_ancestor_of(node):
+				return true
+			if node.is_in_group("enemies") or node.is_in_group("drops"):
+				exclude_rids.append(hit.rid)
+				continue
+		return false
+
+	return false
 
 func _start_prepare_hop(chasing: bool) -> void:
 	current_state = State.PREPARE_HOP
@@ -394,6 +448,9 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bo
 	if hp_viewport:
 		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 
+	if hp_sprite and not is_dead and _has_line_of_sight():
+		hp_sprite.visible = true
+
 	if hp_bar:
 		var bar_tween := create_tween()
 		bar_tween.tween_property(hp_bar, "value", current_health, 0.05).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -487,7 +544,7 @@ func respawn() -> void:
 	velocity = Vector3.ZERO
 
 	if hp_sprite:
-		hp_sprite.visible = true
+		hp_sprite.visible = false
 	if hp_bar:
 		hp_bar.value = max_health
 	if hp_lag_bar:

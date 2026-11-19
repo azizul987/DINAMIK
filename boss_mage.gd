@@ -100,6 +100,10 @@ func _ready() -> void:
 	var players := get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		player_ref = players[0] as Node3D
+		var to_p := player_ref.global_position - global_position
+		to_p.y = 0.0
+		if to_p.length_squared() > 0.01:
+			rotation.y = atan2(to_p.x, to_p.z)
 
 	if animation_player:
 		_play_anim(&"idle")
@@ -160,7 +164,9 @@ func _find_player_if_missing() -> void:
 			player_ref = players[0] as Node3D
 
 func _process_combat_ai(delta: float) -> void:
-	if not is_instance_valid(player_ref):
+	if not is_instance_valid(player_ref) or GlobalLogic.is_dead:
+		velocity.x = 0.0
+		velocity.z = 0.0
 		return
 
 	var to_player: Vector3 = player_ref.global_position - global_position
@@ -170,11 +176,11 @@ func _process_combat_ai(delta: float) -> void:
 		_has_engaged_hud = true
 		GlobalLogic.trigger_boss_engaged("ARCHMAGE MALAKOR", max_health, current_health)
 
-	# Rotasi menghadap pemain secara halus
+	# Rotasi menghadap pemain secara halus (model Skeleton_Mage menghadap sumbu +Z)
 	to_player.y = 0.0
 	if to_player.length_squared() > 0.01:
-		var target_basis := Basis.looking_at(to_player.normalized(), Vector3.UP)
-		global_transform.basis = global_transform.basis.slerp(target_basis, turn_speed * delta)
+		var target_yaw := atan2(to_player.x, to_player.z)
+		rotation.y = lerp_angle(rotation.y, target_yaw, turn_speed * delta)
 
 	# Mekanik Fase 2: Chrono Distortion Teleport jika pemain mendekat TANPA efek Slow
 	if current_phase == 2 and not GlobalLogic.is_potion_active("slow"):
@@ -437,6 +443,11 @@ func _teleport_away_from_player() -> void:
 		tw.tween_property(visual_root, "scale", Vector3.ZERO, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	tw.tween_callback(func() -> void:
 		global_position = new_pos
+		if is_instance_valid(player_ref):
+			var to_p := player_ref.global_position - global_position
+			to_p.y = 0.0
+			if to_p.length_squared() > 0.01:
+				rotation.y = atan2(to_p.x, to_p.z)
 		_play_sfx(_cached_teleport_wav, 1.3)
 	)
 	if visual_root:

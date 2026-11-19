@@ -564,6 +564,8 @@ func _physics_process(delta: float) -> void:
 	if GlobalLogic.is_dead:
 		velocity.x = 0.0
 		velocity.z = 0.0
+		if not is_on_floor():
+			velocity.y -= gravity * delta
 		move_and_slide()
 		return
 
@@ -1178,8 +1180,24 @@ func _on_player_died() -> void:
 	if is_instance_valid(mesh_instance):
 		_set_model_material_override(null)
 		mesh_instance.visible = true
+
 	if animation_player and animation_player.has_animation("death"):
 		animation_player.play("death")
+		var death_anim = animation_player.get_animation("death")
+		var max_wait: float = (death_anim.length if death_anim else 3.9) + 0.2
+		var timer := get_tree().create_timer(max_wait)
+		var finished: bool = false
+		var on_finished := func(anim_name: StringName) -> void:
+			if anim_name == &"death":
+				finished = true
+		animation_player.animation_finished.connect(on_finished, CONNECT_ONE_SHOT)
+		while not finished and timer.time_left > 0.0 and is_inside_tree():
+			await get_tree().process_frame
+	else:
+		await get_tree().create_timer(2.0).timeout
+
+	if is_inside_tree() and GlobalLogic.is_dead:
+		GlobalLogic.notify_player_death_animation_finished()
 
 func _trigger_hit_feedback() -> void:
 	if not mesh_instance or not flash_material:
@@ -1280,6 +1298,9 @@ func _on_potion_consumed(potion_name: String) -> void:
 		"ironskin":
 			flash_col = Color(0.9, 0.95, 1.0, 0.95)
 			_spawn_player_floating_text("+20 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
+		"nightvision":
+			flash_col = Color(0.65, 1.0, 0.35, 0.95)
+			_spawn_player_floating_text("+15 Toxic", Color(0.2, 0.95, 0.5, 1.0), 32, 0.85, 0.6)
 	_trigger_potion_mesh_flash(flash_col)
 
 	if mesh_instance:

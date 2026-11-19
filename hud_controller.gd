@@ -2,6 +2,7 @@ extends Control
 
 const ALCHEMY_SPARK_SCENE: PackedScene = preload("res://alchemy_spark_burst.tscn")
 const ALCHEMY_TOAST_SCENE: PackedScene = preload("res://alchemy_toast.tscn")
+const END_SCREEN_SCENE: PackedScene = preload("res://end_screen.tscn")
 
 @onready var toxic_bar: ProgressBar = %Toxic
 @onready var hp_bar: ProgressBar = %Hp
@@ -56,9 +57,16 @@ var count_ironskin: Label = null
 var icon_ironskin: TextureRect = null
 var btn_ironskin: Button = null
 
+var slot_nightvision: PanelContainer = null
+var count_nightvision: Label = null
+var icon_nightvision: TextureRect = null
+var btn_nightvision: Button = null
+var row_nightvision: PanelContainer = null
+
 var toxic_mat: ShaderMaterial = null
 var _prev_hp: float = 100.0
 var _prev_toxic: float = 0.0
+var _end_screen: CanvasLayer = null
 
 @onready var boss_bar_container: PanelContainer = %BossBarContainer if has_node("%BossBarContainer") else null
 @onready var boss_title: Label = %BossTitle if has_node("%BossTitle") else null
@@ -98,12 +106,12 @@ func _process(_delta: float) -> void:
 func _ready() -> void:
 	_setup_toxic_overlay()
 	_setup_ironskin_ui()
+	_setup_nightvision_ui()
 	GlobalLogic.toxicity_changed.connect(_on_toxicity_changed)
 	GlobalLogic.player_hp_changed.connect(_on_hp_changed)
 	GlobalLogic.player_overdosed.connect(_on_overdose)
 	GlobalLogic.player_died.connect(_on_player_died)
 	GlobalLogic.inventory_updated.connect(_on_inventory_updated)
-	GlobalLogic.game_autosaved.connect(_on_game_autosaved)
 
 	btn_craft_toggle.pressed.connect(toggle_crafting)
 	btn_craft_toggle.mouse_entered.connect(GlobalLogic.play_ui_hover)
@@ -119,6 +127,8 @@ func _ready() -> void:
 	GlobalLogic.boss_engaged.connect(_on_boss_engaged)
 	GlobalLogic.boss_hp_updated.connect(_on_boss_hp_updated)
 	GlobalLogic.boss_defeated_event.connect(_on_boss_defeated)
+	GlobalLogic.game_won.connect(_on_game_won)
+	GlobalLogic.player_death_animation_finished.connect(_on_player_death_animation_finished)
 
 	_on_toxicity_changed(GlobalLogic.current_toxicity, GlobalLogic.max_toxicity)
 	_on_hp_changed(GlobalLogic.current_hp, GlobalLogic.max_hp)
@@ -128,6 +138,30 @@ func _ready() -> void:
 		_on_boss_engaged(GlobalLogic.boss_name_active, GlobalLogic.boss_max_hp_active, GlobalLogic.boss_current_hp_active)
 	else:
 		GlobalLogic.play_bgm(GlobalLogic.BGM_DUNGEON_PATH, "dungeon", 2.0, -8.0)
+
+	_setup_objective_bar_listener()
+
+func _setup_objective_bar_listener() -> void:
+	var objective_bar := find_child("ObjectiveBar", true, false)
+	if not objective_bar:
+		return
+
+	# Validasi: Tutorial BUKAN di Level 1 atau Level 2.
+	# ObjectiveBar HANYA boleh aktif di scene tutorial (main.tscn).
+	var cur_scene := get_tree().current_scene if get_tree() else null
+	var scene_path: String = cur_scene.scene_file_path if cur_scene and cur_scene.scene_file_path else ""
+	var is_disallowed: bool = scene_path.ends_with("level1.tscn") or scene_path.ends_with("level2.tscn") or scene_path.ends_with("SafeRoom.tscn") or scene_path.ends_with("main_menu.tscn") or scene_path.contains("level")
+
+	if is_disallowed or GlobalLogic.is_tutorial_completed or not GlobalLogic.is_tutorial_active:
+		objective_bar.visible = false
+		return
+
+	GlobalLogic.tutorial_completed.connect(func():
+		if is_instance_valid(objective_bar):
+			var tw := create_tween()
+			tw.tween_property(objective_bar, "modulate:a", 0.0, 0.4)
+			tw.chain().tween_callback(objective_bar.hide)
+	)
 
 func _setup_ironskin_ui() -> void:
 	if quick_slots_bar and slot_berserk:
@@ -177,6 +211,54 @@ func _setup_ironskin_ui() -> void:
 			btn_ironskin.pressed.connect(func(): _on_craft_button_pressed("ironskin", btn_ironskin, row_ironskin))
 			btn_ironskin.mouse_entered.connect(GlobalLogic.play_ui_hover)
 
+func _setup_nightvision_ui() -> void:
+	if quick_slots_bar and slot_berserk:
+		slot_nightvision = slot_berserk.duplicate()
+		slot_nightvision.name = "SlotNightvision"
+		slot_nightvision.visible = false
+		quick_slots_bar.add_child(slot_nightvision)
+		quick_slots_bar.move_child(slot_nightvision, quick_slots_bar.get_child_count() - 2)
+
+		count_nightvision = slot_nightvision.find_child("CountBerserk", true, false)
+		if count_nightvision:
+			count_nightvision.name = "CountNightvision"
+			count_nightvision.text = "0"
+
+		icon_nightvision = slot_nightvision.find_child("IconBerserk", true, false)
+		if icon_nightvision:
+			icon_nightvision.name = "IconNightvision"
+			icon_nightvision.self_modulate = Color(0.7, 1.0, 0.4, 1.0)
+
+		var key_label: Label = slot_nightvision.find_child("Key", true, false)
+		if key_label:
+			key_label.text = "6"
+
+	var recipe_list = crafting_panel.find_child("RecipeList", true, false)
+	var row_berserk_src = crafting_panel.find_child("RowBerserk", true, false)
+	if recipe_list and row_berserk_src:
+		row_nightvision = row_berserk_src.duplicate()
+		row_nightvision.name = "RowNightvision"
+		recipe_list.add_child(row_nightvision)
+
+		var icon = row_nightvision.find_child("Icon", true, false)
+		if icon:
+			icon.self_modulate = Color(0.7, 1.0, 0.4, 1.0)
+
+		var name_label = row_nightvision.find_child("Name", true, false)
+		if name_label:
+			name_label.text = "Night Vision Potion"
+			name_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.4, 1.0))
+
+		var cost_label = row_nightvision.find_child("Cost", true, false)
+		if cost_label:
+			cost_label.text = "Butuh: 1 Frost Wing + 1 Slime Gel"
+
+		btn_nightvision = row_nightvision.find_child("BtnBerserk", true, false)
+		if btn_nightvision:
+			btn_nightvision.name = "BtnNightvision"
+			btn_nightvision.pressed.connect(func(): _on_craft_button_pressed("nightvision", btn_nightvision, row_nightvision))
+			btn_nightvision.mouse_entered.connect(GlobalLogic.play_ui_hover)
+
 func _on_toxicity_changed(current: float, max_val: float) -> void:
 	if toxic_mat:
 		var ratio := GlobalLogic.get_toxicity_ratio()
@@ -220,6 +302,29 @@ func _on_player_died() -> void:
 	if hp_bar:
 		hp_bar.value = 0.0
 		hp_bar.add_theme_color_override("font_color", Color.RED)
+	# Fallback pengaman jika tidak ada animasi kematian yang terpancar
+	var fallback_timer := get_tree().create_timer(4.5)
+	fallback_timer.timeout.connect(func():
+		if GlobalLogic.is_dead and not (_end_screen and _end_screen.get("_is_shown")):
+			_show_end_screen("Kamu Mati", Color(0.92, 0.18, 0.22, 1.0), "")
+	)
+
+func _on_player_death_animation_finished() -> void:
+	_show_end_screen("Kamu Mati", Color(0.92, 0.18, 0.22, 1.0), "")
+
+func _on_game_won() -> void:
+	_show_end_screen("Kamu Menang", Color(0.95, 0.82, 0.22, 1.0), "Kamu berhasil keluar dari dungeon!")
+
+## Menampilkan layar akhir (mati / menang).
+func _show_end_screen(title_text: String, color: Color, subtitle_text: String = "") -> void:
+	if not _end_screen:
+		if not END_SCREEN_SCENE:
+			return
+		_end_screen = END_SCREEN_SCENE.instantiate() as CanvasLayer
+		if _end_screen:
+			add_child(_end_screen)
+	if _end_screen and _end_screen.has_method("show_end"):
+		_end_screen.show_end(title_text, color, subtitle_text)
 
 func _on_inventory_updated() -> void:
 	var m = GlobalLogic.materials
@@ -240,6 +345,11 @@ func _on_inventory_updated() -> void:
 		if count_ironskin:
 			count_ironskin.text = str(p.get("ironskin", 0))
 
+	if slot_nightvision:
+		slot_nightvision.visible = p.get("nightvision", 0) > 0
+		if count_nightvision:
+			count_nightvision.text = str(p.get("nightvision", 0))
+
 	var prev_slime := int(mat_slime_count.text) if mat_slime_count.text.is_valid_int() else 0
 	mat_slime_count.text = str(m["slime_gel"])
 	if m["slime_gel"] > prev_slime and is_inside_tree() and mat_slime_count.visible:
@@ -257,6 +367,8 @@ func _on_inventory_updated() -> void:
 	btn_berserk.disabled = not GlobalLogic.can_craft("berserk")
 	if btn_ironskin:
 		btn_ironskin.disabled = not GlobalLogic.can_craft("ironskin")
+	if btn_nightvision:
+		btn_nightvision.disabled = not GlobalLogic.can_craft("nightvision")
 
 func toggle_crafting() -> void:
 	crafting_panel.visible = not crafting_panel.visible
@@ -297,6 +409,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			GlobalLogic.consume_potion("berserk")
 		KEY_5:
 			GlobalLogic.consume_potion("ironskin")
+		KEY_6:
+			GlobalLogic.consume_potion("nightvision")
 
 	if OS.is_debug_build():
 		if event.keycode == KEY_B:
@@ -372,6 +486,8 @@ func _get_potion_color(potion_name: String) -> Color:
 			return Color(1.0, 0.25, 0.35, 1.0)
 		"ironskin":
 			return Color(0.85, 0.92, 1.0, 1.0)
+		"nightvision":
+			return Color(0.7, 1.0, 0.4, 1.0)
 	return Color.WHITE
 
 func _get_potion_slot(potion_name: String) -> Control:
@@ -381,6 +497,7 @@ func _get_potion_slot(potion_name: String) -> Control:
 		"slow": return slot_slow
 		"berserk": return slot_berserk
 		"ironskin": return slot_ironskin
+		"nightvision": return slot_nightvision
 	return null
 
 func _juice_slot_crafted(slot: Control, tint: Color) -> void:
@@ -441,16 +558,7 @@ func _show_alchemy_toast(potion_name: String, tint: Color) -> void:
 		toast.pop(potion_name, tint, start_pos)
 
 func _on_game_autosaved() -> void:
-	if not ALCHEMY_TOAST_SCENE or not toast_container:
-		return
-	var toast := ALCHEMY_TOAST_SCENE.instantiate()
-	if not toast:
-		return
-	toast_container.add_child(toast)
-	var screen_size := get_viewport_rect().size
-	var start_pos := Vector2(screen_size.x - 240.0, 24.0)
-	if toast.has_method("pop_custom"):
-		toast.pop_custom("PROGRES TERSIMPAN", null, Color(0.35, 0.95, 0.55, 1.0), start_pos)
+	pass
 
 func _on_potion_consumed_juice(potion_name: String) -> void:
 	_play_potion_sfx("drink")
@@ -481,6 +589,9 @@ func _on_potion_consumed_juice(potion_name: String) -> void:
 			"ironskin":
 				if cam.has_method("add_trauma"):
 					cam.add_trauma(0.20)
+			"nightvision":
+				if cam.has_method("fov_punch"):
+					cam.fov_punch(2.0, 0.3)
 
 func _play_potion_sfx(type: String) -> void:
 	if not potion_audio:
@@ -617,16 +728,18 @@ func _on_boss_hp_updated(c_hp: float, _m_hp: float) -> void:
 	_update_boss_layer_visuals(c_hp, true)
 
 func _on_boss_defeated() -> void:
-	if not boss_bar_container:
-		return
-	_set_pip_states(false, false, false)
+	if boss_bar_container:
+		_set_pip_states(false, false, false)
 
-	var tw := create_tween()
-	tw.tween_interval(0.4)
-	tw.tween_property(boss_bar_container, "modulate:a", 0.0, 1.2).set_ease(Tween.EASE_IN)
-	tw.tween_callback(func() -> void:
-		boss_bar_container.visible = false
-	)
+		var tw := create_tween()
+		tw.tween_interval(0.4)
+		tw.tween_property(boss_bar_container, "modulate:a", 0.0, 1.2).set_ease(Tween.EASE_IN)
+		tw.tween_callback(func() -> void:
+			boss_bar_container.visible = false
+		)
+
+	await get_tree().create_timer(1.2).timeout
+	_show_end_screen("Kamu Menang", Color(0.95, 0.82, 0.22, 1.0), "Arcmage Malakor telah tumbang!")
 
 func _ensure_boss_styles() -> void:
 	if not boss_hp_bar or not boss_under_bar:

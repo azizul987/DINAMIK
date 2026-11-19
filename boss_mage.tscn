@@ -166,7 +166,7 @@ show_percentage = false
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
 visible = false
 billboard = 1
-no_depth_test = true
+no_depth_test = false
 texture = SubResource("ViewportTexture_hp")
 pixel_size = 0.006
 

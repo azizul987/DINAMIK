@@ -13,8 +13,10 @@ config_version=5
 config/name="TOXEMIA"
 config/description="TOXEMIA - Dark Fantasy Occult Action RPG"
 config/version="1.0.0"
-run/main_scene="res://main_menu.tscn"
+run/main_scene="uid://2kyj7kxuwy81"
 config/features=PackedStringArray("4.6", "Forward Plus")
+boot_splash/show_image=false
+boot_splash/use_filter=false
 config/icon="res://resources/app_icon.png"
 config/windows_native_icon="res://resources/app_icon.ico"
 

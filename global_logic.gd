@@ -13,10 +13,19 @@ signal boss_engaged(boss_name: String, max_hp: float, current_hp: float)
 signal boss_hp_updated(current_hp: float, max_hp: float)
 signal boss_defeated_event()
 signal game_autosaved()
+signal nightvision_changed(active: bool)
+signal game_won()
+signal player_death_animation_finished()
 
 enum ToxicityStage { SAFE, MODERATE, HIGH, OVERDOSE }
 
 var current_floor: int = 1
+
+const LEVEL_SCENES: Array[String] = [
+	"res://level1.tscn",
+	"res://level2.tscn"
+]
+const SAFE_ROOM_SCENE: String = "res://SafeRoom.tscn"
 var is_tutorial_active: bool = true
 var is_tutorial_completed: bool = false
 var current_tutorial_step: int = 0
@@ -41,7 +50,8 @@ var potions := {
 	"strength": 0,
 	"slow": 0,
 	"berserk": 0,
-	"ironskin": 0
+	"ironskin": 0,
+	"nightvision": 0
 }
 
 var is_strength_active: bool = false
@@ -49,11 +59,14 @@ var is_slow_active: bool = false
 var is_berserk_active: bool = false
 var is_ironskin_active: bool = false
 var ironskin_timer: float = 0.0
+var is_nightvision_active: bool = false
+var nightvision_timer: float = 0.0
 var last_consumed_potion: String = ""
 var last_potion_timestamp: float = 0.0
 
 # Save & Load System State
 const SAVE_FILE_PATH := "user://savegame.json"
+const NIGHTVISION_DURATION: float = 15.0
 var pending_player_restore: Dictionary = {}
 var autosave_enabled: bool = true
 var autosave_interval: float = 60.0
@@ -323,6 +336,12 @@ func _process(delta: float) -> void:
 		if ironskin_timer <= 0.0:
 			is_ironskin_active = false
 
+	if is_nightvision_active:
+		nightvision_timer -= delta
+		if nightvision_timer <= 0.0:
+			is_nightvision_active = false
+			nightvision_changed.emit(false)
+
 	# Sistem Auto-Save Berkala
 	if autosave_enabled and not is_dead and not get_tree().paused:
 		var current_scn := get_tree().current_scene
@@ -387,6 +406,8 @@ func reset_safe_zone() -> void:
 	is_slow_active = false
 	is_ironskin_active = false
 	ironskin_timer = 0.0
+	is_nightvision_active = false
+	nightvision_timer = 0.0
 	last_consumed_potion = ""
 	last_potion_timestamp = 0.0
 	max_hp = 100.0
@@ -395,6 +416,7 @@ func reset_safe_zone() -> void:
 	player_hp_changed.emit(current_hp, max_hp)
 	toxicity_changed.emit(current_toxicity, max_toxicity)
 	toxicity_stage_changed.emit(ToxicityStage.SAFE)
+	nightvision_changed.emit(false)
 
 func add_material(item_name: String, amount: int = 1) -> void:
 	if materials.has(item_name):
@@ -408,6 +430,7 @@ func can_craft(potion_name: String) -> bool:
 		"slow": return materials.get("frost_wing", 0) >= 1
 		"berserk": return materials.get("slime_gel", 0) >= 1 and (materials.get("goblin_ear", 0) >= 1 or materials.get("fire_essence", 0) >= 1)
 		"ironskin": return materials.get("slime_gel", 0) >= 2
+		"nightvision": return materials.get("frost_wing", 0) >= 1 and materials.get("slime_gel", 0) >= 1
 	return false
 
 func craft_potion(potion_name: String) -> bool:
@@ -437,6 +460,10 @@ func craft_potion(potion_name: String) -> bool:
 		"ironskin":
 			materials["slime_gel"] -= 2
 			potions["ironskin"] += 1
+		"nightvision":
+			materials["frost_wing"] -= 1
+			materials["slime_gel"] -= 1
+			potions["nightvision"] += 1
 
 	inventory_updated.emit()
 	return true
@@ -465,6 +492,11 @@ func consume_potion(potion_name: String) -> bool:
 			is_ironskin_active = true
 			ironskin_timer = 15.0
 			add_toxicity(20.0)
+		"nightvision":
+			is_nightvision_active = true
+			nightvision_timer = NIGHTVISION_DURATION
+			add_toxicity(15.0)
+			nightvision_changed.emit(true)
 
 	potion_consumed.emit(potion_name)
 	inventory_updated.emit()
@@ -482,10 +514,12 @@ func is_potion_active(potion_name: String) -> bool:
 			return is_slow_active
 		"ironskin":
 			return is_ironskin_active
+		"nightvision":
+			return is_nightvision_active
 		"healing":
 			return last_consumed_potion == "healing" and (current_time - last_potion_timestamp) < 10.0
 		"any":
-			return is_strength_active or is_berserk_active or is_slow_active or is_ironskin_active or (current_time - last_potion_timestamp) < 10.0
+			return is_strength_active or is_berserk_active or is_slow_active or is_ironskin_active or is_nightvision_active or (current_time - last_potion_timestamp) < 10.0
 	return false
 
 ## Menghapus status efek aktif dari ramuan tertentu.
@@ -500,12 +534,19 @@ func clear_potion_buff(potion_name: String) -> void:
 		"ironskin":
 			is_ironskin_active = false
 			ironskin_timer = 0.0
+		"nightvision":
+			is_nightvision_active = false
+			nightvision_timer = 0.0
+			nightvision_changed.emit(false)
 		"any":
 			is_strength_active = false
 			is_berserk_active = false
 			is_slow_active = false
 			is_ironskin_active = false
 			ironskin_timer = 0.0
+			is_nightvision_active = false
+			nightvision_timer = 0.0
+			nightvision_changed.emit(false)
 
 var _hit_stop_id: int = 0
 
@@ -527,6 +568,23 @@ func complete_tutorial() -> void:
 	current_tutorial_step = 8
 	tutorial_completed.emit()
 
+## Memeriksa apakah scene yang aktif saat ini adalah scene tutorial (main.tscn).
+func is_in_tutorial_scene() -> bool:
+	var cur_scene := get_tree().current_scene if get_tree() else null
+	if not cur_scene or cur_scene.scene_file_path.is_empty():
+		return false
+	var path := cur_scene.scene_file_path
+	if path.ends_with("level1.tscn") or path.ends_with("level2.tscn") or path.ends_with("SafeRoom.tscn") or path.ends_with("main_menu.tscn"):
+		return false
+	return path.ends_with("main.tscn")
+
+## Memvalidasi dan memastikan tutorial dinonaktifkan di luar scene tutorial.
+func validate_tutorial_for_current_scene() -> void:
+	if not is_in_tutorial_scene():
+		is_tutorial_active = false
+		is_tutorial_completed = true
+		current_tutorial_step = 8
+
 func reset_game_state() -> void:
 	is_dead = false
 	is_berserk_active = false
@@ -534,6 +592,8 @@ func reset_game_state() -> void:
 	is_slow_active = false
 	is_ironskin_active = false
 	ironskin_timer = 0.0
+	is_nightvision_active = false
+	nightvision_timer = 0.0
 	last_consumed_potion = ""
 	last_potion_timestamp = 0.0
 	max_hp = 100.0
@@ -541,9 +601,12 @@ func reset_game_state() -> void:
 	current_toxicity = 0.0
 	tolerance_level = 1
 	max_toxicity = 100.0
-	current_tutorial_step = 0
-	is_tutorial_active = true
-	is_tutorial_completed = false
+
+	var in_tutor := is_in_tutorial_scene()
+	is_tutorial_active = in_tutor
+	is_tutorial_completed = not in_tutor
+	current_tutorial_step = 0 if in_tutor else 8
+	current_floor = 1
 	materials = {
 		"slime_gel": 0,
 		"fire_essence": 0,
@@ -555,7 +618,8 @@ func reset_game_state() -> void:
 		"strength": 0,
 		"slow": 0,
 		"berserk": 0,
-		"ironskin": 0
+		"ironskin": 0,
+		"nightvision": 0
 	}
 	is_boss_active = false
 	boss_name_active = ""
@@ -569,6 +633,7 @@ func reset_game_state() -> void:
 	player_hp_changed.emit(current_hp, max_hp)
 	toxicity_changed.emit(current_toxicity, max_toxicity)
 	toxicity_stage_changed.emit(ToxicityStage.SAFE)
+	nightvision_changed.emit(false)
 	inventory_updated.emit()
 
 func trigger_boss_engaged(b_name: String, m_hp: float, c_hp: float) -> void:
@@ -586,6 +651,41 @@ func update_boss_hp(c_hp: float, m_hp: float) -> void:
 func trigger_boss_defeated() -> void:
 	is_boss_active = false
 	boss_defeated_event.emit()
+
+## Memicu kemenangan pemain saat mencapai portal keluar terakhir.
+func trigger_victory() -> void:
+	game_won.emit()
+
+## Memicu selesainya animasi kematian pemain untuk menampilkan layar akhir.
+func notify_player_death_animation_finished() -> void:
+	player_death_animation_finished.emit()
+
+# ==============================================================================
+# PROGRESI LEVEL (LEVEL PROGRESSION)
+# ==============================================================================
+
+## Mengembalikan path scene level untuk lantai tertentu.
+func get_level_scene_for_floor(floor: int) -> String:
+	if LEVEL_SCENES.is_empty():
+		return SAFE_ROOM_SCENE
+	var idx: int = clampi(floor - 1, 0, LEVEL_SCENES.size() - 1)
+	return LEVEL_SCENES[idx]
+
+## Mengembalikan path scene level yang sesuai dengan lantai saat ini.
+func get_current_level_scene() -> String:
+	return get_level_scene_for_floor(current_floor)
+
+## Memeriksa apakah masih ada level berikutnya setelah lantai saat ini.
+func has_next_level() -> bool:
+	return current_floor <= LEVEL_SCENES.size()
+
+## Menaikkan penghitung lantai ke level berikutnya.
+func advance_floor() -> void:
+	current_floor += 1
+
+## Mengembalikan nama tampilan lantai untuk keperluan UI.
+func get_level_display_name(floor: int) -> String:
+	return "LEVEL %d" % clampi(floor, 1, maxi(1, LEVEL_SCENES.size()))
 
 # ==============================================================================
 # SISTEM SIMPAN & MUAT PERMAINAN (SAVE & LOAD SYSTEM)
@@ -732,6 +832,8 @@ func load_game() -> bool:
 	is_slow_active = false
 	is_ironskin_active = false
 	ironskin_timer = 0.0
+	is_nightvision_active = false
+	nightvision_timer = 0.0
 
 	# Reset visual audio filter
 	if lpf_effect:
@@ -743,6 +845,7 @@ func load_game() -> bool:
 	player_hp_changed.emit(current_hp, max_hp)
 	toxicity_changed.emit(current_toxicity, max_toxicity)
 	toxicity_stage_changed.emit(get_toxicity_stage())
+	nightvision_changed.emit(false)
 	inventory_updated.emit()
 
 	var target_scene_path: String = data.get("scene_path", "res://main.tscn")

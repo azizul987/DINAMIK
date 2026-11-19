@@ -55,6 +55,7 @@ var tutorial_drop_node: Node3D = null
 var combat_dummy_ref: Node3D = null
 var door_ref: DungeonDoor = null
 var door2_ref: DungeonDoor = null
+var door3_ref: DungeonDoor = null
 var portal_ref: Portal = null
 var tracked_slimes: Array[Node3D] = []
 
@@ -65,7 +66,12 @@ var ui_task: Label = null
 func _ready() -> void:
 	if Engine.is_editor_hint():
 		return
-	if GlobalLogic and "is_tutorial_completed" in GlobalLogic and GlobalLogic.is_tutorial_completed:
+
+	# Validasi: Tutorial BUKAN di Level 1, Level 2, atau Safe Room
+	var cur_scene := get_tree().current_scene if get_tree() else null
+	var scene_path: String = cur_scene.scene_file_path if cur_scene and cur_scene.scene_file_path else ""
+	var is_disallowed: bool = scene_path.ends_with("level1.tscn") or scene_path.ends_with("level2.tscn") or scene_path.ends_with("SafeRoom.tscn") or scene_path.ends_with("main_menu.tscn")
+	if is_disallowed or (GlobalLogic and "is_tutorial_completed" in GlobalLogic and GlobalLogic.is_tutorial_completed):
 		_setup_ui()
 		if ui_container:
 			ui_container.visible = false
@@ -168,10 +174,14 @@ func _process(delta: float) -> void:
 			if _are_all_slimes_dead():
 				_on_all_slimes_defeated()
 		Step.EXIT_PORTAL:
+			var d3 := _get_berserk_door()
+			if d3 and d3.is_open and not is_transitioning:
+				_on_berserk_door_opened()
+				return
 			var player := _get_player()
 			var portal := _get_level_exit_portal()
 			if player and portal and player.global_position.distance_to(portal.global_position) <= 2.8:
-				_on_exit_portal_entered(portal, "res://safe_room.tscn")
+				_on_exit_portal_entered(portal, "res://SafeRoom.tscn")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
@@ -480,13 +490,30 @@ func _advance_from_use_berserk() -> void:
 		start_step(Step.EXIT_PORTAL)
 
 func _start_exit_portal_step() -> void:
-	_set_task("Masuki Safe Room")
-	step_started.emit(Step.EXIT_PORTAL, "Masuki Safe Room")
+	var d3 := _get_berserk_door()
+	if d3 and not d3.is_open:
+		_set_task("Hancurkan Pintu Segel")
+		step_started.emit(Step.EXIT_PORTAL, "Hancurkan Pintu Segel")
+		if not d3.door_opened.is_connected(_on_berserk_door_opened):
+			d3.door_opened.connect(_on_berserk_door_opened)
+	else:
+		_set_task("Masuki Safe Room")
+		step_started.emit(Step.EXIT_PORTAL, "Masuki Safe Room")
 
 	var portal := _get_level_exit_portal()
 	if portal:
 		if not portal.player_entered.is_connected(_on_exit_portal_entered):
 			portal.player_entered.connect(_on_exit_portal_entered)
+
+func _on_berserk_door_opened() -> void:
+	if current_step == Step.EXIT_PORTAL and not is_transitioning:
+		is_transitioning = true
+		_play_chime()
+		_show_step_done("✓ Pintu Segel Hancur")
+		step_completed.emit(Step.EXIT_PORTAL)
+
+		await get_tree().create_timer(1.0).timeout
+		start_step(Step.COMPLETED)
 
 func _on_exit_portal_entered(_portal: Node3D = null, _target_scene: String = "") -> void:
 	if current_step == Step.EXIT_PORTAL and not is_transitioning:
@@ -516,17 +543,28 @@ func _get_sealed_door() -> DungeonDoor:
 		return d
 	return null
 
+func _get_berserk_door() -> DungeonDoor:
+	if door3_ref and is_instance_valid(door3_ref):
+		return door3_ref
+	var d := get_tree().root.find_child("door3", true, false)
+	if d is DungeonDoor:
+		door3_ref = d
+		return d
+	return null
+
 func _get_level_exit_portal() -> Portal:
 	if portal_ref and is_instance_valid(portal_ref):
 		return portal_ref
-	var p := get_tree().root.find_child("LevelExitPortal", true, false)
+	var p := get_tree().root.find_child("Exit", true, false)
+	if not p:
+		p = get_tree().root.find_child("LevelExitPortal", true, false)
 	if p is Portal:
 		portal_ref = p
 		return p
 	return null
 
 func _start_completed_step() -> void:
-	_set_task("Safe Room tercapai")
+	_set_task("✓ Tutorial Selesai")
 	if ui_task:
 		ui_task.add_theme_color_override("font_color", UIPalette.EMERALD)
 
@@ -534,10 +572,10 @@ func _start_completed_step() -> void:
 	tutorial_finished.emit()
 	GlobalLogic.complete_tutorial()
 
-	await get_tree().create_timer(4.0).timeout
+	await get_tree().create_timer(1.8).timeout
 	if ui_container and is_instance_valid(ui_container):
 		var tw := create_tween()
-		tw.tween_property(ui_container, "modulate:a", 0.0, 0.6)
+		tw.tween_property(ui_container, "modulate:a", 0.0, 0.4)
 		tw.chain().tween_callback(ui_container.hide)
 
 func _setup_ui() -> void:

@@ -26,6 +26,9 @@ var trauma: float = 0.0
 var _noise_timer: float = 0.0
 var base_fov: float = 75.0
 
+const NIGHT_VISION_ENV: Environment = preload("res://resources/night_vision_environment.tres")
+var _night_vision_active: bool = false
+
 var _is_snapping: bool = false
 var _snap_target_yaw: float = 0.0
 var _time_since_last_mouse: float = 0.0
@@ -35,6 +38,14 @@ var _time_since_last_mouse: float = 0.0
 
 func add_trauma(amount: float) -> void:
 	trauma = clampf(trauma + amount, 0.0, 1.0)
+
+## Mengaktifkan/menonaktifkan efek Night Vision dengan mengganti Environment kamera.
+func set_night_vision(active: bool) -> void:
+	if _night_vision_active == active:
+		return
+	_night_vision_active = active
+	if camera:
+		camera.environment = NIGHT_VISION_ENV if active else null
 
 func fov_punch(amount: float = 1.6, duration: float = 0.12) -> void:
 	if not camera:
@@ -58,6 +69,10 @@ func _ready() -> void:
 	var parent_body := get_parent()
 	if parent_body is CollisionObject3D:
 		spring_arm.add_excluded_object(parent_body.get_rid())
+	if GlobalLogic and GlobalLogic.has_signal("nightvision_changed"):
+		if not GlobalLogic.nightvision_changed.is_connected(set_night_vision):
+			GlobalLogic.nightvision_changed.connect(set_night_vision)
+		set_night_vision(GlobalLogic.is_nightvision_active)
 
 func _process(delta: float) -> void:
 	_time_since_last_mouse += delta

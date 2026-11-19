@@ -30,6 +30,7 @@ const ITEM_DROP_SCENE: PackedScene = preload("res://item_drop.tscn")
 @export_group("AI Ranges")
 @export var detection_radius: float = 14.0
 @export var lose_interest_radius: float = 18.0
+@export var hp_bar_visible_radius: float = 12.0
 @export var preferred_shoot_distance: float = 8.0
 @export var min_kite_distance: float = 3.8
 @export var walk_speed: float = 2.8
@@ -44,7 +45,7 @@ const ITEM_DROP_SCENE: PackedScene = preload("res://item_drop.tscn")
 
 @export_group("Dungeon Glow")
 @export var glow_color: Color = Color(0.95, 0.45, 0.12, 1.0)
-@export var glow_intensity: float = 0.55
+@export var glow_intensity: float = 0.28
 @export var glow_pulse: float = 0.25
 
 @export_group("Loot Drop")
@@ -127,6 +128,9 @@ func _setup_health_bar() -> void:
 	if hp_sprite and hp_viewport and not hp_sprite.texture:
 		hp_sprite.texture = hp_viewport.get_texture()
 
+	if hp_sprite:
+		hp_sprite.visible = false
+
 	if hp_bar:
 		hp_bar.max_value = max_health
 		hp_bar.value = current_health
@@ -191,20 +195,26 @@ func _update_player_detection() -> void:
 			player_ref = players[0] as Node3D
 
 	if not player_ref or not is_instance_valid(player_ref):
+		if hp_sprite and not is_dead:
+			hp_sprite.visible = false
 		return
 
 	if GlobalLogic.is_dead:
 		player_ref = null
+		if hp_sprite and not is_dead:
+			hp_sprite.visible = false
 		if current_state != State.IDLE and current_state != State.PATROL:
 			current_state = State.IDLE
 		return
 
 	var dist := global_position.distance_to(player_ref.global_position)
+	_update_hp_bar_visibility(dist)
+
 	if current_state == State.AIMING or current_state == State.SHOOTING or current_state == State.HURT:
 		return
 
 	if dist <= detection_radius:
-		if shoot_timer <= 0.0 and dist <= preferred_shoot_distance * 1.25 and dist >= min_kite_distance:
+		if shoot_timer <= 0.0 and dist <= preferred_shoot_distance * 1.25 and dist >= min_kite_distance and _has_line_of_sight():
 			_start_aiming()
 		elif dist < min_kite_distance:
 			current_state = State.KITE
@@ -214,6 +224,48 @@ func _update_player_detection() -> void:
 		if current_state == State.CHASE or current_state == State.KITE:
 			current_state = State.IDLE
 			idle_timer = randf_range(min_idle_time, max_idle_time)
+
+func _update_hp_bar_visibility(dist: float) -> void:
+	if not hp_sprite or is_dead:
+		return
+	var in_range: bool = dist <= hp_bar_visible_radius or (current_health < max_health and dist <= lose_interest_radius) or (current_state != State.IDLE and current_state != State.PATROL and dist <= lose_interest_radius)
+	var should_show: bool = in_range and _has_line_of_sight()
+	if hp_sprite.visible != should_show:
+		hp_sprite.visible = should_show
+
+func _has_line_of_sight() -> bool:
+	if not is_instance_valid(player_ref) or GlobalLogic.is_dead:
+		return false
+	var space_state := get_world_3d().direct_space_state
+	if not space_state:
+		return false
+
+	var from_pos := global_position + Vector3(0.0, 0.75, 0.0)
+	var to_pos := player_ref.global_position + Vector3(0.0, 0.9, 0.0)
+
+	var exclude_rids: Array[RID] = [get_rid()]
+	var query := PhysicsRayQueryParameters3D.create(from_pos, to_pos)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	for _i in range(5):
+		query.exclude = exclude_rids
+		var hit := space_state.intersect_ray(query)
+		if hit.is_empty():
+			return true
+		var col: Object = hit.collider
+		if col == player_ref:
+			return true
+		if col is Node:
+			var node := col as Node
+			if node.is_in_group("player") or player_ref.is_ancestor_of(node):
+				return true
+			if node.is_in_group("enemies") or node.is_in_group("drops"):
+				exclude_rids.append(hit.rid)
+				continue
+		return false
+
+	return false
 
 func _process_idle(delta: float) -> void:
 	if animation_player and animation_player.current_animation != "idle" and animation_player.has_animation("idle"):
@@ -264,7 +316,7 @@ func _process_chase(delta: float) -> void:
 	to_player.y = 0.0
 	var dist := to_player.length()
 
-	if dist <= preferred_shoot_distance and shoot_timer <= 0.0:
+	if dist <= preferred_shoot_distance and shoot_timer <= 0.0 and _has_line_of_sight():
 		_start_aiming()
 		return
 
@@ -286,7 +338,7 @@ func _process_kite(delta: float) -> void:
 	var dist := to_player.length()
 
 	if dist >= min_kite_distance * 1.2:
-		if shoot_timer <= 0.0:
+		if shoot_timer <= 0.0 and _has_line_of_sight():
 			_start_aiming()
 		else:
 			current_state = State.CHASE
@@ -397,6 +449,9 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, _is_sharp: bo
 
 	current_health = maxf(0.0, current_health - amount)
 	damaged.emit(amount)
+
+	if hp_sprite and not is_dead and _has_line_of_sight():
+		hp_sprite.visible = true
 
 	_trigger_hit_flash()
 	_update_hp_bar()
